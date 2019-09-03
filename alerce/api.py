@@ -160,7 +160,7 @@ class AlerceAPI(object):
         
         return stats
 
-    def get_probabilities(self, oid, doearly=True, dolate=True):
+    def get_probabilities(self, oid, early=True, late=True):
         'get probabilities given oid as pandas dataframe (late or early)'
 
         #oid
@@ -171,25 +171,31 @@ class AlerceAPI(object):
         # show api results
         r = requests.post(url = "%s/get_probabilities" % self.ztf_url, json = params)
 
-        if doearly:
+        if early:
             try:
-                early = json_normalize(r.json()["result"]["probabilities"]["early_classifier"])
-                early.set_index("oid", inplace=True)
+                df_early = json_normalize(r.json()["result"]["probabilities"]["early_classifier"])
+                if df_early.shape[1] != 0:
+                    df_early.set_index("oid", inplace=True)
+                else:
+                    early = False
             except AlerceParseError:
                 print("ERROR (get_probabilities): could not convert early probabilities API output to dataframe")
             
-        if dolate:
+        if late:
             try:
-                late = json_normalize(r.json()["result"]["probabilities"]["random_forest"])
-                late.set_index("oid", inplace=True)
+                df_late = json_normalize(r.json()["result"]["probabilities"]["random_forest"])
+                if df_late.shape[1] != 0:
+                    df_late.set_index("oid", inplace=True)
+                else:
+                    late = False
             except AlerceParseError:
                 print("ERROR (get_probabilities): could not convert early probabilities API output to dataframe")
 
         result = {}
-        if doearly:
-            result["early_probabilities"] = early
-        if dolate:
-            result["late_probabilities"] = late
+        if early:
+            result["early"] = df_early
+        if late:
+            result["late"] = df_late
 
         return result
 
