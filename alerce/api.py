@@ -190,7 +190,7 @@ class AlerceAPI(object):
         if doearly:
             result["early_probabilities"] = early
         if dolate:
-            result["late_probabilities"] = early
+            result["late_probabilities"] = late
 
         return result
 
