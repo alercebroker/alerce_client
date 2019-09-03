@@ -162,7 +162,7 @@ class AlerceAPI(object):
 
     def get_probabilities(self, oid, doearly=True, dolate=True):
         'get probabilities given oid as pandas dataframe (late or early)'
-        
+
         #oid
         params = {
             "oid": oid
@@ -182,7 +182,6 @@ class AlerceAPI(object):
             try:
                 late = json_normalize(r.json()["result"]["probabilities"]["random_forest"])
                 late.set_index("oid", inplace=True)
-                return early, late
             except AlerceParseError:
                 print("ERROR (get_probabilities): could not convert early probabilities API output to dataframe")
 
