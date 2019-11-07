@@ -14,7 +14,7 @@
 #
 import os
 import sys
-sys.path.insert(0, os.path.abspath('..'))
+sys.path.insert(0, os.path.abspath('../..'))
 
 
 # -- Project information -----------------------------------------------------
@@ -44,7 +44,9 @@ extensions = [
     'sphinx.ext.todo',
     'sphinx.ext.imgmath',
     'sphinx.ext.viewcode',
+    'numpydoc'
 ]
+
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -91,6 +93,13 @@ html_theme = 'alabaster'
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ['_static']
+
+html_theme_options = {
+    'logo': 'img/logo.png',
+    # 'github_user': 'bitprophet',
+    # 'github_repo': 'alabaster',
+}
+
 
 # Custom sidebar templates, must be a dictionary that maps document names
 # to template names.
@@ -183,7 +192,12 @@ epub_exclude_files = ['search.html']
 # -- Options for intersphinx extension ---------------------------------------
 
 # Example configuration for intersphinx: refer to the Python standard library.
-intersphinx_mapping = {'https://docs.python.org/': None}
+intersphinx_mapping = {
+    "pandas":("https://pandas.pydata.org/pandas-docs/stable/",None),
+    "astropy":("http://docs.astropy.org/en/stable/",None),
+    'python': ('https://docs.python.org/3', None),
+}
+
 
 # -- Options for todo extension ----------------------------------------------
 

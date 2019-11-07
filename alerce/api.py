@@ -1,8 +1,10 @@
 import requests
 import pandas as pd
 from pandas.io.json import json_normalize
-from IPython.display import HTML
 from astropy.table import Table, Column
+
+
+from json.decoder import JSONDecodeError
 
 class AlerceParseError(Exception):
     pass
@@ -11,185 +13,316 @@ class AlerceOidError(Exception):
     pass
 
 class AlerceAPI(object):
-    'ALeRCE API python wrapper class'
-    
-    # init
+    """ALeRCE API Wrapper.
+
+    Parameters
+    ----------
+    ztf_url : :py:class:`str`
+        URL for ALeRCE ZTF data access API.     (default ALeRCE current url).
+    catsHTM_url : :py:class:`str`
+        URL for catsHTM service.                (default ALeRCE current url).
+
+    """
+
     def __init__(self, **kwargs):
-                
+
         self.ztf_url = "http://ztf.alerce.online"
         if "ztf_url" in kwargs.keys():
             self.ztf_url = kwargs["ztf_url"]
-            
+
         self.catsHTM_url = "http://catshtm.alerce.online"
         if "catsHTM_url" in kwargs.keys():
             self.catsHTM_url = kwargs["catsHTM_url"]
-            
+
         self.oid = ""
 
 
-    def query(self, params):
+    def query(self, params, format = "votable"):
         """Query the ALeRCE API to get matching objects into a pandas dataframe.
 
-        The current fields to query the db are the following:
+        Parameters
+        ----------
+        params : :py:class:`dict`
+            Dictionary of parameters for the API. The current fields to query the db are the following:
 
-        {
-        total: number (if not set the total is counted and the query is slower),
-        records_per_pages: number (default 20),
-        page: number (default 1),
-        sortBy: string columnName (default nobs),
-        query_parameters:{
-           filters:{
-              //ZTF Object id
-              oid: "ZTFXXXXXX",
-              //Number of detections
-              nobs: { 
-                  min: int
-                  max: int
-              },
-              //Late Classifier (Random Forest)
-              classrf: ["CEPH","DSCT","EB","LPV","RRL","SNe","Other"] or int,
-              pclassrf: float [0-1],
-              //Early Classifier (Stamp Classifier)
-              classearly: ["AGN","SN","VS","asteroid","bogus"] or int,
-              pclassearly: float [0-1],
-              },
-              //Coordinate based search (RA,DEC) and Search Radius.
-              coordinates:{
-                ra: float degrees,
-                dec: float degrees,
-                sr: float degrese
-                },
-              dates:{
-              //First detection (Discovery date)
-              firstmjd: {
-                 min: float mjd,
-                 max: float mjd
+            .. code-block:: json
+
+                {
+                total: number (if not set the total is counted and the query is slower),
+                records_per_pages: number (default 20),
+                page: number (default 1),
+                sortBy: :py:class:`str` columnName (default nobs),
+                query_parameters:{
+                   filters:{
+                      //ZTF object id
+                      oid: "ZTFXXXXXX",
+                      //Number of detections
+                      nobs: {
+                          min: int
+                          max: int
+                      },
+                      //Late Classifier (Random Forest)
+                      classrf: string or int,
+                      pclassrf: float [0-1],
+                      //Early Classifier (Stamp Classifier)
+                      classearly: list, string or int,
+                      pclassearly: float [0-1],
+                      },
+                      //Coordinate based search (RA,DEC) and Search Radius.
+                      coordinates:{
+                        ra: float degrees,
+                        dec: float degrees,
+                        sr: float degrese
+                        },
+                      dates:{
+                      //First detection (Discovery date)
+                      firstmjd: {
+                         min: float mjd,
+                         max: float mjd
+                        }
+                      }
+                   }
                 }
-              }
-           }
-        }
-        The response contains the following columns in a pandas dataframe:
-        
-        {
-        "total": int,
-        "num_pages": int,
-        "page": int,
-        "result": {
-           <ObjectId>: <ObjectStats>
-           }
-        }
 
-"""
-        
-        # show api results
-        r = requests.post(url = "%s/query" % self.ztf_url, json = params) 
-        df = pd.DataFrame(r.json())
-        query_results = json_normalize(df.result)
-        query_results.set_index('oid', inplace=True)
+            for a more updated available fields check `ZTF API documentation <https://alerceapi.readthedocs.io/en/latest/ztf_db.html>`_
+        format : :py:class:`str`
+            Output format [votable|pandas]
+
+        Returns
+        -------
+        :class:`astropy.table.Table` or :class:`pandas.DataFrame`
+            The response contains the objects matching the filtering parameters with their statistics.
+
+        """
+
+
+        r = requests.post(url = "%s/query" % self.ztf_url, json = params)
+        try:
+            response = r.json()
+        except JSONDecodeError:
+            return None
+
+        result = response["result"]
+        query_results = Table([result[key] for key in result])
+
+        if format == "pandas":
+            query_results = query_results.to_pandas()
+            query_results.set_index('oid', inplace=True)
+
         return query_results
 
     def get_sql(self, params):
-        'get sql from given json query parameters'
-        
-        r = requests.post(url = "%s/get_sql" % self.ztf_url, json = params)
-        return r.content
+        """Get the SQL statement executed on the database given a set of filters
 
-    def get_detections(self, oid):
-        'get detections given oid as pandas dataframe'
-        
+        Parameters
+        ----------
+        params : :py:class:`dict`
+            Same parameters used in :meth:`alerce.api.AlerceAPI.query()`
+
+        Returns
+        -------
+        :py:class:`string`
+            SQL Statement.
+
+        """
+
+        r = requests.post(url = "%s/get_sql" % self.ztf_url, json = params)
+
+        return r.content.decode('utf-8')
+
+    def get_detections(self, oid, format="votable"):
+        """Get detections for an object.
+
+        Parameters
+        ----------
+        oid : :py:class:`str`
+            object ID in ALeRCE DBs.
+        format : :py:class:`str`
+            Output format [votable|pandas]
+
+        Returns
+        -------
+        :class:`astropy.table.Table` or :class:`pandas.DataFrame`
+            VoTable or DataFrame with detections.
+
+            The schema used is the same as ZTF (`schema <https://zwickytransientfacility.github.io/ztf-avro-alert/schema.html>`_), also
+            the fields with `_corr` suffix are corrected magnitudes with the object reference magnitude.
+
+        """
+
         #oid
         params = {
             "oid": oid
         }
-        
+
         # show api results
-        r = requests.post(url = "%s/get_detections" % self.ztf_url, json = params) 
-        df = pd.DataFrame(r.json())
-        detections = json_normalize(df.result.detections)
-        detections.sort_values(by=['mjd'], inplace=True)
-        detections.set_index('candid', inplace=True)
+        r = requests.post(url = "%s/get_detections" % self.ztf_url, json = params)
+        try:
+            response = r.json()
+        except JSONDecodeError:
+            return None
+
+        if len(response["result"]["detections"]) > 0:
+            detections = Table(response["result"]["detections"])
+        else:
+            return None
+
+        if format == "pandas":
+            detections = detections.to_pandas()
+            detections.sort_values("mjd",inplace=True)
+            detections.set_index('candid',inplace=True)
+            return detections
+
         return detections
 
-    
-    def get_non_detections(self, oid):
-        '# get non detections given oid as pandas  dataframe'
-        
-        #oid
+
+    def get_non_detections(self, oid, format="votable"):
+        """Get Non detections for an object.
+
+        Parameters
+        ----------
+        oid : :py:class:`str`
+            object ID in ALeRCE DBs.
+        format : :py:class:`str`
+            Output format [votable|pandas]
+
+        Returns
+        -------
+        :class:`astropy.table.Table` or :class:`pandas.DataFrame`
+            VoTable or DataFrame with non detections.
+
+        """
+
         params = {
             "oid": oid
         }
-        
+
         # show api results
         r = requests.post(url = "%s/get_non_detections" % self.ztf_url, json = params)
         try:
-            df = pd.DataFrame(r.json())
-        except AlerceParseError:
-            print("ERROR (get_non_detections): could not convert API output to dataframe")
-        non_detections = json_normalize(df.result.non_detections)
-        if non_detections.shape[0] > 0:
-            non_detections.sort_values(by=['mjd'], inplace=True)
+            response = r.json()
+        except JSONDecodeError:
+            return
+
+        if len(response["result"]["non_detections"]) > 0:
+            non_detections = Table(response["result"]["non_detections"])
+        else:
+            return None
+
+        if format == "pandas":
+            non_detections = non_detections.to_pandas()
+            non_detections.sort_values("mjd",inplace=True)
             non_detections.set_index('mjd', inplace=True)
+
+            return non_detections
+
+
         return non_detections
 
-    def get_stats(self, oid, verbose=False):
-        'get stats given oid as pandas dataframe'
-        
-        #oid
+    def get_stats(self, oid, format="votable"):
+        """Get object aggregated statistics.
+
+        Parameters
+        ----------
+        oid : :py:class:`str`
+            object ID in ALeRCE DBs.
+        format : :py:class:`str`
+            Output format [votable|pandas]
+
+        Returns
+        -------
+        :class:`astropy.table.Table` or :class:`pandas.Series`
+            VoTable or Series with the object statistics.
+
+        """
+
         params = {
             "oid": oid
         }
-        
-        # show api results
+
         r = requests.post(url = "%s/get_stats" % self.ztf_url, json = params)
 
         try:
-            df = pd.DataFrame(r.json())
-        except AlerceParseError:
-            print("ERROR (get_non_detections): could not convert API output to dataframe")
-        
-        stats = json_normalize(df.result.stats)
-        stats.set_index('oid', inplace=True)
-        
-        # save some features
-        if verbose:
-            print("Setting ra, dec, firstMJD")
+            response = r.json()
+        except JSONDecodeError:
+            return None
+
+        stats = response["result"]["stats"]
+
         self.oid = oid
-        self.meanra = stats.meanra
-        self.meandec = stats.meandec
-        self.firstMJD = stats.firstmjd
-        
+        self.meanra = stats["meanra"]
+        self.meandec = stats["meandec"]
+        self.firstMJD = stats["firstmjd"]
+
+        if format == "votable":
+            stats = {key:[stats[key]] for key in stats}
+            stats = Table(stats)
+        elif format == "pandas":
+            stats = pd.Series(stats)
+        else: return None
+
         return stats
 
-    def get_probabilities(self, oid, early=True, late=True):
-        'get probabilities given oid as pandas dataframe (late or early)'
+    def get_probabilities(self, oid, early=True, late=True,format="votable"):
+        """ Get probabilities for a given object.
 
-        #oid
+
+        Parameters
+        ----------
+        oid : :py:class:`str`
+            object ID in ALeRCE DBs.
+        early : :py:class:`bool`
+            Get probabilities from Early Classifier.
+        late : :py:class:`bool`
+            Get probabilities from Late Classifier.
+        format : :py:class:`str`
+            Output format [votable|pandas]
+
+        Returns
+        -------
+        :py:class:`dict`
+            :py:class:`dict`ionary with the following structure:
+              {
+                "early": :class:`astropy.table.Table` or :class:`pandas.Series`,
+
+                "late": :class:`astropy.table.Table` or :class:`pandas.Series`
+              }
+
+
+        """
+
         params = {
             "oid": oid
         }
-        
+
         # show api results
         r = requests.post(url = "%s/get_probabilities" % self.ztf_url, json = params)
 
         if early:
             try:
-                df_early = json_normalize(r.json()["result"]["probabilities"]["early_classifier"])
-                if df_early.shape[1] != 0:
-                    df_early.set_index("oid", inplace=True)
+                if format == "pandas":
+                    df_early = pd.Series(r.json()["result"]["probabilities"]["early_classifier"])
+                elif format=="votable":
+                    resp = r.json()["result"]["probabilities"]["early_classifier"]
+                    df_early = Table({key:[resp[key]] for key in resp})
                 else:
-                    early = False
-            except AlerceParseError:
-                print("ERROR (get_probabilities): could not convert early probabilities API output to dataframe")
-            
+                    df_early = None
+
+            except JSONDecodeError:
+                return None
+
         if late:
             try:
-                df_late = json_normalize(r.json()["result"]["probabilities"]["random_forest"])
-                if df_late.shape[1] != 0:
-                    df_late.set_index("oid", inplace=True)
+                if format == "pandas":
+                    df_late = pd.Series(r.json()["result"]["probabilities"]["random_forest"])
+                elif format=="votable":
+                    resp = r.json()["result"]["probabilities"]["random_forest"]
+                    df_late = Table({key:[resp[key]] for key in resp})
                 else:
-                    late = False
-            except AlerceParseError:
-                print("ERROR (get_probabilities): could not convert early probabilities API output to dataframe")
+                    df_late = None
+
+            except JSONDecodeError:
+                return None
 
         result = {}
         if early:
@@ -199,27 +332,71 @@ class AlerceAPI(object):
 
         return result
 
-    def get_features(self, oid):
-        'get features given oid as pandas dataframe'
-    
-        #oid
+    def get_features(self, oid,format="votable"):
+        """Get features given object.
+
+        Parameters
+        ----------
+        oid : :py:class:`str`
+            object ID in ALeRCE DBs.
+        format : :py:class:`str`
+            Output format [votable|pandas]
+
+        Returns
+        -------
+        :class:`astropy.table.Table` or :class:`pandas.Series`
+            Features calculated for the late classification.
+
+        """
+
         params = {
             "oid": oid
         }
-        
+
         # show api results
-        r = requests.post(url = "%s/get_features" % self.ztf_url, json = params) 
-        features = json_normalize(r.json())
-        features.set_index('oid', inplace=True)
+        r = requests.post(url = "%s/get_features" % self.ztf_url, json = params)
+
+        try:
+            resp = r.json()
+        except JSONDecodeError:
+            return None
+
+        if format == "pandas":
+            features = pd.Series(resp["result"]["features"])
+        elif format == "votable":
+            resp = {key:[resp[key]] for key in resp}
+            features = Table(resp)
+        else: return None
+
         return features
-    
-    def catsHTM_conesearch(self, oid, catalog_name, radius):
-        'get catsHTM crossmatch given oid, catalog_name (all is also allowed) and search radius in arcsec'
-        
-        # get ra, dec
+
+    def catsHTM_conesearch(self, oid, radius, catalog_name="all",format="votable"):
+        """ catsHTM conesearch given an object and catalog_name.
+
+        Parameters
+        ----------
+        oid : :py:class:`str`
+            object ID in ALeRCE DBs.
+        catalog_name : :py:class:`str`
+            catsHTM Catalog name, `"all"` can be used to query all available catalogs. List of available catalogs can be found in `here <https://alerceapi.readthedocs.io/en/latest/catshtm.html#id1>`_.
+        radius : :py:class:`float`
+            Conesearch radius in arcsec.
+        format : :py:class:`str`
+            Output format [votable|pandas]
+
+        Returns
+        -------
+        :py:class:`dict`
+            Dictionary with the following structure:
+            {
+                <catalog_name>: :class:`astropy.table.Table` or :class:`pandas.DataFrame`
+            }
+
+        """
+
         if oid != self.oid:
             self.get_stats(oid)
-        
+
         params = {
             "catalog": "%s" % catalog_name,
             "ra": "%f" % self.meanra,
@@ -230,7 +407,7 @@ class AlerceAPI(object):
             result = requests.get(url = "%s/conesearch" % self.catsHTM_url, params = params)
         else:
             result = requests.get(url = "%s/conesearch_all" % self.catsHTM_url, params = params)
-        
+
         votables = {}
 
         try:
@@ -238,7 +415,7 @@ class AlerceAPI(object):
                 return
         except:
             return
-        
+
         for idx, r in enumerate(result.json()["catalogs"]):
 
             key = list(r.keys())[0]
@@ -250,59 +427,145 @@ class AlerceAPI(object):
                 t.add_column(Column(data, name=field))
                 t[field].unit = r[key][field]['units']
             t["cat_name"] = Column(["catsHTM_%s" % key], name="cat_name")
+            if format == "pandas":
+                t = t.to_pandas()
             votables[key] = t
-        
-        return votables
-    
 
-    def catsHTM_redshift(self, oid, radius):
-        'get redshift given oid using catsHTM crossmatch'
+        return votables
+
+
+    def catsHTM_crossmatch(self, oid, radius=100, catalog_name="all",format="votable"):
+        """ catsHTM crossmatch given an object and catalog_name.
+
+        Parameters
+        ----------
+        oid : :py:class:`str`
+            object ID in ALeRCE DBs.
+        catalog_name : :py:class:`str`
+            catsHTM Catalog name, `"all"` can be used to query all available catalogs. List of available catalogs can be found in `here <https://alerceapi.readthedocs.io/en/latest/catshtm.html#id1>`_.
+        radius : :py:class:`float`
+            Crossmatch radius in arcsec. (Default 100 arcsec)
+        format : :py:class:`str`
+            Output format [votable|pandas]
+
+        Returns
+        -------
+        :py:class:`dict`
+            Dictionary with the following structure:
+            {
+                <catalog_name>: :class:`astropy.table.Table` or :class:`pandas.Series`
+            }
+
+        """
+
+        if oid != self.oid:
+            self.get_stats(oid)
+
+        params = {
+            "catalog": "%s" % catalog_name,
+            "ra": "%f" % self.meanra,
+            "dec": "%f" % self.meandec,
+            "radius": "%f" % radius
+        }
+        if catalog_name != "all":
+            result = requests.get(url = "%s/crossmatch" % self.catsHTM_url, params = params)
+        else:
+            result = requests.get(url = "%s/crossmatch_all" % self.catsHTM_url, params = params)
+        votables = {}
+
+        try:
+            results = result.json()
+        except JSONDecodeError:
+            return None
+
+        for idx, catalog_result in enumerate(results):
+
+            catalog_name = list(catalog_result.keys())[0]
+            if format == "pandas":
+                t = {}
+            elif format == "votable":
+                t = Table()
+            else:
+                return None
+
+            catalog_data =  catalog_result[catalog_name]
+            for field in catalog_data:
+                data = catalog_data[field]['value']
+                unit = catalog_data[field]['unit']
+                if format == "pandas":
+                    t[field]=data
+                elif format == "votable":
+                    t.add_column(Column([data], name=field))
+                    t[field].unit = unit
+                    t["cat_name"] = Column(["catsHTM_%s" % catalog_name], name="cat_name")
+                else: return None
+            if format == "pandas":
+                votables[catalog_name] = pd.Series(t)
+            else:
+                votables[catalog_name] = t
+
+        return votables
+
+    def catsHTM_redshift(self, oid, radius,format="votable"):
+        """Get redshift given an object.
+
+        Parameters
+        ----------
+        oid : :py:class:`str`
+            object ID in ALeRCE DBs.
+        radius : :py:class:`float`
+            catsHTM conesearch radius in arcsec.
+        format : :py:class:`str`
+            Output format [votable|pandas]
+
+        Returns
+        -------
+        :py:class:`float`
+            Check if redshift is in a catsHTM xmatch response.
+
+        """
 
         # get ra, dec
         if oid != self.oid:
             self.get_stats(oid)
-                
+
         # search data in catsHTM
-        xmatches = self.catsHTM(oid, "all", radius)
-        
+        xmatches = self.catsHTM_crossmatch(oid, catalog_name="all", radius=radius)
+
         # check whether redshift exists
-        for xmatch in xmatches:
-            for catname in xmatch.keys():
-                for col in xmatch[catname].keys():
-                    if col == 'z':
-                        print("Found redshift in catalog %s: %f" % (catname, xmatch[catname][col]["value"]))
-                        return float(xmatch[catname][col]["value"])
+        for catname in xmatches:
+            for col in xmatches[catname].keys():
+                if col == 'z':
+                    return float(xmatches[catname][col])
 
         # check whether photometric redshift exists
-        for xmatch in xmatches:
-            for catname in xmatch.keys():
-                for col in xmatch[catname].keys():
-                    if col in ['zphot',  'z_phot']:
-                        print("Found photometric redshift in catalog %s: %f" % (catname, xmatch[catname][col]["value"]))
-                        return float(xmatch[catname][col]["value"])
-                    
+        for catname in xmatches:
+            for col in xmatches[catname].keys():
+                if col in ['zphot',  'z_phot']:
+                    return float(xmatch[catname][col])
+
         return
 
-    def plot_stamp(self, oid, candid=None):
-        'plot stamp in a notebook given oid. It uses IPython HTML.'
-        
-        # if candid is None, get minimum candid
-        if candid is None:
-            candid = min(self.get_detections(oid).index)
-            
-        science = "http://avro.alerce.online/get_stamp?oid=%s&candid=%s&type=science&format=png" % (oid, candid)
-        images="""
-        <div>ZTF oid: %s, candid: %s</div>
-        <div>&emsp;&emsp;&emsp;&emsp;&emsp;
-        Science
-        &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp; 
-        Template
-        &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp; 
-        Difference
-        <div class="container">
-        <div style="float:left;width:20%%"><img src="%s"></div>
-        <div style="float:left;width:20%%"><img src="%s"></div>
-        <div style="float:left;width:20%%"><img src="%s"></div>
-        </div>
-        """ % (oid, candid, science, science.replace("science", "template"), science.replace("science", "difference"))
-        display(HTML(images))
+    # def plot_stamp(self, oid, candid=None):
+    #     'plot stamp in a notebook given oid. It uses IPython HTML.'
+    #
+    #     # if candid is None, get minimum candid
+    #     if candid is None:
+    #         candid = min(self.get_detections(oid).index)
+    #
+    #     science = "http://avro.alerce.online/get_stamp?oid=%s&candid=%s&type=science&format=png" % (oid, candid)
+    #     images="""
+    #     <div>ZTF oid: %s, candid: %s</div>
+    #     <div>&emsp;&emsp;&emsp;&emsp;&emsp;
+    #     Science
+    #     &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;
+    #     Template
+    #     &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;
+    #     Difference
+    #     <div class="container">
+    #     <div style="float:left;width:20%%"><img src="%s"></div>
+    #     <div style="float:left;width:20%%"><img src="%s"></div>
+    #     <div style="float:left;width:20%%"><img src="%s"></div>
+    #     </div>
+    #     """ % (oid, candid, science, science.replace("science", "template"), science.replace("science", "difference"))
+    #     display(HTML(images))

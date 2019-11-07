@@ -1,8 +1,13 @@
-ALeRCE API
+API Access
 ======================================
 
-.. note:: For Astronomers and Advanced Users
+The ALeRCE API Wrapper gives an easy access to ALeRCE services with python.
 
-.. autoclass:: alerce_api.AlerceAPI
+.. code-block:: python
+
+    from alerce.api import AlerceAPI
+    alerce = AlerceAPI()
+
+
+.. autoclass:: alerce.api.AlerceAPI
     :members:
-
