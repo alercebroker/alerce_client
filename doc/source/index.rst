@@ -3,8 +3,19 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to ALeRCE API's documentation!
+ALeRCE Client's documentation!
 ======================================
+
+`ALeRCE <http://alerce.science>`_ client is a Python library to interact with ALeRCE services and databases.
+
+It has two main modules:
+
+- :mod:`alerce.api` to interact with alerce APIs.
+
+.. role:: rubric
+
+- :mod:`alerce.stream` *(currently develop)* to consume real-time data from ALeRCE classification streams.
+
 
 .. toctree::
    :maxdepth: 2
