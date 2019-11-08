@@ -638,6 +638,6 @@ class AlerceAPI(object):
         for stamp_type in ["science", "template", "difference"]:
             tmp_hdulist = fits_open("%s/get_stamp?oid=%s&candid=%s&type=%s&format=fits"%(self.avro_url,oid,candid,stamp_type))
             hdu = tmp_hdulist[0]
-            hdu.header["TYPE"] = stamp_type
+            hdu.header["STAMP_TYPE"] = stamp_type
             hdulist.append(hdu)
         return hdulist
