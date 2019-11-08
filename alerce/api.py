@@ -2,8 +2,9 @@ import requests
 import pandas as pd
 from pandas.io.json import json_normalize
 from astropy.table import Table, Column
+from IPython.display import HTML
 
-
+import warnings
 from json.decoder import JSONDecodeError
 
 class AlerceParseError(Exception):
@@ -546,26 +547,78 @@ class AlerceAPI(object):
 
         return
 
-    # def plot_stamp(self, oid, candid=None):
-    #     'plot stamp in a notebook given oid. It uses IPython HTML.'
-    #
-    #     # if candid is None, get minimum candid
-    #     if candid is None:
-    #         candid = min(self.get_detections(oid).index)
-    #
-    #     science = "http://avro.alerce.online/get_stamp?oid=%s&candid=%s&type=science&format=png" % (oid, candid)
-    #     images="""
-    #     <div>ZTF oid: %s, candid: %s</div>
-    #     <div>&emsp;&emsp;&emsp;&emsp;&emsp;
-    #     Science
-    #     &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;
-    #     Template
-    #     &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;
-    #     Difference
-    #     <div class="container">
-    #     <div style="float:left;width:20%%"><img src="%s"></div>
-    #     <div style="float:left;width:20%%"><img src="%s"></div>
-    #     <div style="float:left;width:20%%"><img src="%s"></div>
-    #     </div>
-    #     """ % (oid, candid, science, science.replace("science", "template"), science.replace("science", "difference"))
-    #     display(HTML(images))
+    def _in_ipynb(self):
+        try:
+            from IPython import get_ipython
+            import os
+            if "IPKernelApp" not in get_ipython().config:  # pragma: no cover
+                raise ImportError("console")
+                return False
+            if "VSCODE_PID" in os.environ:  # pragma: no cover
+                raise ImportError("vscode")
+                return False
+        except Exception as e:
+            print(e)
+            return False
+        else:  # pragma: no cover
+            return True
+
+    def plot_stamp(self, oid, candid=None):
+        """Plot stamp in a notebook given oid. It uses IPython HTML.
+
+        Parameters
+        ----------
+        oid : :py:class:`str`
+            object ID in ALeRCE DBs.
+        candid : :py:class:`int`
+            Candid of the stamp to be displayed, if not set shows the Discovery stamp (first one).
+
+        Returns
+        -------
+            Display the stamps on a jupyter notebook.
+
+        """
+        ''
+
+        # if candid is None, get minimum candid
+        if candid is None:
+            candid = min(self.get_detections(oid,format="pandas").index)
+
+        if not self._in_ipynb():
+            warnings.warn("This method only works on Notebooks", RuntimeWarning)
+            return
+
+        science = "%s/get_stamp?oid=%s&candid=%s&type=science&format=png" % (oid, candid)
+        images="""
+        <div>ZTF oid: %s, candid: %s</div>
+        <div>&emsp;&emsp;&emsp;&emsp;&emsp;
+        Science
+        &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;
+        Template
+        &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;
+        Difference
+        <div class="container">
+        <div style="float:left;width:20%%"><img src="%s"></div>
+        <div style="float:left;width:20%%"><img src="%s"></div>
+        <div style="float:left;width:20%%"><img src="%s"></div>
+        </div>
+        """ % (oid, candid, science, science.replace("science", "template"), science.replace("science", "difference"))
+        display(HTML(images))
+
+    def get_stamps(self,oid,candid=None):
+        """Download Stamps for an specific alert.
+
+        Parameters
+        ----------
+        oid : :py:class:`str`
+            object ID in ALeRCE DBs.
+        candid : :py:class:`int`
+            Candid of the stamp to be displayed, if not set shows the Discovery stamp (first one).
+
+        Returns
+        -------
+
+        """
+
+        if candid is None:
+            candid = min(self.get_detections(oid,format="pandas").index)

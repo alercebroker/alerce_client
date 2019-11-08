@@ -129,9 +129,5 @@ class TestAlerceAPI(unittest.TestCase):
         self.assertEqual(type(redshift),float)
 
 
-    # def test_plot_stamp(self):
-    #     pass
-
-
 if __name__ == '__main__':
     unittest.main()

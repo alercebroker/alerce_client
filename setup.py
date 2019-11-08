@@ -1,4 +1,6 @@
 from setuptools import setup
+with open("requirements.txt") as f:
+    required_packages = f.readlines()
 
 setup(
    name='alerce',
@@ -7,6 +9,7 @@ setup(
    author='ALeRCE Team',
    author_email='contact@alerce.online',
    packages=['alerce'],  #same as name
-   install_requires=['pandas', 'requests', 'IPython'], #external packages as dependencies
+   install_requires=required_packages, 
+
 )
 
