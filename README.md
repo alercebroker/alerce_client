@@ -1,5 +1,5 @@
 # [ALeRCE](http://alerce.science) Client
-[![Documentation Status](https://readthedocs.org/projects/alerce/badge/?version=latest)](https://alerce.readthedocs.io/en/latest/?badge=latest) [![Build Status](https://travis-ci.com/alercebroker/alerce_client.svg?branch=master)](https://travis-ci.com/alercebroker/alerce_client)
+[![Documentation Status](https://readthedocs.org/projects/alerce/badge/?version=latest)](https://alerce.readthedocs.io/en/latest/?badge=latest) [![Build Status](https://travis-ci.com/alercebroker/alerce_client.svg?branch=master)](https://travis-ci.com/alercebroker/alerce_client)[![PyPI version](https://badge.fury.io/py/alerce.svg)](https://badge.fury.io/py/alerce)
 
 The ALeRCE client gives a easy python interface with ALeRCE services.
 
