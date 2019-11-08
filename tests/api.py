@@ -128,6 +128,9 @@ class TestAlerceAPI(unittest.TestCase):
         redshift = self.api.catsHTM_redshift(self.oid,radius=100)
         self.assertEqual(type(redshift),float)
 
+    def test_get_stamps(self):
+        stamps = self.api.get_stamps(self.oid)
+
 
 if __name__ == '__main__':
     unittest.main()

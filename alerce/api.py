@@ -3,6 +3,8 @@ import pandas as pd
 from pandas.io.json import json_normalize
 from astropy.table import Table, Column
 from IPython.display import HTML
+from astropy.io.fits import HDUList
+from astropy.io.fits import open as fits_open
 
 import warnings
 from json.decoder import JSONDecodeError
@@ -34,6 +36,10 @@ class AlerceAPI(object):
         self.catsHTM_url = "http://catshtm.alerce.online"
         if "catsHTM_url" in kwargs.keys():
             self.catsHTM_url = kwargs["catsHTM_url"]
+
+        self.avro_url = "http://avro.alerce.online"
+        if "catsHTM_url" in kwargs.keys():
+            self.avro_url = kwargs["avro_url"]
 
         self.oid = ""
 
@@ -588,7 +594,7 @@ class AlerceAPI(object):
             warnings.warn("This method only works on Notebooks", RuntimeWarning)
             return
 
-        science = "%s/get_stamp?oid=%s&candid=%s&type=science&format=png" % (oid, candid)
+        science = "%s/get_stamp?oid=%s&candid=%s&type=science&format=png" % (self.avro_url,oid, candid)
         images="""
         <div>ZTF oid: %s, candid: %s</div>
         <div>&emsp;&emsp;&emsp;&emsp;&emsp;
@@ -612,13 +618,26 @@ class AlerceAPI(object):
         ----------
         oid : :py:class:`str`
             object ID in ALeRCE DBs.
-        candid : :py:class:`int`
+        candid : :py:class:`int` (default First Stamps)
             Candid of the stamp to be displayed, if not set shows the Discovery stamp (first one).
 
         Returns
         -------
+        :class:`astropy.io.fits.HDUList`
+            Science, Template and Difference stamps for an specific alert.
 
         """
 
         if candid is None:
-            candid = min(self.get_detections(oid,format="pandas").index)
+            detections = self.get_detections(oid,format="pandas")
+            if detections is None:
+                return None
+            candid = min(detections.index)
+
+        hdulist = HDUList()
+        for stamp_type in ["science", "template", "difference"]:
+            tmp_hdulist = fits_open("%s/get_stamp?oid=%s&candid=%s&type=%s&format=fits"%(self.avro_url,oid,candid,stamp_type))
+            hdu = tmp_hdulist[0]
+            hdu.header["TYPE"] = stamp_type
+            hdulist.append(hdu)
+        return hdulist

@@ -4,7 +4,7 @@ with open("requirements.txt") as f:
 
 setup(
    name='alerce',
-   version='0.1',
+   version='0.2',
    description='Package to access to ALeRCE data',
    author='ALeRCE Team',
    author_email='contact@alerce.online',
