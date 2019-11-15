@@ -17,6 +17,16 @@ It has two main modules:
 - :mod:`alerce.stream` *(currently develop)* to consume real-time data from ALeRCE classification streams.
 
 
+Installing ALeRCE Client
+========================
+
+The ALeRCE client can be installed through pip with
+
+.. code-block:: bash
+
+    pip install alerce
+
+
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
