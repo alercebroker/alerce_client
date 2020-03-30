@@ -321,9 +321,9 @@ class AlerceAPI(object):
         if late:
             try:
                 if format == "pandas":
-                    df_late = pd.Series(r.json()["result"]["probabilities"]["random_forest"])
+                    df_late = pd.Series(r.json()["result"]["probabilities"]["late_classifier"])
                 elif format=="votable":
-                    resp = r.json()["result"]["probabilities"]["random_forest"]
+                    resp = r.json()["result"]["probabilities"]["late_classifier"]
                     df_late = Table({key:[resp[key]] for key in resp})
                 else:
                     df_late = None
