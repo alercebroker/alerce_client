@@ -1,6 +1,5 @@
 import requests
 import pandas as pd
-from pandas.io.json import json_normalize
 from astropy.table import Table, Column
 from IPython.display import HTML
 from astropy.io.fits import HDUList
@@ -9,11 +8,14 @@ from astropy.io.fits import open as fits_open
 import warnings
 from json.decoder import JSONDecodeError
 
+
 class AlerceParseError(Exception):
     pass
 
+
 class AlerceOidError(Exception):
     pass
+
 
 class AlerceAPI(object):
     """ALeRCE API Wrapper.
@@ -42,9 +44,9 @@ class AlerceAPI(object):
             self.avro_url = kwargs["avro_url"]
 
         self.oid = ""
+        self.session = requests.Session()
 
-
-    def query(self, params, format = "votable"):
+    def query(self, params, format="votable"):
         """Query the ALeRCE API to get matching objects into a pandas dataframe.
 
         Parameters
@@ -102,8 +104,7 @@ class AlerceAPI(object):
 
         """
 
-
-        r = requests.post(url = "%s/query" % self.ztf_url, json = params)
+        r = self.session.post(url="%s/query" % self.ztf_url, json=params)
         try:
             response = r.json()
         except JSONDecodeError:
@@ -133,7 +134,7 @@ class AlerceAPI(object):
 
         """
 
-        r = requests.post(url = "%s/get_sql" % self.ztf_url, json = params)
+        r = self.session.post(url="%s/get_sql" % self.ztf_url, json=params)
 
         return r.content.decode('utf-8')
 
@@ -157,13 +158,13 @@ class AlerceAPI(object):
 
         """
 
-        #oid
+        # oid
         params = {
             "oid": oid
         }
 
         # show api results
-        r = requests.post(url = "%s/get_detections" % self.ztf_url, json = params)
+        r = self.session.post(url="%s/get_detections" % self.ztf_url, json=params)
         try:
             response = r.json()
         except JSONDecodeError:
@@ -176,12 +177,11 @@ class AlerceAPI(object):
 
         if format == "pandas":
             detections = detections.to_pandas()
-            detections.sort_values("mjd",inplace=True)
-            detections.set_index('candid',inplace=True)
+            detections.sort_values("mjd", inplace=True)
+            detections.set_index('candid', inplace=True)
             return detections
 
         return detections
-
 
     def get_non_detections(self, oid, format="votable"):
         """Get Non detections for an object.
@@ -205,7 +205,7 @@ class AlerceAPI(object):
         }
 
         # show api results
-        r = requests.post(url = "%s/get_non_detections" % self.ztf_url, json = params)
+        r = self.session.post(url="%s/get_non_detections" % self.ztf_url, json=params)
         try:
             response = r.json()
         except JSONDecodeError:
@@ -218,11 +218,10 @@ class AlerceAPI(object):
 
         if format == "pandas":
             non_detections = non_detections.to_pandas()
-            non_detections.sort_values("mjd",inplace=True)
+            non_detections.sort_values("mjd", inplace=True)
             non_detections.set_index('mjd', inplace=True)
 
             return non_detections
-
 
         return non_detections
 
@@ -247,7 +246,7 @@ class AlerceAPI(object):
             "oid": oid
         }
 
-        r = requests.post(url = "%s/get_stats" % self.ztf_url, json = params)
+        r = self.session.post(url="%s/get_stats" % self.ztf_url, json=params)
 
         try:
             response = r.json()
@@ -266,11 +265,12 @@ class AlerceAPI(object):
             stats = Table(stats)
         elif format == "pandas":
             stats = pd.Series(stats)
-        else: return None
+        else:
+            return None
 
         return stats
 
-    def get_probabilities(self, oid, early=True, late=True,format="votable"):
+    def get_probabilities(self, oid, early=True, late=True, format="votable"):
         """ Get probabilities for a given object.
 
 
@@ -303,15 +303,15 @@ class AlerceAPI(object):
         }
 
         # show api results
-        r = requests.post(url = "%s/get_probabilities" % self.ztf_url, json = params)
+        r = self.session.post(url="%s/get_probabilities" % self.ztf_url, json=params)
 
         if early:
             try:
                 if format == "pandas":
                     df_early = pd.Series(r.json()["result"]["probabilities"]["early_classifier"])
-                elif format=="votable":
+                elif format == "votable":
                     resp = r.json()["result"]["probabilities"]["early_classifier"]
-                    df_early = Table({key:[resp[key]] for key in resp})
+                    df_early = Table({key: [resp[key]] for key in resp})
                 else:
                     df_early = None
 
@@ -322,9 +322,9 @@ class AlerceAPI(object):
             try:
                 if format == "pandas":
                     df_late = pd.Series(r.json()["result"]["probabilities"]["late_classifier"])
-                elif format=="votable":
+                elif format == "votable":
                     resp = r.json()["result"]["probabilities"]["late_classifier"]
-                    df_late = Table({key:[resp[key]] for key in resp})
+                    df_late = Table({key: [resp[key]] for key in resp})
                 else:
                     df_late = None
 
@@ -339,7 +339,7 @@ class AlerceAPI(object):
 
         return result
 
-    def get_features(self, oid,format="votable"):
+    def get_features(self, oid, format="votable"):
         """Get features given object.
 
         Parameters
@@ -361,7 +361,7 @@ class AlerceAPI(object):
         }
 
         # show api results
-        r = requests.post(url = "%s/get_features" % self.ztf_url, json = params)
+        r = self.session.post(url="%s/get_features" % self.ztf_url, json=params)
 
         try:
             resp = r.json()
@@ -371,13 +371,14 @@ class AlerceAPI(object):
         if format == "pandas":
             features = pd.Series(resp["result"]["features"])
         elif format == "votable":
-            resp = {key:[resp[key]] for key in resp}
+            resp = {key: [resp[key]] for key in resp}
             features = Table(resp)
-        else: return None
+        else:
+            return None
 
         return features
 
-    def catsHTM_conesearch(self, oid, radius, catalog_name="all",format="votable"):
+    def catsHTM_conesearch(self, oid, radius, catalog_name="all", format="votable"):
         """ catsHTM conesearch given an object and catalog_name.
 
         Parameters
@@ -411,9 +412,9 @@ class AlerceAPI(object):
             "radius": "%f" % radius
         }
         if catalog_name != "all":
-            result = requests.get(url = "%s/conesearch" % self.catsHTM_url, params = params)
+            result = self.session.get(url="%s/conesearch" % self.catsHTM_url, params=params)
         else:
-            result = requests.get(url = "%s/conesearch_all" % self.catsHTM_url, params = params)
+            result = self.session.get(url="%s/conesearch_all" % self.catsHTM_url, params=params)
 
         votables = {}
 
@@ -430,7 +431,7 @@ class AlerceAPI(object):
                 continue
             t = Table()
             for field in r[key].keys():
-                data = r[key][field]['values'] #list(map(lambda x: x["value"], r[key][field]))
+                data = r[key][field]['values']  # list(map(lambda x: x["value"], r[key][field]))
                 t.add_column(Column(data, name=field))
                 t[field].unit = r[key][field]['units']
             t["cat_name"] = Column(["catsHTM_%s" % key], name="cat_name")
@@ -440,8 +441,7 @@ class AlerceAPI(object):
 
         return votables
 
-
-    def catsHTM_crossmatch(self, oid, radius=100, catalog_name="all",format="votable"):
+    def catsHTM_crossmatch(self, oid, radius=100, catalog_name="all", format="votable"):
         """ catsHTM crossmatch given an object and catalog_name.
 
         Parameters
@@ -475,9 +475,9 @@ class AlerceAPI(object):
             "radius": "%f" % radius
         }
         if catalog_name != "all":
-            result = requests.get(url = "%s/crossmatch" % self.catsHTM_url, params = params)
+            result = self.session.get(url="%s/crossmatch" % self.catsHTM_url, params=params)
         else:
-            result = requests.get(url = "%s/crossmatch_all" % self.catsHTM_url, params = params)
+            result = self.session.get(url="%s/crossmatch_all" % self.catsHTM_url, params=params)
         votables = {}
 
         try:
@@ -495,17 +495,18 @@ class AlerceAPI(object):
             else:
                 return None
 
-            catalog_data =  catalog_result[catalog_name]
+            catalog_data = catalog_result[catalog_name]
             for field in catalog_data:
                 data = catalog_data[field]['value']
                 unit = catalog_data[field]['unit']
                 if format == "pandas":
-                    t[field]=data
+                    t[field] = data
                 elif format == "votable":
                     t.add_column(Column([data], name=field))
                     t[field].unit = unit
                     t["cat_name"] = Column(["catsHTM_%s" % catalog_name], name="cat_name")
-                else: return None
+                else:
+                    return None
             if format == "pandas":
                 votables[catalog_name] = pd.Series(t)
             else:
@@ -513,7 +514,7 @@ class AlerceAPI(object):
 
         return votables
 
-    def catsHTM_redshift(self, oid, radius,format="votable"):
+    def catsHTM_redshift(self, oid, radius, format="votable"):
         """Get redshift given an object.
 
         Parameters
@@ -548,8 +549,8 @@ class AlerceAPI(object):
         # check whether photometric redshift exists
         for catname in xmatches:
             for col in xmatches[catname].keys():
-                if col in ['zphot',  'z_phot']:
-                    return float(xmatch[catname][col])
+                if col in ['zphot', 'z_phot']:
+                    return float(xmatches[catname][col])
 
         return
 
@@ -588,14 +589,15 @@ class AlerceAPI(object):
 
         # if candid is None, get minimum candid
         if candid is None:
-            candid = min(self.get_detections(oid,format="pandas").index)
+            candid = min(self.get_detections(oid, format="pandas").index)
 
         if not self._in_ipynb():
             warnings.warn("This method only works on Notebooks", RuntimeWarning)
             return
 
-        science = "%s/get_stamp?oid=%s&candid=%s&type=science&format=png" % (self.avro_url,oid, candid)
-        images="""
+        science = "%s/get_stamp?oid=%s&candid=%s&type=science&format=png" % (
+            self.avro_url, oid, candid)
+        images = """
         <div>ZTF oid: %s, candid: %s</div>
         <div>&emsp;&emsp;&emsp;&emsp;&emsp;
         Science
@@ -611,7 +613,7 @@ class AlerceAPI(object):
         """ % (oid, candid, science, science.replace("science", "template"), science.replace("science", "difference"))
         display(HTML(images))
 
-    def get_stamps(self,oid,candid=None):
+    def get_stamps(self, oid, candid=None):
         """Download Stamps for an specific alert.
 
         Parameters
@@ -629,14 +631,16 @@ class AlerceAPI(object):
         """
 
         if candid is None:
-            detections = self.get_detections(oid,format="pandas")
+            detections = self.get_detections(oid, format="pandas")
             if detections is None:
                 return None
             candid = min(detections.index)
 
         hdulist = HDUList()
         for stamp_type in ["science", "template", "difference"]:
-            tmp_hdulist = fits_open("%s/get_stamp?oid=%s&candid=%s&type=%s&format=fits"%(self.avro_url,oid,candid,stamp_type))
+            tmp_hdulist = fits_open(
+                "%s/get_stamp?oid=%s&candid=%s&type=%s&format=fits" % (
+                    self.avro_url, oid, candid, stamp_type))
             hdu = tmp_hdulist[0]
             hdu.header["STAMP_TYPE"] = stamp_type
             hdulist.append(hdu)
