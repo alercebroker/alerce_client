@@ -56,42 +56,42 @@ class AlerceAPI(object):
 
             .. code-block:: json
 
-                {
-                total: number (if not set the total is counted and the query is slower),
-                records_per_pages: number (default 20),
-                page: number (default 1),
-                sortBy: :py:class:`str` columnName (default nobs),
-                query_parameters:{
-                   filters:{
-                      //ZTF object id
-                      oid: "ZTFXXXXXX",
-                      //Number of detections
-                      nobs: {
-                          min: int
-                          max: int
-                      },
-                      //Late Classifier (Random Forest)
-                      classrf: string or int,
-                      pclassrf: float [0-1],
-                      //Early Classifier (Stamp Classifier)
-                      classearly: list, string or int,
-                      pclassearly: float [0-1],
-                      //Coordinate based search (RA,DEC) and Search Radius.
-                      coordinates:{
-                        ra: float degrees,
-                        dec: float degrees,
-                        sr: float degrese
-                        },
-                      },
-                      dates:{
-                      //First detection (Discovery date)
-                      firstmjd: {
-                         min: float mjd,
-                         max: float mjd
-                        }
-                      }
-                   }
+            {
+               total :  number (if not set the total is counted and the query is slower) ,
+               records_per_pages :  number (default 20) ,
+               page :  number (default 1) ,
+               sortBy :  :py:class:`str` columnName (default nobs) ,
+               query_parameters : {
+                 filters : {
+                  //ZTF object id
+                   oid :  ZTFXXXXXX ,
+                  //Number of detections
+                   nobs : {
+                     min :  int ,
+                     max :  int 
+                  },
+                  //Late Classifier (Random Forest)
+                   classrf :  string or int ,
+                   pclassrf :  float [0-1] ,
+                  //Early Classifier (Stamp Classifier)
+                   classearly :  list, string or int ,
+                   pclassearly :  float [0-1] ,
+                 } 
+                 //Coordinate based search (RA,DEC) and Search Radius.
+                 coordinates : {
+                     ra :  float degrees ,
+                     dec :  float degrees ,
+                     sr :  float degrese 
+                 },
+                 dates : {
+                 //First detection (Discovery date)
+                   firstmjd : {
+                     min :  float mjd ,
+                     max :  float mjd 
+                  }
                 }
+              }
+            }
 
             for a more updated available fields check `ZTF API documentation <https://alerceapi.readthedocs.io/en/latest/ztf_db.html>`_
         format : :py:class:`str`
