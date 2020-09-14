@@ -76,13 +76,13 @@ class AlerceAPI(object):
                       //Early Classifier (Stamp Classifier)
                       classearly: list, string or int,
                       pclassearly: float [0-1],
-                      },
                       //Coordinate based search (RA,DEC) and Search Radius.
                       coordinates:{
                         ra: float degrees,
                         dec: float degrees,
                         sr: float degrese
                         },
+                      },
                       dates:{
                       //First detection (Discovery date)
                       firstmjd: {
