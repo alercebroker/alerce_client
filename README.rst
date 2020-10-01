@@ -1,5 +1,5 @@
-.. image:: https://github.com/alercebroker/alerce_client_new/workflows/Tests/badge.svg
-.. image:: https://codecov.io/gh/alercebroker/alerce_client_new/branch/master/graph/badge.svg?token=ZUHW7C308N
+.. image:: https://github.com/alercebroker/alerce_client/workflows/Tests/badge.svg?branch=develop
+.. image:: https://readthedocs.org/projects/alerce/badge/?version=develop
   :target: https://codecov.io/gh/alercebroker/alerce_client_new
   
 
