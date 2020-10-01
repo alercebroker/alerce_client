@@ -54,7 +54,7 @@ class AlerceStamps(Client):
         ----------
         oid : :py:class:`str`
             object ID in ALeRCE DBs.
-        candid : :py:class:`int`
+        candid : :py:class:`str`
             Candid of the stamp to be displayed.
 
         Returns
@@ -105,7 +105,7 @@ class AlerceStamps(Client):
         ----------
         oid : :py:class:`str`
             object ID in ALeRCE DBs.
-        candid : :py:class:`int`
+        candid : :py:class:`str`
             Candid of the stamp to be displayed.
 
         Returns

@@ -140,3 +140,4 @@ def test_query_single_feature(mock_request):
     mock_request.return_value.status_code = 200
     r = alerce.query_feature(oid="oid", name="feature")
     assert r is not None
+
