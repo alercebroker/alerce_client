@@ -35,7 +35,7 @@ Usage
     alerce = Alerce()
 
     dataframe = alerce.query_objects(
-        classifier="light curve", 
+        classifier="lc_classifier", 
         class_name="LPV", 
         format="pandas"
     )
@@ -109,7 +109,7 @@ Usage
     alerce = Alerce()
 
     dataframe = alerce.query_objects(
-        classifier="light curve", 
+        classifier="lc_classifier", 
         class_name="LPV", 
         format="pandas"
     )
@@ -151,7 +151,7 @@ For example, getting all the objects classified as LPV could be done like this:
     alerce = Alerce()
 
     dataframe = alerce.query_objects(
-        classifier="light curve", 
+        classifier="lc_classifier", 
         class_name="LPV",
         format="pandas"
     )
