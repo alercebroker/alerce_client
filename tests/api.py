@@ -2,25 +2,26 @@ import unittest
 import pandas as pd
 from alerce.api import AlerceAPI
 from astropy.table import Table
+import warnings
 
 
 class TestAlerceAPI(unittest.TestCase):
-
-    oid = "ZTF19abueupg"
-    api = AlerceAPI()
+    def setUp(self):
+        self.oid = "ZTF19abueupg"
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter("always")
+            self.api = AlerceAPI()
+            assert len(w) == 1
+            assert issubclass(w[-1].category, DeprecationWarning)
+            assert "deprecated" in str(w[-1].message)
 
     def test_query(self):
         params = {
-            "query_parameters":
-                {"filters":
-                    {"nobs":
-                        {"min": 2,
-                         "max": 3
-                         }
-                     }
-                 }
-            }
-
+            "query_parameters": {"filters": {"nobs": {"min": 2, "max": 3}}},
+            "page": 1,
+            "perPage": 10,
+            "total": 10,
+        }
         resp = self.api.query(params)
         self.assertEqual(type(resp), Table)
 
@@ -28,18 +29,9 @@ class TestAlerceAPI(unittest.TestCase):
         self.assertEqual(type(resp), pd.DataFrame)
 
     def test_get_sql(self):
-        params = {
-            "query_parameters":{
-            "filters":{
-                "nobs":{
-                        "min": 3,
-                        "max": 5
-                    }
-                }
-            }
-        }
+        params = {"query_parameters": {"filters": {"nobs": {"min": 3, "max": 5}}}}
         sql = self.api.get_sql(params)
-        self.assertEqual(type(sql),str)
+        self.assertEqual(type(sql), str)
 
     def test_get_detections(self):
         detections = self.api.get_detections(self.oid)
@@ -114,23 +106,23 @@ class TestAlerceAPI(unittest.TestCase):
             self.assertEqual(type(conesearch[key]), Table)
 
     def test_catsHTM_xmatch(self):
-        xmatch = self.api.catsHTM_crossmatch(self.oid,radius=100)
-        self.assertEqual(type(xmatch),dict)
+        xmatch = self.api.catsHTM_crossmatch(self.oid, radius=100)
+        self.assertEqual(type(xmatch), dict)
         for key in xmatch:
-            self.assertEqual(type(xmatch[key]),Table)
+            self.assertEqual(type(xmatch[key]), Table)
 
-        xmatch = self.api.catsHTM_crossmatch(self.oid,radius=100,format="pandas")
-        self.assertEqual(type(xmatch),dict)
+        xmatch = self.api.catsHTM_crossmatch(self.oid, radius=100, format="pandas")
+        self.assertEqual(type(xmatch), dict)
         for key in xmatch:
-            self.assertEqual(type(xmatch[key]),pd.Series)
+            self.assertEqual(type(xmatch[key]), pd.Series)
 
     def test_catsHTM_redshift(self):
-        redshift = self.api.catsHTM_redshift(self.oid,radius=100)
-        self.assertEqual(type(redshift),float)
+        redshift = self.api.catsHTM_redshift(self.oid, radius=100)
+        self.assertEqual(type(redshift), float)
 
     def test_get_stamps(self):
         stamps = self.api.get_stamps(self.oid)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

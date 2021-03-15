@@ -30,6 +30,11 @@ class AlerceAPI(object):
     """
 
     def __init__(self, **kwargs):
+        warnings.warn(
+            "This python client will be deprecated soon. Please visit https://github.com/alercebroker/alerce_client_new for information on the future client",
+            DeprecationWarning,
+            stacklevel=2,
+        )
 
         self.ztf_url = "http://ztf.alerce.online"
         if "ztf_url" in kwargs.keys():
@@ -68,7 +73,7 @@ class AlerceAPI(object):
                   //Number of detections
                    nobs : {
                      min :  int ,
-                     max :  int 
+                     max :  int
                   },
                   //Late Classifier (Random Forest)
                    classrf :  string or int ,
@@ -76,18 +81,18 @@ class AlerceAPI(object):
                   //Early Classifier (Stamp Classifier)
                    classearly :  list, string or int ,
                    pclassearly :  float [0-1] ,
-                 } 
+                 }
                  //Coordinate based search (RA,DEC) and Search Radius.
                  coordinates : {
                      ra :  float degrees ,
                      dec :  float degrees ,
-                     sr :  float degrese 
+                     sr :  float degrese
                  },
                  dates : {
                  //First detection (Discovery date)
                    firstmjd : {
                      min :  float mjd ,
-                     max :  float mjd 
+                     max :  float mjd
                   }
                 }
               }
@@ -115,7 +120,7 @@ class AlerceAPI(object):
 
         if format == "pandas":
             query_results = query_results.to_pandas()
-            query_results.set_index('oid', inplace=True)
+            query_results.set_index("oid", inplace=True)
 
         return query_results
 
@@ -136,7 +141,7 @@ class AlerceAPI(object):
 
         r = self.session.post(url="%s/get_sql" % self.ztf_url, json=params)
 
-        return r.content.decode('utf-8')
+        return r.content.decode("utf-8")
 
     def get_detections(self, oid, format="votable"):
         """Get detections for an object.
@@ -159,9 +164,7 @@ class AlerceAPI(object):
         """
 
         # oid
-        params = {
-            "oid": oid
-        }
+        params = {"oid": oid}
 
         # show api results
         r = self.session.post(url="%s/get_detections" % self.ztf_url, json=params)
@@ -178,7 +181,7 @@ class AlerceAPI(object):
         if format == "pandas":
             detections = detections.to_pandas()
             detections.sort_values("mjd", inplace=True)
-            detections.set_index('candid', inplace=True)
+            detections.set_index("candid", inplace=True)
             return detections
 
         return detections
@@ -200,9 +203,7 @@ class AlerceAPI(object):
 
         """
 
-        params = {
-            "oid": oid
-        }
+        params = {"oid": oid}
 
         # show api results
         r = self.session.post(url="%s/get_non_detections" % self.ztf_url, json=params)
@@ -219,7 +220,7 @@ class AlerceAPI(object):
         if format == "pandas":
             non_detections = non_detections.to_pandas()
             non_detections.sort_values("mjd", inplace=True)
-            non_detections.set_index('mjd', inplace=True)
+            non_detections.set_index("mjd", inplace=True)
 
             return non_detections
 
@@ -242,9 +243,7 @@ class AlerceAPI(object):
 
         """
 
-        params = {
-            "oid": oid
-        }
+        params = {"oid": oid}
 
         r = self.session.post(url="%s/get_stats" % self.ztf_url, json=params)
 
@@ -261,7 +260,7 @@ class AlerceAPI(object):
         self.firstMJD = stats["firstmjd"]
 
         if format == "votable":
-            stats = {key:[stats[key]] for key in stats}
+            stats = {key: [stats[key]] for key in stats}
             stats = Table(stats)
         elif format == "pandas":
             stats = pd.Series(stats)
@@ -271,7 +270,7 @@ class AlerceAPI(object):
         return stats
 
     def get_probabilities(self, oid, early=True, late=True, format="votable"):
-        """ Get probabilities for a given object.
+        """Get probabilities for a given object.
 
 
         Parameters
@@ -298,9 +297,7 @@ class AlerceAPI(object):
 
         """
 
-        params = {
-            "oid": oid
-        }
+        params = {"oid": oid}
 
         # show api results
         r = self.session.post(url="%s/get_probabilities" % self.ztf_url, json=params)
@@ -308,7 +305,9 @@ class AlerceAPI(object):
         if early:
             try:
                 if format == "pandas":
-                    df_early = pd.Series(r.json()["result"]["probabilities"]["early_classifier"])
+                    df_early = pd.Series(
+                        r.json()["result"]["probabilities"]["early_classifier"]
+                    )
                 elif format == "votable":
                     resp = r.json()["result"]["probabilities"]["early_classifier"]
                     df_early = Table({key: [resp[key]] for key in resp})
@@ -321,7 +320,9 @@ class AlerceAPI(object):
         if late:
             try:
                 if format == "pandas":
-                    df_late = pd.Series(r.json()["result"]["probabilities"]["late_classifier"])
+                    df_late = pd.Series(
+                        r.json()["result"]["probabilities"]["late_classifier"]
+                    )
                 elif format == "votable":
                     resp = r.json()["result"]["probabilities"]["late_classifier"]
                     df_late = Table({key: [resp[key]] for key in resp})
@@ -356,9 +357,7 @@ class AlerceAPI(object):
 
         """
 
-        params = {
-            "oid": oid
-        }
+        params = {"oid": oid}
 
         # show api results
         r = self.session.post(url="%s/get_features" % self.ztf_url, json=params)
@@ -379,7 +378,7 @@ class AlerceAPI(object):
         return features
 
     def catsHTM_conesearch(self, oid, radius, catalog_name="all", format="votable"):
-        """ catsHTM conesearch given an object and catalog_name.
+        """catsHTM conesearch given an object and catalog_name.
 
         Parameters
         ----------
@@ -409,12 +408,16 @@ class AlerceAPI(object):
             "catalog": "%s" % catalog_name,
             "ra": "%f" % self.meanra,
             "dec": "%f" % self.meandec,
-            "radius": "%f" % radius
+            "radius": "%f" % radius,
         }
         if catalog_name != "all":
-            result = self.session.get(url="%s/conesearch" % self.catsHTM_url, params=params)
+            result = self.session.get(
+                url="%s/conesearch" % self.catsHTM_url, params=params
+            )
         else:
-            result = self.session.get(url="%s/conesearch_all" % self.catsHTM_url, params=params)
+            result = self.session.get(
+                url="%s/conesearch_all" % self.catsHTM_url, params=params
+            )
 
         votables = {}
 
@@ -431,9 +434,11 @@ class AlerceAPI(object):
                 continue
             t = Table()
             for field in r[key].keys():
-                data = r[key][field]['values']  # list(map(lambda x: x["value"], r[key][field]))
+                data = r[key][field][
+                    "values"
+                ]  # list(map(lambda x: x["value"], r[key][field]))
                 t.add_column(Column(data, name=field))
-                t[field].unit = r[key][field]['units']
+                t[field].unit = r[key][field]["units"]
             t["cat_name"] = Column(["catsHTM_%s" % key], name="cat_name")
             if format == "pandas":
                 t = t.to_pandas()
@@ -442,7 +447,7 @@ class AlerceAPI(object):
         return votables
 
     def catsHTM_crossmatch(self, oid, radius=100, catalog_name="all", format="votable"):
-        """ catsHTM crossmatch given an object and catalog_name.
+        """catsHTM crossmatch given an object and catalog_name.
 
         Parameters
         ----------
@@ -472,12 +477,16 @@ class AlerceAPI(object):
             "catalog": "%s" % catalog_name,
             "ra": "%f" % self.meanra,
             "dec": "%f" % self.meandec,
-            "radius": "%f" % radius
+            "radius": "%f" % radius,
         }
         if catalog_name != "all":
-            result = self.session.get(url="%s/crossmatch" % self.catsHTM_url, params=params)
+            result = self.session.get(
+                url="%s/crossmatch" % self.catsHTM_url, params=params
+            )
         else:
-            result = self.session.get(url="%s/crossmatch_all" % self.catsHTM_url, params=params)
+            result = self.session.get(
+                url="%s/crossmatch_all" % self.catsHTM_url, params=params
+            )
         votables = {}
 
         try:
@@ -497,14 +506,16 @@ class AlerceAPI(object):
 
             catalog_data = catalog_result[catalog_name]
             for field in catalog_data:
-                data = catalog_data[field]['value']
-                unit = catalog_data[field]['unit']
+                data = catalog_data[field]["value"]
+                unit = catalog_data[field]["unit"]
                 if format == "pandas":
                     t[field] = data
                 elif format == "votable":
                     t.add_column(Column([data], name=field))
                     t[field].unit = unit
-                    t["cat_name"] = Column(["catsHTM_%s" % catalog_name], name="cat_name")
+                    t["cat_name"] = Column(
+                        ["catsHTM_%s" % catalog_name], name="cat_name"
+                    )
                 else:
                     return None
             if format == "pandas":
@@ -543,13 +554,13 @@ class AlerceAPI(object):
         # check whether redshift exists
         for catname in xmatches:
             for col in xmatches[catname].keys():
-                if col == 'z':
+                if col == "z":
                     return float(xmatches[catname][col])
 
         # check whether photometric redshift exists
         for catname in xmatches:
             for col in xmatches[catname].keys():
-                if col in ['zphot', 'z_phot']:
+                if col in ["zphot", "z_phot"]:
                     return float(xmatches[catname][col])
 
         return
@@ -558,6 +569,7 @@ class AlerceAPI(object):
         try:
             from IPython import get_ipython
             import os
+
             if "IPKernelApp" not in get_ipython().config:  # pragma: no cover
                 raise ImportError("console")
                 return False
@@ -585,7 +597,7 @@ class AlerceAPI(object):
             Display the stamps on a jupyter notebook.
 
         """
-        ''
+        ""
 
         # if candid is None, get minimum candid
         if candid is None:
@@ -596,7 +608,10 @@ class AlerceAPI(object):
             return
 
         science = "%s/get_stamp?oid=%s&candid=%s&type=science&format=png" % (
-            self.avro_url, oid, candid)
+            self.avro_url,
+            oid,
+            candid,
+        )
         images = """
         <div>ZTF oid: %s, candid: %s</div>
         <div>&emsp;&emsp;&emsp;&emsp;&emsp;
@@ -610,7 +625,13 @@ class AlerceAPI(object):
         <div style="float:left;width:20%%"><img src="%s"></div>
         <div style="float:left;width:20%%"><img src="%s"></div>
         </div>
-        """ % (oid, candid, science, science.replace("science", "template"), science.replace("science", "difference"))
+        """ % (
+            oid,
+            candid,
+            science,
+            science.replace("science", "template"),
+            science.replace("science", "difference"),
+        )
         display(HTML(images))
 
     def get_stamps(self, oid, candid=None):
@@ -639,8 +660,9 @@ class AlerceAPI(object):
         hdulist = HDUList()
         for stamp_type in ["science", "template", "difference"]:
             tmp_hdulist = fits_open(
-                "%s/get_stamp?oid=%s&candid=%s&type=%s&format=fits" % (
-                    self.avro_url, oid, candid, stamp_type))
+                "%s/get_stamp?oid=%s&candid=%s&type=%s&format=fits"
+                % (self.avro_url, oid, candid, stamp_type)
+            )
             hdu = tmp_hdulist[0]
             hdu.header["STAMP_TYPE"] = stamp_type
             hdulist.append(hdu)
