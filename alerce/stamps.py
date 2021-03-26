@@ -46,7 +46,7 @@ class AlerceStamps(Client):
             raise CandidError()
         return first_detection
 
-    def plot_stamp(self, oid, candid=None):
+    def plot_stamps(self, oid, candid=None):
         """
         Plot stamp in a notebook given oid. It uses IPython HTML.
 
@@ -54,7 +54,7 @@ class AlerceStamps(Client):
         ----------
         oid : :py:class:`str`
             object ID in ALeRCE DBs.
-        candid : :py:class:`str`
+        candid : :py:class:`int`
             Candid of the stamp to be displayed.
 
         Returns
@@ -105,7 +105,7 @@ class AlerceStamps(Client):
         ----------
         oid : :py:class:`str`
             object ID in ALeRCE DBs.
-        candid : :py:class:`str`
+        candid : :py:class:`int`
             Candid of the stamp to be displayed.
 
         Returns

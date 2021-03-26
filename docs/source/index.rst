@@ -3,12 +3,15 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to ALeRCE Python Client's documentation!
+ALeRCE Client
 ================================================
 `ALeRCE <http://alerce.science>`_ client is a Python library to interact with ALeRCE services and databases.
 
+In this documentation you will find the basic usage of the ALeRCE Client, how to install, a short tutorial for each
+service and the guidelines to contribute to the project.
+
 Installing ALeRCE Client
-========================
+########################
 
 The ALeRCE client can be installed through pip with
 
@@ -24,84 +27,36 @@ Or clone the repository and install from there
     cd alerce_client_new
     python setup.py install
 
-Usage
-===========
-.. code-block:: python
+Tutorials
+###########
 
-    from alerce.core import Alerce
-    alerce = Alerce()
-
-    dataframe = alerce.query_objects(
-        classifier="lc_classifier", 
-        class_name="LPV", 
-        format="pandas"
-    )
-
-    detections = alerce.query_detections("ObjectID", format="pandas", sort="mjd")
-
-    magstats = alerce.query_magstats("ObjectID")
-
-    
-
-Configuration
-==============
-By default the `Alerce` object should be ready to use without any external configuration, but in case you need to adjust any parameters then you can configure the Alerce object in different ways.
-
-At the client object initialization
------------------------------
-You can pass parameters to the `Alerce` class constructor to set the parameters for API connection.
-
-.. code-block:: python
-
-    alerce = Alerce(ZTF_API_URL="https://ztf.alerce.online")
-
-From a dictionary object
---------------------------
-You can pass parameters to the `Alerce` class from a dictionary object.
-
-.. code-block:: python
-
-    my_config = {
-        "ZTF_API_URL": "https://ztf.alerce.online"
-    }
-    alerce = Alerce()
-    alerce.load_config_from_object(my_config)
-
-From a config file
---------------------------
-You can pass parameters to the `Alerce` class from a file
-
-Take for example a ``config.py`` file:
-
-.. code-block:: python
-    
-    import os
-
-    api_url = os.getenv("API_URL")
-    AlerceAPIConfig = {
-        "ZTF_API_URL": api_url
-    }
-
-Then you can initialize the client like this:
-
-.. code-block:: python
-
-    alerce = Alerce()
-    alerce.load_config_from_file("config.py")
-
+The ALeRCE client is divided according to the requested API,
+depending on your usecase check the following tutorials:
 
 .. toctree::
-   :maxdepth: 4
-   :caption: Contents:
+   :maxdepth: 2
+   :glob:
 
-   ztf_api
-   xmatch_api
-   stamps_api
+   tutorials/ztf_api.rst
+   tutorials/stamps_api.rst
+   tutorials/xmatch_api.rst
 
 
-Indices and tables
-==================
+API Reference
+#############
+.. toctree::
+  :maxdepth: 2
+  :glob:
 
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
+  apis
+  models
+
+
+Developer and Support documentation
+####################################
+
+.. toctree::
+  :maxdepth: 2
+
+  support_dev/support
+  support_dev/dev

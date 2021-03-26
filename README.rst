@@ -1,5 +1,5 @@
-.. image:: https://github.com/alercebroker/alerce_client/workflows/Tests/badge.svg?branch=develop
-.. image:: https://readthedocs.org/projects/alerce/badge/?version=develop
+.. image:: https://github.com/alercebroker/alerce_client_new/workflows/Tests/badge.svg
+.. image:: https://codecov.io/gh/alercebroker/alerce_client_new/branch/master/graph/badge.svg?token=ZUHW7C308N
   :target: https://codecov.io/gh/alercebroker/alerce_client_new
   
 
@@ -35,7 +35,7 @@ Usage
     alerce = Alerce()
 
     dataframe = alerce.query_objects(
-        classifier="lc_classifier", 
+        classifier="light curve", 
         class_name="LPV", 
         format="pandas"
     )
@@ -109,7 +109,7 @@ Usage
     alerce = Alerce()
 
     dataframe = alerce.query_objects(
-        classifier="lc_classifier", 
+        classifier="light curve", 
         class_name="LPV", 
         format="pandas"
     )
@@ -151,7 +151,7 @@ For example, getting all the objects classified as LPV could be done like this:
     alerce = Alerce()
 
     dataframe = alerce.query_objects(
-        classifier="lc_classifier", 
+        classifier="light curve", 
         class_name="LPV",
         format="pandas"
     )

@@ -8,7 +8,7 @@ class AlerceSearch(Client):
     def __init__(self, **kwargs):
         self.session = requests.Session()
         default_config = {
-            "ZTF_API_URL": "http://3.212.59.238:8082",
+            "ZTF_API_URL": "https://dev.api.alerce.online",
             "ZTF_ROUTES": {
                 "objects": "/objects",
                 "single_object": "/objects/%s",
@@ -19,6 +19,8 @@ class AlerceSearch(Client):
                 "probabilities": "/objects/%s/probabilities",
                 "features": "/objects/%s/features",
                 "single_feature": "/objects/%s/features/%s",
+                "classifiers": "/classifiers",
+                "classifier_classes": "/classifiers/%s/%s/classes",
             },
         }
         default_config.update(kwargs)
@@ -52,7 +54,7 @@ class AlerceSearch(Client):
             Name of the column to use as index when format is 'pandas'
         sort : str
             Name of the column to sort when format is 'pandas'
-       
+
         **kwargs
             Keyword arguments. Each argument can be one of the `ALERCE ZTF API`_
             object query parameters.
@@ -229,5 +231,31 @@ class AlerceSearch(Client):
         """
         q = self._request(
             "GET", self.__get_url("single_feature", oid, name), result_format=format
+        )
+        return q.result()
+
+    def query_classifiers(self, format="json"):
+        """
+        Gets all classifiers and their classes
+        """
+        q = self._request("GET", self.__get_url("classifiers"), result_format=format)
+        return q.result()
+
+    def query_classes(self, classifier_name, classifier_version, format="json"):
+        """
+        Gets classes from a specified classifier
+
+        Parameters
+        ----------
+
+        classifier_name : str
+            The classifier unique name
+        classifier_version : str
+            The classifier's version
+        """
+        q = self._request(
+            "GET",
+            self.__get_url("classifier_classes", classifier_name, classifier_version),
+            result_format=format,
         )
         return q.result()
