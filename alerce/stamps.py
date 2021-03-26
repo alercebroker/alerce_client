@@ -32,7 +32,6 @@ class AlerceStamps(Client):
                 raise ImportError("vscode")
                 return False
         except Exception as e:
-            print(e)
             return False
         else:  # pragma: no cover
             return True
@@ -69,6 +68,7 @@ class AlerceStamps(Client):
             candid = self._get_first_detection(oid)
 
         from IPython.display import HTML
+
         science = "%s?oid=%s&candid=%s&type=science&format=png" % (
             self.config["AVRO_URL"] + self.config["AVRO_ROUTES"]["get_stamp"],
             oid,
