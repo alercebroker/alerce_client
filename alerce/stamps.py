@@ -12,7 +12,7 @@ class AlerceStamps(Client):
 
     def __init__(self, **kwargs):
         default_config = {
-            "AVRO_URL": "http://avro.alerce.online",
+            "AVRO_URL": "https://avro.alerce.online",
             "AVRO_ROUTES": {
                 "get_stamp": "/get_stamp",
             },

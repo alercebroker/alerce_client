@@ -7,7 +7,7 @@ In ALeRCE we work using the Github Repository Issues. To inform a problem check 
 Reporting Issues
 ================
 
-To report a bug, error or other kind of issue go to `Bug Report <https://github.com/alercebroker/alerce_client_new/issues/new?assignees=&labels=bug&template=bug_report.md&title=%5BBug%5D>`_.
+To report a bug, error or other kind of issue go to `Bug Report <https://github.com/alercebroker/alerce_client/issues/new?assignees=&labels=bug&template=bug_report.md&title=%5BBug%5D>`_.
 
 And add a Issue with the *bug* label and the following:
 
@@ -18,7 +18,7 @@ And add a Issue with the *bug* label and the following:
 Requesting Features
 ====================
 
-To request a new feature that can be useful for other users/usecases `Feature Request <https://github.com/alercebroker/alerce_client_new/issues/new?assignees=&labels=enhancement&template=feature_request.md&title=%5BFeature%5D>`_
+To request a new feature that can be useful for other users/usecases `Feature Request <https://github.com/alercebroker/alerce_client/issues/new?assignees=&labels=enhancement&template=feature_request.md&title=%5BFeature%5D>`_
 with the *enhancement* label.
 
 And adding the following:
@@ -31,4 +31,4 @@ And adding the following:
 General Question
 =================
 
-Create an  `General Question <https://github.com/alercebroker/alerce_client_new/issues/new?assignees=&labels=question&template=general-question.md&title=%5BQuestion%5D>`_ with the *astronomy* or *programming* label.
+Create an  `General Question <https://github.com/alercebroker/alerce_client/issues/new?assignees=&labels=question&template=general-question.md&title=%5BQuestion%5D>`_ with the *astronomy* or *programming* label.

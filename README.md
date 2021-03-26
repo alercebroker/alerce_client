@@ -59,7 +59,7 @@ parameters for API connection.
 For example using an API on localhost: .. code-block:: python
 
 ``` {.sourceCode .python}
-alerce = Alerce(ZTF\_API\_URL="<http://localhost:5000>")
+alerce = Alerce(ZTF_API_URL="<http://localhost:5000>")
 ```
 
 From a dictionary object
