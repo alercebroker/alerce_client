@@ -8,7 +8,7 @@ class AlerceSearch(Client):
     def __init__(self, **kwargs):
         self.session = requests.Session()
         default_config = {
-            "ZTF_API_URL": "https://dev.api.alerce.online",
+            "ZTF_API_URL": "https://api.alerce.online/ztf/v1/",
             "ZTF_ROUTES": {
                 "objects": "/objects",
                 "single_object": "/objects/%s",
