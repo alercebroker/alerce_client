@@ -9,3 +9,14 @@ Here is a list of the response specification for each data model.
 
 .. _Detection Response:
 .. include:: models/detection.rst
+
+
+.. _Non-Detection Response:
+.. include:: models/non_detection.rst
+
+.. _Probability Response:
+.. include:: models/probability.rst
+
+
+.. _PMagstats Response:
+.. include:: models/magstats.rst

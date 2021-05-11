@@ -18,7 +18,7 @@ class AlerceXmatch(Client):
     def __init__(self, **kwargs):
         self.session = requests.Session()
         default_config = {
-            "CATSHTM_API_URL": "http://catshtm.alerce.online",
+            "CATSHTM_API_URL": "https://catshtm.alerce.online",
             "CATSHTM_ROUTES": {
                 "conesearch": "/conesearch",
                 "conesearch_all": "/conesearch_all",

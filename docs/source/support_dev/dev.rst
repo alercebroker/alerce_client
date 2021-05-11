@@ -13,7 +13,7 @@ You can pass parameters to the `Alerce` class constructor to set the parameters 
 
 .. code-block:: python
 
-    alerce = Alerce(ZTF_API_URL="https://ztf.alerce.online")
+    alerce = Alerce(ZTF_API_URL="https://localhost:5000")
 
 
 From a dictionary object
@@ -23,7 +23,7 @@ You can pass parameters to the `Alerce` class from a dictionary object.
 .. code-block:: python
 
     my_config = {
-        "ZTF_API_URL": "https://ztf.alerce.online"
+        "ZTF_API_URL": "https://localhost:5000"
     }
     alerce = Alerce()
     alerce.load_config_from_object(my_config)
@@ -41,7 +41,7 @@ The examples changes the default ZTF api, but there are other API and routes tha
      - Default
      - Description
    * - ZTF_API_URL
-     - http://dev.api.alerce.online/
+     - http://api.alerce.online/ztf/v1
      - ALeRCE ZTF API route.
    * - ZTF_ROUTES
      - {
@@ -89,6 +89,6 @@ Steps to create a Pull Request
 2. Create a branch if necessary
 3. Fix the issue or add new feature
 4. Push changed to personal repository
-5. `Create a PR <https://github.com/alercebroker/alerce_client_new/pulls>` to the *alercebroker* repository
+5. `Create a PR <https://github.com/alercebroker/alerce_client/pulls>` to the *alercebroker* repository
 
 For a detailed guide check `this link <https://docs.github.com/en/github/collaborating-with-issues-and-pull-requests/creating-a-pull-request-from-a-fork>`_
