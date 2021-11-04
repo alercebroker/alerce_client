@@ -38,7 +38,7 @@ class AlerceStamps(Client):
 
     def _get_first_detection(self, oid):
         detections = self.search_client.query_detections(oid, format="pandas")
-        first_detection = detections[detections.has_stamp].candid.astype(int).min()
+        first_detection = detections[detections.has_stamp].candid.astype('int64').min()
         try:
             first_detection = int(first_detection)
         except TypeError:
