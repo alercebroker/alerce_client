@@ -12,7 +12,7 @@ from alerce.core import Alerce
 
 FILE_PATH = os.path.dirname(__file__)
 EXAMPLE_PATH = os.path.join(FILE_PATH, "examples/example.fits")
-EXAMPLE_FITS = fio.open(EXAMPLE_PATH)
+EXAMPLE_FITS = fio.open(EXAMPLE_PATH, ignore_missing_simple=True)
 
 def test_plot_stamp():
     alerce = Alerce()
