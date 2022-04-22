@@ -15,10 +15,7 @@ class AlerceStamps(Client):
     def __init__(self, **kwargs):
         default_config = {
             "AVRO_URL": "https://avro.alerce.online",
-            "AVRO_ROUTES": {
-                "get_stamp": "/get_stamp",
-                "get_avro": "/get_avro"
-            },
+            "AVRO_ROUTES": {"get_stamp": "/get_stamp", "get_avro": "/get_avro"},
         }
         default_config.update(kwargs)
         super().__init__(**default_config)
@@ -41,7 +38,7 @@ class AlerceStamps(Client):
 
     def _get_first_detection(self, oid):
         detections = self.search_client.query_detections(oid, format="pandas")
-        first_detection = detections[detections.has_stamp].candid.astype('int64').min()
+        first_detection = detections[detections.has_stamp].candid.astype("int64").min()
         try:
             first_detection = int(first_detection)
         except TypeError:
@@ -101,7 +98,7 @@ class AlerceStamps(Client):
         )
         display(HTML(images))
 
-    def get_stamps(self, oid, candid=None, format='HDUList'):
+    def get_stamps(self, oid, candid=None, format="HDUList"):
         """Download Stamps for an specific alert.
 
         Parameters
@@ -124,29 +121,28 @@ class AlerceStamps(Client):
             stamp_list = []
             for stamp_type in stamp_types:
                 url = "%s?oid=%s&candid=%s&type=%s&format=fits" % (
-                    self.config["AVRO_URL"]
-                    + self.config["AVRO_ROUTES"]["get_stamp"],
+                    self.config["AVRO_URL"] + self.config["AVRO_ROUTES"]["get_stamp"],
                     oid,
                     candid,
-                    stamp_type)
+                    stamp_type,
+                )
 
                 http_response = self.session.request("GET", url)
 
-                with gzip.open(io.BytesIO(http_response.content), 'rb') as f:
+                with gzip.open(io.BytesIO(http_response.content), "rb") as f:
                     tmp_hdulist = fits_open(
-                        io.BytesIO(f.read()),
-                        ignore_missing_simple=True
+                        io.BytesIO(f.read()), ignore_missing_simple=True
                     )
 
                 stamp_list.append(tmp_hdulist[0])
 
-            if format == 'HDUList':
+            if format == "HDUList":
                 hdulist = HDUList()
                 for stamp, stamp_type in zip(stamp_list, stamp_types):
                     stamp.header["STAMP_TYPE"] = stamp_type
                     hdulist.append(stamp)
                 return hdulist
-            elif format == 'numpy':
+            elif format == "numpy":
                 return [stamp.data.copy() for stamp in stamp_list]
         except HTTPError:
             warnings.warn("AVRO File not found.", RuntimeWarning)
@@ -169,11 +165,8 @@ class AlerceStamps(Client):
         if candid is None:
             candid = self._get_first_detection(oid)
         try:
-            url = self.config['AVRO_URL'] + self.config["AVRO_ROUTES"]["get_avro"]
-            params = {
-                "oid": oid,
-                "candid": candid
-            }
+            url = self.config["AVRO_URL"] + self.config["AVRO_ROUTES"]["get_avro"]
+            params = {"oid": oid, "candid": candid}
             http_response = self.session.request("GET", url, params=params)
             return http_response.content
         except HTTPError:

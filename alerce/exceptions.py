@@ -1,4 +1,3 @@
-
 def handle_error(response):
     codes = {-1: APIError, 400: ParseError, 404: ObjectNotFoundError}
     try:
