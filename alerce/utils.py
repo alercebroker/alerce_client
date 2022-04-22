@@ -1,6 +1,7 @@
 from pandas import DataFrame
 from astropy.table import Table
 from .exceptions import handle_error, FormatValidationError
+import requests
 
 
 class Result:
@@ -37,6 +38,7 @@ class Result:
 
 class Client:
     def __init__(self, **kwargs):
+        self.session = requests.Session()
         self.config = {}
         self.config.update(kwargs)
         self.allowed_formats = ["pandas", "votable", "json"]

@@ -18,7 +18,7 @@ class Alerce(AlerceSearch, AlerceXmatch, AlerceStamps):
         The url of the ZTF API
     """
     def __init__(self, **kwargs):
-       super().__init__(**kwargs)
+        super().__init__(**kwargs)
 
     def load_config_from_file(self, path):
         pass

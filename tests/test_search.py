@@ -15,8 +15,12 @@ alerce = Alerce()
 
 @patch.object(Session, "request")
 def test_query_objects(mock_request):
+    def mock_result():
+        return {"items": [{"oid": "test"}]}
+
     mock_request.return_value.status_code = 200
-    r = alerce.query_objects(classifier="late")
+    mock_request.return_value.json = mock_result
+    r = alerce.query_objects(classifier="lc_classifier")
     assert r is not None
 
 
@@ -24,7 +28,7 @@ def test_query_objects(mock_request):
 def test_query_objects_not_found(mock_request):
     mock_request.return_value.status_code = 404
     with pytest.raises(ObjectNotFoundError):
-        alerce.query_objects(classifier="late")
+        alerce.query_objects(classifier="lc_classifier")
 
 
 @patch.object(Session, "request")
@@ -43,7 +47,11 @@ def test_query_objects_format_error(mock_request):
 
 @patch.object(Session, "request")
 def test_query_objects_format_pandas(mock_request):
+    def mock_result():
+        return {"items": [{"oid": "test"}]}
+
     mock_request.return_value.status_code = 200
+    mock_request.return_value.json = mock_result
     r = alerce.query_objects(format="pandas")
     assert isinstance(r, DataFrame)
 
