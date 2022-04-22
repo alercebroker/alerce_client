@@ -28,7 +28,12 @@ jobs:
         pip install black pytest coverage
         if [ -f requirements.txt ]; then pip install -r requirements-dev.txt; fi
     - name: Black Code Formatter
-      uses: lgeiger/black-action@v1.0.1
+    - uses: actions/checkout@v2
+    - uses: psf/black@stable
+      with:
+        options: "--check --verbose"
+        src: "alerce/"
+
     - name: Test with pytest
       run: |
         coverage run --source alerce/ -m pytest tests/
