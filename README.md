@@ -56,10 +56,10 @@ At the client object initialization
 You can pass parameters to the Alerce class constructor to set the
 parameters for API connection.
 
-For example using an API on localhost: .. code-block:: python
-
+For example using the ZTF API on localhost:5000 and the DB API on localhost:5050 
 ``` {.sourceCode .python}
 alerce = Alerce(ZTF_API_URL="<http://localhost:5000>")
+alerce = Alerce(ZTF_DB_API_URL="<http://localhost:5050>")
 ```
 
 From a dictionary object
@@ -70,6 +70,7 @@ You can pass parameters to the Alerce class from a dictionary object.
 ``` {.sourceCode .python}
 my_config = {
     "ZTF_API_URL": "http://localhost:5000"
+    "ZTF_DB_API_URL": "http://localhost:5050"
 }
 alerce = Alerce()
 alerce.load_config_from_object(my_config)
