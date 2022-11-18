@@ -1,6 +1,8 @@
 def handle_error(response):
+    # TODO: The direct API uses code 400 for user input error (bad requests, etc), what should be done here then?
     codes = {-1: APIError, 400: ParseError, 404: ObjectNotFoundError}
     try:
+        # TODO: We can no longer assumes all replies are json
         error = response.json().get("errors", {})
         message = response.json().get("message")
     except:

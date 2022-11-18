@@ -6,8 +6,11 @@ import requests
 
 class Result:
     def __init__(self, json_result, format="json"):
+        # TODO: results are no longer on json only
         self.json_result = json_result
         self.format = format
+
+    # TODO: cases must be added for when the result is csv
 
     def to_pandas(self, index=None, sort=None):
         dataframe = None
@@ -27,6 +30,10 @@ class Result:
     def to_json(self):
         return self.json_result
 
+    # TODO
+    def to_csv(self):
+        pass
+
     def result(self, index=None, sort=None):
         if self.format == "json":
             return self.to_json()
@@ -34,6 +41,8 @@ class Result:
             return self.to_pandas(index, sort)
         if self.format == "votable":
             return self.to_votable()
+        if self.format == 'csv':
+            return self.to_csv()
 
 
 class Client:
@@ -63,6 +72,7 @@ class Client:
         result_format = self._validate_format(result_format)
         resp = self.session.request(method, url, params=params)
 
+        # TODO: add a case for when the response is expected to be csv. Direct API cant NOT return json requests.
         if resp.status_code >= 400:
             handle_error(resp)
         if response_field and result_format != "json":
