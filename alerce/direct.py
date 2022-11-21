@@ -10,18 +10,24 @@ class AlerceDirect(Client):
             "ZTF_DB_API_URL": "https://api.alerce.online/db/",
         }
         default_config.update(kwargs)
-        # TODO: json must not be allowed for the direct client
         super().__init__(**default_config)
 
     def __get_url(self):
         return f"{self.config['ZTF_DB_API_URL']}"
 
-    def send_query(self, query, format='csv'):
+    def send_query(self, query, format='csv', index=None, sort=None):
         """Sends the query directly to the API, returning the byte reply directly
 
         :query: query for the database
+        :format: Format to be returned
+        :index: index if format is pandas
+        :sort: sorting column if format is pandas
         :returns: byte reply
 
         """
-        pass
+        data = {'query': query}
+        q = self._request(
+            "POST", self.__get_url(), data=data, result_format=format, response_format='csv'
+        )
+        return q.result(index, sort)
 
