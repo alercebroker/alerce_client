@@ -8,7 +8,7 @@ import pytest
 
 sys.path.append("..")
 from alerce.core import Alerce
-from alerce.exceptions import ParseError
+from alerce.exceptions import ParseError, FormatValidationError
 
 alerce = Alerce()
 
