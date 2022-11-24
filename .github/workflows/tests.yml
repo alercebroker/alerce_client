@@ -5,11 +5,11 @@ name: Tests
 
 on:
   push:
-    branches: [ main ]
+    branches:
+      - main
   pull_request:
-    branches: [ main ]
-  schedule:
-    - cron: '0 9 * * MON,WED,FRI'
+    branches:
+      - main
 
 jobs:
   build:
