@@ -55,7 +55,6 @@ class ResultJson(Result):
     def __init__(self, json_result, **kwargs):
         self.json_result = json_result
         super().__init__(**kwargs)
-        print(self.format)
 
     def to_pandas(self, index=None, sort=None):
         dataframe = None

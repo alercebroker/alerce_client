@@ -93,7 +93,6 @@ def test_query_objects_format_csv(mock_request):
     mock_request.return_value.json.return_value = [{'oid': 1, 'mjd': 2}, {'oid' : 3, 'mjd' : 4}]
     r = alerce.query_objects(format="csv")
     expected_csv = "oid,mjd\n1,2\n3,4\n"
-    print(r)
     assert r == expected_csv
 
 @patch.object(Session, "request")
