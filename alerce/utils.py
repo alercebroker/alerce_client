@@ -38,17 +38,18 @@ class Result(abc.ABC):
 
         :index: if format is pandas, this is the index column
         :sort: if format is pandas, this is the sort column
-        :returns: Result in the indicated formar
+        :returns: Result in the indicated format
 
         """
         if self.format == "pandas":
             return self.to_pandas(index, sort)
-        if self.format == "votable":
+        elif self.format == "votable":
             return self.to_votable()
-        if self.format == "csv":
+        elif self.format == "csv":
             return self.to_csv()
-        if self.format == "json":
+        elif self.format == "json":
             return self.to_json()
+        raise ValueError(f"Unrecognized format '{self.format}'")
 
 
 class ResultJson(Result):
@@ -59,7 +60,6 @@ class ResultJson(Result):
         super().__init__(**kwargs)
 
     def to_pandas(self, index=None, sort=None):
-        dataframe = None
         if isinstance(self.json_result, list):
             dataframe = DataFrame(self.json_result)
         else:
