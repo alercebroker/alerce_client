@@ -6,7 +6,7 @@ import requests
 import abc
 
 
-class Result:
+class Result(abc.ABC):
     def __init__(self, format="json"):
         self.format = format
 
