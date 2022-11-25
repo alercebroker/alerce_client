@@ -62,7 +62,8 @@ class ResultJson(Result):
             dataframe = DataFrame(self.json_result)
         else:
             dataframe = DataFrame([self.json_result])
-        if sort: dataframe.sort_values(sort, inplace=True)
+        if sort:
+            dataframe.sort_values(sort, inplace=True)
         if index:
             dataframe.set_index(index, inplace=True)
         return dataframe
