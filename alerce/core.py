@@ -18,4 +18,5 @@ class Alerce(AlerceSearch, AlerceXmatch, AlerceStamps, AlerceDirect):
     ztf_url
         The url of the ZTF API
     """
+
     pass
