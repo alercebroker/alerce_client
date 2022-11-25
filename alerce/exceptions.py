@@ -1,3 +1,5 @@
+import requests
+
 def handle_error(response, response_format='json'):
     print(response)
     # TODO: The direct API uses code 400 for user input error (bad requests, etc), what should be done here then?
@@ -8,9 +10,8 @@ def handle_error(response, response_format='json'):
         try:
             error = response.json().get("errors", {})
             message = response.json().get("message")
-        except:
-            message = "Unknown API error."
-            error = "Unknown API error."
+        except requests.exceptions.JSONDecodeError:
+            pass
     elif response_format=='csv':
         error = response.content.decode('utf-8')
         message = response.content.decode('utf-8')
