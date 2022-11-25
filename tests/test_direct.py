@@ -135,3 +135,21 @@ def test_query_format_error(mock_request):
     expected_result = '[{"mjd":1,"oid":5,"oid_1":5},{"mjd":2,"oid":6,"oid_1":6}]'
     assert r == expected_result
 
+def test_init():
+    api_url = "test.alece"
+    db_api_url = "db.test.alerce"
+    alerce_test = Alerce(ZTF_API_URL=api_url, ZTF_DB_API_URL=db_api_url)
+    assert alerce_test.config['ZTF_DB_API_URL'] == db_api_url
+    assert alerce_test.config['ZTF_API_URL'] == api_url
+
+def test_init_json():
+    api_url = "test.alece"
+    db_api_url = "db.test.alerce"
+    test_config = {
+        "ZTF_API_URL": api_url,
+        "ZTF_DB_API_URL": db_api_url
+    }
+    alerce_test = Alerce()
+    alerce_test.load_config_from_object(test_config)
+    assert alerce_test.config['ZTF_DB_API_URL'] == db_api_url
+    assert alerce_test.config['ZTF_API_URL'] == api_url
