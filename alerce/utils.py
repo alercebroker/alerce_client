@@ -27,7 +27,7 @@ class Result(abc.ABC):
 
     @abc.abstractmethod
     def to_json(self):
-       pass
+        pass
 
     @abc.abstractmethod
     def to_csv(self, index=None, sort=None):
@@ -50,8 +50,10 @@ class Result(abc.ABC):
         if self.format == "json":
             return self.to_json()
 
+
 class ResultJson(Result):
     """Object that holds a json type result"""
+
     def __init__(self, json_result, **kwargs):
         self.json_result = json_result
         super().__init__(**kwargs)
@@ -84,10 +86,10 @@ class ResultCsv(Result):
     """Object that holds a csv type result"""
 
     def __init__(self, csv_result_byte, **kwargs):
-        self.csv_result = csv_result_byte.decode('utf-8')
-        self.data = [x.split(',') for x in self.csv_result.split('\n')[1:-1]]
+        self.csv_result = csv_result_byte.decode("utf-8")
+        self.data = [x.split(",") for x in self.csv_result.split("\n")[1:-1]]
 
-        self.columns = [x for x in self.csv_result.split('\n')[0].split(',')]
+        self.columns = [x for x in self.csv_result.split("\n")[0].split(",")]
         super().__init__(**kwargs)
 
     def _rename_duplicates(self):
@@ -101,10 +103,10 @@ class ResultCsv(Result):
                 counts[column] = 1
         return columns
 
-
     def to_pandas(self, index=None, sort=None):
         dataframe = read_csv(StringIO(self.csv_result))
-        if sort: dataframe.sort_values(sort, inplace=True)
+        if sort:
+            dataframe.sort_values(sort, inplace=True)
         if index:
             dataframe.set_index(index, inplace=True)
         return dataframe
@@ -120,10 +122,11 @@ class ResultCsv(Result):
     def to_json(self):
         columns = self._rename_duplicates()
         df = read_csv(StringIO(self.csv_result), names=columns, skiprows=1)
-        return df.to_json(orient='records')
+        return df.to_json(orient="records")
 
     def to_csv(self):
         return self.csv_result
+
 
 class Client:
     def __init__(self, **kwargs):
@@ -147,7 +150,14 @@ class Client:
         return format
 
     def _request(
-        self, method, url, params=None, data=None, response_field=None, result_format="json", response_format="json"
+        self,
+        method,
+        url,
+        params=None,
+        data=None,
+        response_field=None,
+        result_format="json",
+        response_format="json",
     ):
         result_format = self._validate_format(result_format)
 
@@ -155,8 +165,8 @@ class Client:
         if resp.status_code >= 400:
             handle_error(resp, response_format)
 
-        if response_format == 'csv':
+        if response_format == "csv":
             return ResultCsv(resp, format=result_format)
-        if response_field and result_format != "json" and result_format != 'csv':
+        if response_field and result_format != "json" and result_format != "csv":
             return ResultJson(resp.json()[response_field], format=result_format)
         return ResultJson(resp.json(), format=result_format)

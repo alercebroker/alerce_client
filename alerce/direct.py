@@ -1,6 +1,7 @@
 from .exceptions import FormatValidationError, ParseError, handle_error
 from .utils import Result, Client
 
+
 class AlerceDirect(Client):
 
     """Handles direct request to the database using the available http API"""
@@ -15,7 +16,7 @@ class AlerceDirect(Client):
     def __get_url(self):
         return f"{self.config['ZTF_DB_API_URL']}"
 
-    def send_query(self, query, format='csv', index=None, sort=None):
+    def send_query(self, query, format="csv", index=None, sort=None):
         """Sends the query directly to the API, returning the byte reply directly
 
         :query: query for the database
@@ -25,9 +26,12 @@ class AlerceDirect(Client):
         :returns: byte reply
 
         """
-        data = {'query': query}
+        data = {"query": query}
         q = self._request(
-            "POST", self.__get_url(), data=data, result_format=format, response_format='csv'
+            "POST",
+            self.__get_url(),
+            data=data,
+            result_format=format,
+            response_format="csv",
         )
         return q.result(index, sort)
-

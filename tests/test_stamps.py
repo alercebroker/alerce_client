@@ -19,7 +19,7 @@ class Dummy:
         self.content = content
 
 
-with open(EXAMPLE_PATH, 'rb') as f:
+with open(EXAMPLE_PATH, "rb") as f:
     EXAMPLE_FITS = Dummy(f.read())
 
 
@@ -31,7 +31,7 @@ def test_plot_stamp():
 
 
 @pytest.mark.filterwarnings("ignore:Keyword name")
-@patch('requests.Session.request', return_value=EXAMPLE_FITS)
+@patch("requests.Session.request", return_value=EXAMPLE_FITS)
 def test_get_stamp_fits(mock_fits):
     alerce = Alerce()
     r = alerce.get_stamps(oid="ZTF18abjpdlh", candid="570448435315010000")
@@ -39,16 +39,21 @@ def test_get_stamp_fits(mock_fits):
 
 
 @pytest.mark.filterwarnings("ignore:Keyword name")
-@patch('requests.Session.request', return_value=EXAMPLE_FITS)
+@patch("requests.Session.request", return_value=EXAMPLE_FITS)
 def test_get_stamp_numpy(mock_fits):
     alerce = Alerce()
-    r = alerce.get_stamps(oid="ZTF18abjpdlh", candid="570448435315010000", format="numpy")
+    r = alerce.get_stamps(
+        oid="ZTF18abjpdlh", candid="570448435315010000", format="numpy"
+    )
     assert len(r) == 3
     for i in r:
         assert isinstance(i, np.ndarray)
 
 
-@patch('alerce.stamps.fits_open', side_effect=HTTPError(url="mock://test", code=500, msg="mock", hdrs={}, fp=None))
+@patch(
+    "alerce.stamps.fits_open",
+    side_effect=HTTPError(url="mock://test", code=500, msg="mock", hdrs={}, fp=None),
+)
 def test_exception_stamp(mock_fits):
     alerce = Alerce()
     with pytest.warns(RuntimeWarning):
