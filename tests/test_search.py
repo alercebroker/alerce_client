@@ -1,6 +1,5 @@
-from unittest.mock import Mock, patch
+from unittest.mock import patch
 from requests import Session
-from requests import Response
 from pandas import DataFrame
 from astropy.table import Table
 import sys

@@ -1,6 +1,5 @@
-from unittest.mock import Mock, patch, ANY
+from unittest.mock import patch, ANY
 from requests import Session
-from requests import Response
 import pandas as pd
 from astropy.table import Table
 import sys
@@ -8,7 +7,7 @@ import pytest
 
 sys.path.append("..")
 from alerce.core import Alerce
-from alerce.exceptions import ParseError, FormatValidationError
+from alerce.exceptions import ParseError
 
 alerce = Alerce()
 
