@@ -2,7 +2,6 @@ import requests
 
 
 def handle_error(response, response_format="json"):
-    print(response)
     # TODO: The direct API uses code 400 for user input error (bad requests, etc), what should be done here then?
     codes = {-1: APIError, 400: ParseError, 404: ObjectNotFoundError}
     message = "Unknown API error."
