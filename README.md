@@ -41,6 +41,16 @@ dataframe = alerce.query_objects(
 detections = alerce.query_detections("ZTF20aaelulu", format="pandas", sort="mjd")
 
 magstats = alerce.query_magstats("ZTF20aaelulu")
+
+query='''
+SELECT
+    oid, sgmag1, srmag1, simag1, szmag1, sgscore1
+FROM
+    ps1_ztf
+WHERE
+    oid = 'ZTF20aaelulu'
+'''
+detections_direct = alerce.send_query(query, format="pandas")
 ```
 
 Configuration

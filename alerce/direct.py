@@ -23,7 +23,7 @@ class AlerceDirect(Client):
         :format: Format to be returned
         :index: index if format is pandas
         :sort: sorting column if format is pandas
-        :returns: byte reply
+        :returns: reply in the format specified
 
         """
         data = {"query": query}
