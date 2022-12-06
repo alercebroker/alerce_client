@@ -20,7 +20,7 @@ def test_select(mock_request):
         return result.decode(encoding)
 
     mock_request.return_value.status_code = 200
-    mock_request.return_value.decode = mock_result
+    mock_request.return_value.content.decode = mock_result
     query = "SELECT * from objects;"
     r = alerce.send_query(query)
 
@@ -36,7 +36,7 @@ def test_empty(mock_request):
         return result.decode(encoding)
 
     mock_request.return_value.status_code = 200
-    mock_request.return_value.decode = mock_result
+    mock_request.return_value.content.decode = mock_result
     query = "SELECT * from objects where oid=-1;"
     r = alerce.send_query(query)
     assert r == result.decode("utf-8")
@@ -84,7 +84,7 @@ def test_query_format_csv(mock_request):
         return result.decode(encoding)
 
     mock_request.return_value.status_code = 200
-    mock_request.return_value.decode = mock_result
+    mock_request.return_value.content.decode = mock_result
     query = "SELECT * FROM objects;"
     r = alerce.send_query(query, format="csv")
     assert r == result.decode("utf-8")
@@ -98,7 +98,7 @@ def test_query_format_pandas(mock_request):
         return result.decode(encoding)
 
     mock_request.return_value.status_code = 200
-    mock_request.return_value.decode = mock_result
+    mock_request.return_value.content.decode = mock_result
     query = "SELECT * FROM objects;"
     r = alerce.send_query(query, format="pandas")
     assert isinstance(r, pd.DataFrame)
@@ -111,7 +111,7 @@ def test_query_format_pandas_sort(mock_request):
         return "mjd\n2\n1\n"
 
     mock_request.return_value.status_code = 200
-    mock_request.return_value.decode = mock_result
+    mock_request.return_value.content.decode = mock_result
     sort = "mjd"
     r = alerce.send_query("", format="pandas", sort=sort)
     assert r.mjd.iloc[0] < r.mjd.iloc[1]
@@ -123,7 +123,7 @@ def test_query_format_pandas_index(mock_request):
         return "oid,oid,mjd\ntest,test,1\n"
 
     mock_request.return_value.status_code = 200
-    mock_request.return_value.decode = mock_result
+    mock_request.return_value.content.decode = mock_result
     index = "oid"
     r = alerce.send_query("", format="pandas", index=index)
     assert r.index.name == index
@@ -132,7 +132,7 @@ def test_query_format_pandas_index(mock_request):
 @patch.object(Session, "request")
 def test_query_format_votable(mock_request):
     mock_request.return_value.status_code = 200
-    mock_request.return_value.decode.return_value = "mjd,oid,oid\n1,5,5\n"
+    mock_request.return_value.content.decode.return_value = "mjd,oid,oid\n1,5,5\n"
     r = alerce.send_query("", format="votable")
     columns = ["mjd", "oid", "oid_1"]
     expected_table = Table([[1], [5], [5]], names=columns)
@@ -148,7 +148,7 @@ def test_query_format_votable(mock_request):
 @patch.object(Session, "request")
 def test_query_format_error(mock_request):
     mock_request.return_value.status_code = 200
-    mock_request.return_value.decode.return_value = "mjd,oid,oid\n1,5,5\n2,6,6\n"
+    mock_request.return_value.content.decode.return_value = "mjd,oid,oid\n1,5,5\n2,6,6\n"
     r = alerce.send_query("", format="json")
     expected_result = '[{"mjd":1,"oid":5,"oid_1":5},{"mjd":2,"oid":6,"oid_1":6}]'
     assert r == expected_result

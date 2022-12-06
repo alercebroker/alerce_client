@@ -166,7 +166,7 @@ class Client:
             handle_error(resp, response_format)
 
         if response_format == "csv":
-            return ResultCsv(resp, format=result_format)
+            return ResultCsv(resp.content, format=result_format)
         if response_field and result_format != "json" and result_format != "csv":
             return ResultJson(resp.json()[response_field], format=result_format)
         return ResultJson(resp.json(), format=result_format)
