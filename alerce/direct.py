@@ -7,7 +7,7 @@ class AlerceDirect(Client):
 
     def __init__(self, **kwargs):
         default_config = {
-            "ZTF_DB_API_URL": "https://api.alerce.online/db/",
+            "ZTF_DB_API_URL": "https://dev-api.alerce.online/dbquery/v1/db/",
         }
         default_config.update(kwargs)
         super().__init__(**default_config)
