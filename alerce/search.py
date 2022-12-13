@@ -1,5 +1,4 @@
-from .exceptions import FormatValidationError, ParseError, handle_error
-from .utils import Result, Client
+from .utils import Client
 
 
 class AlerceSearch(Client):
@@ -29,14 +28,6 @@ class AlerceSearch(Client):
 
     def __get_url(self, resource, *args):
         return self.ztf_url + self.config["ZTF_ROUTES"][resource] % args
-
-    def __validate_format(self, format):
-        format = format.lower()
-        if not format in self.allowed_formats:
-            raise FormatValidationError(
-                "Format '%s' not in %s" % (format, self.allowed_formats), code=500
-            )
-        return format
 
     def query_objects(self, format="pandas", index=None, sort=None, **kwargs):
         """

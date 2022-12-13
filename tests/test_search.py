@@ -1,6 +1,5 @@
-from unittest.mock import Mock, patch
+from unittest.mock import patch
 from requests import Session
-from requests import Response
 from pandas import DataFrame
 from astropy.table import Table
 import sys
@@ -86,6 +85,18 @@ def test_query_objects_format_json(mock_request):
     mock_request.return_value.json.return_value = "ok"
     r = alerce.query_objects(format="json")
     assert r == "ok"
+
+
+@patch.object(Session, "request")
+def test_query_objects_format_csv(mock_request):
+    mock_request.return_value.status_code = 200
+    mock_request.return_value.json.return_value = [
+        {"oid": 1, "mjd": 2},
+        {"oid": 3, "mjd": 4},
+    ]
+    r = alerce.query_objects(format="csv")
+    expected_csv = "oid,mjd\n1,2\n3,4\n"
+    assert r == expected_csv
 
 
 @patch.object(Session, "request")

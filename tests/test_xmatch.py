@@ -1,6 +1,4 @@
-from unittest.mock import Mock, patch
 import pytest
-from requests import Session
 import sys
 
 sys.path.append("..")
