@@ -22,8 +22,6 @@ jobs:
           fetch-depth: 0
           token: ${{ secrets.ADMIN_TOKEN }}
       - name: Semantic Release
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
         run: |
           git config --global user.name "@alerceadmin"
           git config --global user.email "alerceadmin@users.noreply.github.com"
