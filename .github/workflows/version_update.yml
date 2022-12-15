@@ -25,6 +25,6 @@ jobs:
         run: |
           git config --global user.name "@alerceadmin"
           git config --global user.email "alerceadmin@users.noreply.github.com"
-          pip install python-semantic-release
+          pip install python-semantic-release==7.28.1
           semantic-release version
           git push
