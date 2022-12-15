@@ -16,8 +16,7 @@ class AlerceDirect(Client):
         return f"{self.config['ZTF_DB_API_URL']}"
 
     def send_query(self, query, format="csv", index=None, sort=None):
-        """Sends the query the the DB API, returning the reply in the
-        format specified in the arguments.
+        """Sends the query directly to the API, returning the byte reply directly
 
         :query: query for the database
         :format: Format to be returned
