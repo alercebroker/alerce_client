@@ -6,7 +6,7 @@ __version__ = "1.2.0"
 
 setup(
    name='alerce',
-   version=__version__",
+   version=__version__,
    description='ALeRCE Client',
    author='ALeRCE Team',
    author_email='contact@alerce.online',
