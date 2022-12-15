@@ -1,0 +1,27 @@
+name: CI
+on:
+  pull_request:
+    types: [ closed ]
+    branches: [ main ]
+
+jobs:
+  versioning:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+      - name: Checkout code
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: Semantic Release
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git config --global user.name "@alerceadmin"
+          git config --global user.email "alerceadmin@users.noreply.github.com"
+          pip install python-semantic-release
+          semantic-release version
+          git push
