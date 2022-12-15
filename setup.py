@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 with open("requirements.txt") as f:
     required_packages = f.readlines()
 
-__version__ = "1.1.0"
+__version__ = "1.2.0"
 
 setup(
    name='alerce',
