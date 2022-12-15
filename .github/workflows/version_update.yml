@@ -1,8 +1,12 @@
 name: CI
 on:
   pull_request:
-    types: [ closed ]
-    branches: [ main ]
+    types:
+      - closed
+    branches:
+      - main
+    paths:
+      - 'alerce/**'
 
 jobs:
   versioning:
