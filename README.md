@@ -84,3 +84,6 @@ my_config = {
 alerce = Alerce()
 alerce.load_config_from_object(my_config)
 ```
+Contribuiting
+=============
+Each pull request must have at least one commit following the [angular commit guidelines](https://github.com/angular/angular.js/blob/master/DEVELOPERS.md#commits) for the semantic versioning to work.
