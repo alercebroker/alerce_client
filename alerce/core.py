@@ -1,10 +1,10 @@
 from .search import AlerceSearch
 from .crossmatch import AlerceXmatch
 from .stamps import AlerceStamps
-from .direct import AlerceDirect
+from .direct import AlerceDirect, AlerceMongo
 
 
-class Alerce(AlerceSearch, AlerceXmatch, AlerceStamps, AlerceDirect):
+class Alerce(AlerceSearch, AlerceXmatch, AlerceStamps, AlerceDirect, AlerceMongo):
     """
     The main client class that has all the methods for accessing the different services.
 
