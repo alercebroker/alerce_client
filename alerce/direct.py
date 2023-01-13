@@ -82,7 +82,7 @@ class AlerceMongo(Client):
         :returns: reply in the format specified
 
         """
-        return self.__mongo_aggregate('aggregate', 'documents', data, format, index, sort)
+        return self.__mongo_send('aggregate', 'documents', data, format, index, sort)
 
     def __mongo_send(self, endpoint, response_field, data, format="csv", index=None, sort=None):
         q = self._request(
