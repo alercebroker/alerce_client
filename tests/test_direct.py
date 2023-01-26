@@ -56,8 +56,6 @@ def test_typo(mock_request):
     query = "SLECT * FROM OBJECTS;"
     with pytest.raises(ParseError) as error:
         r = alerce.send_query(query)
-    print(message)
-    print(error.value.message)
     assert error.value.message == message.decode("utf-8")
 
 

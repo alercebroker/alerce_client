@@ -104,5 +104,23 @@ def test_user_error(mock_request):
     assert error.value.message == message
 
 @patch.object(Session, "request")
-def test_server_error(mock_request):
-    pass
+def test_query_format_pandas(mock_request):
+    query = {
+      "collection": "object",
+      "filter": {"ndet": {"$gte": 100}},
+      "limit": 10,
+      "projection": {
+        "oid": 1,
+      }
+    }
+    result = {"documents": {"oid": "test"}}
+    expected_df = pd.DataFrame(["test"], columns=["oid"])
+
+    def mock_result():
+        return result
+
+    mock_request.return_value.status_code = 200
+    mock_request.return_value.json = mock_result
+    r = alerce.mongo_find(query, format="pandas")
+    assert isinstance(r, pd.DataFrame)
+    assert r.equals(expected_df)
