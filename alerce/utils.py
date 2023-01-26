@@ -127,6 +127,7 @@ class ResultCsv(Result):
     def to_csv(self):
         return self.csv_result
 
+
 class Client:
     def __init__(self, **kwargs):
         self.session = requests.Session()

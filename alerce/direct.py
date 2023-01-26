@@ -35,6 +35,7 @@ class AlerceDirect(Client):
         )
         return q.result(index, sort)
 
+
 class AlerceMongo(Client):
     """Handles direct request to the mongo database using the available http API"""
 
@@ -58,7 +59,7 @@ class AlerceMongo(Client):
         :returns: reply in the format specified
 
         """
-        return self.__mongo_send('findOne', 'document', data, format, index, sort)
+        return self.__mongo_send("findOne", "document", data, format, index, sort)
 
     def mongo_find(self, data, format="json", index=None, sort=None):
         """Sends the query directly to the /find endpoint of the API, returning the reply in the specified format
@@ -70,7 +71,7 @@ class AlerceMongo(Client):
         :returns: reply in the format specified
 
         """
-        return self.__mongo_send('find', 'documents', data, format, index, sort)
+        return self.__mongo_send("find", "documents", data, format, index, sort)
 
     def mongo_aggregate(self, data, format="json", index=None, sort=None):
         """Sends the query directly to the /aggregate endpoint of the API, returning the reply in the specified format
@@ -82,15 +83,17 @@ class AlerceMongo(Client):
         :returns: reply in the format specified
 
         """
-        return self.__mongo_send('aggregate', 'documents', data, format, index, sort)
+        return self.__mongo_send("aggregate", "documents", data, format, index, sort)
 
-    def __mongo_send(self, endpoint, response_field, data, format="csv", index=None, sort=None):
+    def __mongo_send(
+        self, endpoint, response_field, data, format="csv", index=None, sort=None
+    ):
         q = self._request(
             "POST",
             self.__get_url() + endpoint,
             json=data,
             result_format=format,
             response_format="json",
-            response_field=response_field
+            response_field=response_field,
         )
         return q.result(index, sort)
