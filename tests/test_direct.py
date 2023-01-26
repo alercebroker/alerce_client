@@ -24,7 +24,7 @@ def test_select(mock_request):
     query = "SELECT * from objects;"
     r = alerce.send_query(query)
 
-    mock_request.assert_called_with("POST", ANY, params=None, data={"query": query})
+    mock_request.assert_called_with("POST", ANY, params=None, json=None, data={"query": query})
     assert r is not None
 
 
@@ -56,8 +56,6 @@ def test_typo(mock_request):
     query = "SLECT * FROM OBJECTS;"
     with pytest.raises(ParseError) as error:
         r = alerce.send_query(query)
-    print(message)
-    print(error.value.message)
     assert error.value.message == message.decode("utf-8")
 
 

@@ -155,18 +155,20 @@ class Client:
         url,
         params=None,
         data=None,
+        json=None,
         response_field=None,
         result_format="json",
         response_format="json",
     ):
         result_format = self._validate_format(result_format)
 
-        resp = self.session.request(method, url, params=params, data=data)
+        resp = self.session.request(method, url, params=params, json=json, data=data)
+
         if resp.status_code >= 400:
             handle_error(resp, response_format)
 
         if response_format == "csv":
             return ResultCsv(resp.content, format=result_format)
-        if response_field and result_format != "json" and result_format != "csv":
+        if response_field and result_format != "json":
             return ResultJson(resp.json()[response_field], format=result_format)
         return ResultJson(resp.json(), format=result_format)
