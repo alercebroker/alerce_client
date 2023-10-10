@@ -35,7 +35,7 @@ class AlerceSearch(Client):
         return self.config["API_BASE_URL"] + self.config["V2_ROUTE_PREFIX"]
 
     def __get_url(self, resource, *args):
-        if resource in self.config['V2_ROUTES']:
+        if resource in self.config["V2_ROUTES"]:
             return self.v2_url + self.config["V2_ROUTES"][resource] % args
         else:
             return self.ztf_v1_url + self.config["ZTF_V1_ROUTES"][resource] % args
