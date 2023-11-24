@@ -4,13 +4,11 @@ from .utils import Client
 class AlerceSearch(Client):
     def __init__(self, **kwargs):
         default_config = {
-            "ZTF_API_URL": "https://api.alerce.online/ztf/v1/",
-            "ZTF_ROUTES": {
+            "ZTF_API_URL": "https://api.alerce.online",
+            "ZTF_V1_ROUTE_PREFIX": "/ztf/v1",
+            "ZTF_V1_ROUTES": {
                 "objects": "/objects",
                 "single_object": "/objects/%s",
-                "detections": "/objects/%s/detections",
-                "non_detections": "/objects/%s/non_detections",
-                "lightcurve": "/objects/%s/lightcurve",
                 "magstats": "/objects/%s/magstats",
                 "probabilities": "/objects/%s/probabilities",
                 "features": "/objects/%s/features",
@@ -18,16 +16,29 @@ class AlerceSearch(Client):
                 "classifiers": "/classifiers",
                 "classifier_classes": "/classifiers/%s/%s/classes",
             },
+            "V2_ROUTE_PREFIX": "/v2/lightcurve",
+            "V2_ROUTES": {
+                "detections": "/detections/%s",
+                "non_detections": "/non_detections/%s",
+                "lightcurve": "/lightcurve/%s",
+            },
         }
         default_config.update(kwargs)
         super().__init__(**default_config)
 
     @property
-    def ztf_url(self):
-        return self.config["ZTF_API_URL"]
+    def ztf_v1_url(self):
+        return self.config["ZTF_API_URL"] + self.config["ZTF_V1_ROUTE_PREFIX"]
+
+    @property
+    def v2_url(self):
+        return self.config["ZTF_API_URL"] + self.config["V2_ROUTE_PREFIX"]
 
     def __get_url(self, resource, *args):
-        return self.ztf_url + self.config["ZTF_ROUTES"][resource] % args
+        if resource in self.config["V2_ROUTES"]:
+            return self.v2_url + self.config["V2_ROUTES"][resource] % args
+        else:
+            return self.ztf_v1_url + self.config["ZTF_V1_ROUTES"][resource] % args
 
     def query_objects(self, format="pandas", index=None, sort=None, **kwargs):
         """
@@ -81,6 +92,7 @@ class AlerceSearch(Client):
 
         if "class_name" in kwargs:
             kwargs["class"] = kwargs.pop("class_name")
+        print(self.__get_url("objects"))
         q = self._request(
             "GET",
             url=self.__get_url("objects"),
@@ -139,6 +151,7 @@ class AlerceSearch(Client):
         sort : str
             The name of the column to sort when format is 'pandas'
         """
+        print(self.__get_url("detections", oid))
         q = self._request(
             "GET", self.__get_url("detections", oid), result_format=format
         )

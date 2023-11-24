@@ -11,6 +11,20 @@ from alerce.exceptions import ObjectNotFoundError, FormatValidationError, ParseE
 
 alerce = Alerce()
 
+@patch.object(Session, "request")
+def test_get_url(mock_request):
+    def mock_result():
+        return {"items": [{"oid": "test"}]}
+
+    mock_request.return_value.status_code = 200
+    mock_request.return_value.json = mock_result
+
+    r = alerce.query_lightcurve("test")
+    print(alerce.config)
+    assert mock_request.call_args.args[1] == "https://api.alerce.online/v2/lightcurve/lightcurve/test"
+
+    r = alerce.query_object("test")
+    assert mock_request.call_args.args[1] == "https://api.alerce.online/ztf/v1/objects/test"
 
 @patch.object(Session, "request")
 def test_query_objects(mock_request):
