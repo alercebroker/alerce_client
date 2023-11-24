@@ -4,7 +4,7 @@ from .utils import Client
 class AlerceSearch(Client):
     def __init__(self, **kwargs):
         default_config = {
-            "ZTF_API_URL": "https://api.staging.alerce.online",
+            "ZTF_API_URL": "https://api.alerce.online",
             "ZTF_V1_ROUTE_PREFIX": "/ztf/v1",
             "ZTF_V1_ROUTES": {
                 "objects": "/objects",

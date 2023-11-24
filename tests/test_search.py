@@ -20,7 +20,8 @@ def test_get_url(mock_request):
     mock_request.return_value.json = mock_result
 
     r = alerce.query_lightcurve("test")
-    assert mock_request.call_args.args[1] == "https://api.alerce.online/v2/lightcurve/test"
+    print(alerce.config)
+    assert mock_request.call_args.args[1] == "https://api.alerce.online/v2/lightcurve/lightcurve/test"
 
     r = alerce.query_object("test")
     assert mock_request.call_args.args[1] == "https://api.alerce.online/ztf/v1/objects/test"
