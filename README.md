@@ -1,4 +1,4 @@
-![image](https://github.com/alercebroker/alerce_client/workflows/Tests/badge.svg)![image](https://codecov.io/gh/alercebroker/alerce_client/branch/master/graph/badge.svg)![image](https://readthedocs.org/projects/alerce/badge/?version=latest)
+![image](https://github.com/alercebroker/alerce_client/workflows/Tests/badge.svg)[![codecov](https://codecov.io/gh/alercebroker/alerce_client/graph/badge.svg?token=Y2AQJ3SWFE)](https://codecov.io/gh/alercebroker/alerce_client)![image](https://readthedocs.org/projects/alerce/badge/?version=latest)
 
 
 Welcome to ALeRCE Python Client.
