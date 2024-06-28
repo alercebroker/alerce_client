@@ -2,7 +2,6 @@ from .utils import Client
 
 
 class AlerceDirect(Client):
-
     """Handles direct request to the database using the available http API"""
 
     def __init__(self, **kwargs):

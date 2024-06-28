@@ -82,7 +82,6 @@ class ResultJson(Result):
 
 
 class ResultCsv(Result):
-
     """Object that holds a csv type result"""
 
     def __init__(self, csv_result_byte, **kwargs):

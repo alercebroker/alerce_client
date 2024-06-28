@@ -148,7 +148,9 @@ def test_query_format_votable(mock_request):
 @patch.object(Session, "request")
 def test_query_format_error(mock_request):
     mock_request.return_value.status_code = 200
-    mock_request.return_value.content.decode.return_value = "mjd,oid,oid\n1,5,5\n2,6,6\n"
+    mock_request.return_value.content.decode.return_value = (
+        "mjd,oid,oid\n1,5,5\n2,6,6\n"
+    )
     r = alerce.send_query("", format="json")
     expected_result = '[{"mjd":1,"oid":5,"oid_1":5},{"mjd":2,"oid":6,"oid_1":6}]'
     assert r == expected_result
