@@ -100,7 +100,7 @@ class AlerceXmatch(Client):
         ----------
         ra : :py:class:`float`
             Right ascension in Degrees.
-        def : :py:class:`float`
+        dec : :py:class:`float`
             Declination in Degrees.
         catalog_name : :py:class:`str`
             catsHTM Catalog name, `"all"` can be used to query all available catalogs. List of available catalogs can be found in `here <https://alerceapi.readthedocs.io/en/latest/catshtm.html#id1>`_.
@@ -153,7 +153,7 @@ class AlerceXmatch(Client):
         ----------
         ra : :py:class:`float`
             Right ascension in Degrees.
-        def: :py:class:`float`
+        dec: :py:class:`float`
             Declination in Degrees.
         catalog_name : :py:class:`str`
             catsHTM Catalog name, `"all"` can be used to query all available catalogs. List of available catalogs can be found in `here <https://alerceapi.readthedocs.io/en/latest/catshtm.html#id1>`_.
@@ -203,8 +203,10 @@ class AlerceXmatch(Client):
 
         Parameters
         ----------
-        oid : :py:class:`str`
-            object ID in ALeRCE DBs.
+        ra : :py:class:`float`
+            Right ascension in Degrees.
+        dec: :py:class:`float`
+            Declination in Degrees.
         radius : :py:class:`float`
             catsHTM conesearch radius in arcsec.
         format : :py:class:`str`
