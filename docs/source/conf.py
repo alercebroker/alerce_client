@@ -64,11 +64,11 @@ html_static_path = ["_static"]
 html_theme_options = {"logo": "img/logo.png"}
 
 intersphinx_mapping = {
-    "pandas":("https://pandas.pydata.org/pandas-docs/stable/",None),
-    "astropy":("http://docs.astropy.org/en/stable/",None),
-    'python': ('https://docs.python.org/3', None),
+    "pandas": ("https://pandas.pydata.org/pandas-docs/stable/", None),
+    "astropy": ("http://docs.astropy.org/en/stable/", None),
+    "python": ("https://docs.python.org/3", None),
 }
 
-master_doc = 'index'
+master_doc = "index"
 
-source_suffix = '.rst'
+source_suffix = ".rst"

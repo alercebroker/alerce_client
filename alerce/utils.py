@@ -30,7 +30,7 @@ class Result(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def to_csv(self, index=None, sort=None):
+    def to_csv(self):
         pass
 
     def result(self, index=None, sort=None):
@@ -82,7 +82,6 @@ class ResultJson(Result):
 
 
 class ResultCsv(Result):
-
     """Object that holds a csv type result"""
 
     def __init__(self, csv_result_byte, **kwargs):
@@ -143,7 +142,7 @@ class Client:
 
     def _validate_format(self, format):
         format = format.lower()
-        if not format in self.allowed_formats:
+        if format not in self.allowed_formats:
             raise FormatValidationError(
                 "Format '%s' not in %s" % (format, self.allowed_formats), code=500
             )
