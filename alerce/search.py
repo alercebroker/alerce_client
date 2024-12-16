@@ -159,6 +159,26 @@ class AlerceSearch(Client):
             "GET", self.__get_url("non_detections", oid), result_format=format
         )
         return q.result(index, sort)
+    
+    def query_forced_photometry(self, oid, format="json", index=None, sort=None):
+        """
+        Gets all forced photometry detections of a given object
+
+        Parameters
+        ----------
+        oid : str
+            The object identifier
+        format : str
+            Return format. Can be one of 'pandas' | 'votable' | 'json'
+        """
+        q = self._request(
+            "GET", "https://api.alerce.online/v2/lightcurve/forced-photometry/%s" % oid, result_format=format
+        )
+
+        # NOTA: la api principal de ztf no tiene ruta de forced photometry, la v2 si tiene. Esto es lo mas facil
+        # pero no es correcto.
+        
+        return q.result(index, sort)
 
     def query_magstats(self, oid, format="json", index=None, sort=None):
         """
