@@ -29,6 +29,7 @@ jobs:
       with:
         options: "--check --verbose"
         src: "alerce/"
+        version: "~=24.0"
     - name: Test with pytest
       run: |
         coverage run --source alerce/ -m pytest tests/
