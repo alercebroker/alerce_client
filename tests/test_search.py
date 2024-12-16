@@ -182,10 +182,10 @@ def test_query_detections(mock_request):
         return [
             {"candid":"candid1","tid":"ztf","sid":None,"aid":None,"pid":1234,"oid":"oid"},
             {"candid":"candid2","tid":"ztf","sid":None,"aid":None,"pid":1234,"oid":"oid"}
-            ]
+        ]
     
     mock_request.return_value.status_code = 200
-    mock_request.return_value.json = mock_result()
+    mock_request.return_value.json = mock_result
 
     r = alerce.query_forced_photometry("oid")
     assert r is not None
