@@ -162,7 +162,7 @@ class AlerceSearch(Client):
 
     def query_forced_photometry(self, oid, format="json", index=None, sort=None):
         """
-        Gets all forced photometry detections of a given object
+        Gets all forced photometry epochs of a given object
 
         Parameters
         ----------
