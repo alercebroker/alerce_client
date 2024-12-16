@@ -74,11 +74,7 @@ def test_query_objects_format_pandas_sort(mock_request):
 
     mock_request.return_value.status_code = 200
     mock_request.return_value.json = mock_result
-    sort = "mjd"@patch.object(Session, "request")
-def test_query_detections(mock_request):
-    mock_request.return_value.status_code = 200
-    r = alerce.query_detections("oid")
-    assert r is not None
+    sort = "mjd"
     r = alerce.query_objects(format="pandas", sort=sort)
     assert r.mjd.iloc[0] < r.mjd.iloc[1]
 
@@ -161,7 +157,7 @@ def test_query_features(mock_request):
 
 
 @patch.object(Session, "request")
-def test_query_single_feature(mock_request):ZTF24aalvzza
+def test_query_single_feature(mock_request):
     mock_request.return_value.status_code = 200
     r = alerce.query_feature(oid="oid", name="feature")
     assert r is not None
@@ -179,7 +175,6 @@ def test_query_classes(mock_request):
     mock_request.return_value.status_code = 200
     r = alerce.query_classes("lc_classifier", "bulk_0.0.1")
     assert r is not None
-
 
 @patch.object(Session, "request")
 def test_query_detections(mock_request):
