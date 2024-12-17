@@ -13,52 +13,55 @@ Forced Photometry Response
     - Processing ID for image
   * - mjd
     - number
-    - Description
+    - Modified julian Date
   * - fid
     - integer
-    - Filter ID (1=g; 2=R; 3=i)
+    - Filter ID (1=g; 2=r; 3=i)
   * - ra
     - number
-    - Description
+    - Right Ascension of epoch (same as of candidate) [deg]
   * - dec
     - number
-    - Description
+    - Declination of epoch (same as of candidate) [deg]
   * - e_ra
     - number
-    - Description
+    - Right Ascension uncertainty
   * - e_dec
     - number
-    - Description
+    - Declination uncertainty
   * - mag
     - number
-    - Description
+    - Magnitude from PSF-fit photometry [mag], obtained from magzpsci and forcediffimflux avro fields
   * - e_mag
     - number
-    - Description
+    - 1-sigma uncertainty in mag [mag], obtained from forcediffimflux and forcediffimfluxunc avro fields
+  * - mag_corr
+    - number
+    - Corrected PSF magnitude
   * - e_mag_corr
     - number
-    - Description
+    - Error of the corrected PSF magnitude assuming no contribution from an extended component
   * - e_mag_corr_ext
     - number
-    - Description
+    - Error of the corrected PSF magnitude assuming a contribution from an extended component
   * - isdiffpos
     - integer
-    - Description
+    - 1: candidate is from positive (sci minus ref) subtraction; -1: didate is from negative (ref minus sci) subtraction
   * - corrected
     - boolean
-    - Description
+    - Whether the corrected photometry was applied
   * - dubious
     - boolean
-    - Description
+    - Whether the corrected photometry should be flagged
   * - parent_candid
     - number
-    - Description
+    - candid of the alert for which forced photometry was triggered
   * - has_stamp
     - boolean
-    - Description
+    - Whether the epoch has an associated image stamp triplet (always False for forced photometry)
   * - field
     - integer
-    - Description
+    - ZTF field ID
   * - rcid
     - integer
     - Readout channel ID [00 .. 63]
@@ -79,7 +82,7 @@ Forced Photometry Response
     - Magnitude zero point for photometry estimates [mag]
   * - magzpsciunc
     - number
-    - DescriptionMagnitude zero point uncertainty (in magzpsci) [mag]
+    - Magnitude zero point uncertainty (in magzpsci) [mag]
   * - magzpscirms
     - number
     - RMS (deviation from average) in all differences between instrumental photometry and matched photometric calibrators from science image processing [mag]

@@ -40,7 +40,7 @@ Detection Response
     - Magnitude from PSF-fit photometry [mag]
   * - sigmapsf
     - number
-    - 1-sigma uncertainty in magap [mag]
+    - 1-sigma uncertainty in magpsf [mag]
   * - magap
     - number
     - Aperture mag using 8 pixel diameter aperture [mag]
