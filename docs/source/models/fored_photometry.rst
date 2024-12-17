@@ -10,13 +10,13 @@ Forced Photometry Response
     - Description
   * - pid
     - integer
-    - Description
+    - Processing ID for image
   * - mjd
     - number
     - Description
   * - fid
     - integer
-    - Description
+    - Filter ID (1=g; 2=R; 3=i)
   * - ra
     - number
     - Description
@@ -61,70 +61,70 @@ Forced Photometry Response
     - Description
   * - rcid
     - integer
-    - Description
+    - Readout channel ID [00 .. 63]
   * - rfid
     - integer
-    - Description
+    - Processing ID for reference image to facilitate archive retrieval
   * - sciinpseeing
     - number
-    - Description
+    - Effective FWHM of sci image [pixels]
   * - scibckgnd
     - number
-    - Description
+    - Background level in sci image [DN]
   * - scisigpix
     - number
-    - Description
+    - Robust sigma per pixel in sci image [DN]
   * - magzpsci
     - number
-    - Description
+    - Magnitude zero point for photometry estimates [mag]
   * - magzpsciunc
     - number
-    - Description
+    - DescriptionMagnitude zero point uncertainty (in magzpsci) [mag]
   * - magzpscirms
     - number
-    - Description
+    - RMS (deviation from average) in all differences between instrumental photometry and matched photometric calibrators from science image processing [mag]
   * - clrcoeff
     - number
-    - Description
+    - Color coefficient from linear fit from photometric calibration of science image
   * - clrcounc
     - number
-    - Description
+    - Color coefficient uncertainty from linear fit (corresponding to clrcoeff)
   * - exptime
     - number
-    - Description
+    - Integration time of camera exposure [sec]
   * - adpctdif1
     - number
-    - Description
+    - Full sci image astrometric RMS along R.A. with respect to Gaia1 [arcsec]
   * - adpctdif2
     - number
-    - Description
+    - Full sci image astrometric RMS along Dec. with respect to Gaia1 [arcsec]
   * - diffmaglim
-    -number 
-    - Description
+    - number 
+    - Expected 5-sigma mag limit in difference image based on global noise estimate [mag]
   * - programid
     - integer
-    - Description
+    - Program ID: encodes either public, collab, or caltech mode
   * - procstatus
     - string
-    - Description
+    - Forced photometry processing status codes (0 => no warnings); see documentation
   * - distnr
     - number
-    - Description
+    - distance to nearest source in reference image PSF-catalog [arcsec]
   * - ranr
     - number
-    - Description
+    - Right Ascension of nearest source in reference image PSF-catalog; J2000 [deg]
   * - decnr
     - number
-    - Description
+    - Declination of nearest source in reference image PSF-catalog; J2000 [deg]
   * - magnr
     - number
-    - Description
+    - magnitude of nearest source in reference image PSF-catalog [mag]
   * - sigmagnr
     - number
-    - Description
+    - 1-sigma uncertainty in magnr [mag]    
   * - chinr
     - number
-    - Description
+    - DAOPhot chi parameter of nearest source in reference image PSF-catalog
   * - sharpnr
     - number 
-    - Description
+    - DAOPhot sharp parameter of nearest source in reference image PSF-catalog
