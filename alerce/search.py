@@ -180,7 +180,13 @@ class AlerceSearch(Client):
         # NOTA: la api principal de ztf no tiene ruta de forced photometry, la v2 si tiene. Esto es lo mas facil
         # pero no es correcto.
 
-        return q.result(index, sort)
+        # all this extra code is to expand the extra fields.
+        complete_result = q.result(index, sort)
+        extra_fields = complete_result.pop("extra_fields", None)
+        parsed_result = complete_result.update(extra_fields)
+
+        return parsed_result
+
 
     def query_magstats(self, oid, format="json", index=None, sort=None):
         """
