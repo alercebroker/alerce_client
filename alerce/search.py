@@ -181,9 +181,26 @@ class AlerceSearch(Client):
         # pero no es correcto.
 
         # all this extra code is to expand the extra fields.
-        complete_result = q.result(index, sort)
-        extra_fields = complete_result.pop("extra_fields", None)
-        parsed_result = complete_result.update(extra_fields)
+        if format == "json":
+            complete_result = q.result(index, sort)
+            parsed_result = []
+            print(complete_result)
+            for result in complete_result:
+                new_result = result.copy()
+                extra_fields = new_result.pop("extra_fields", {})
+                new_result.update(extra_fields)
+                parsed_result.append(new_result)
+        if format == "pandas" or format == "csv":
+            complete_result = q.result(index, sort)
+            extra_fields = complete_result["extra_fields"].copy()
+            complete_result = complete_result.drop(columns="extra_fields")
+            # expand
+            import pandas as pd
+            extra_fields = pd.json_normalize(extra_fields)
+            # merge
+            parsed_result = complete_result.merge(extra_fields)
+            if format == "csv":
+                parsed_result = parsed_result.to_csv(index=False)
 
         return parsed_result
 
