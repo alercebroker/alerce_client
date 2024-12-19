@@ -196,6 +196,7 @@ class AlerceSearch(Client):
             complete_result = complete_result.drop(columns="extra_fields")
             # expand
             import pandas as pd
+
             extra_fields = pd.json_normalize(extra_fields)
             # merge
             parsed_result = complete_result.merge(extra_fields)
@@ -203,7 +204,6 @@ class AlerceSearch(Client):
                 parsed_result = parsed_result.to_csv(index=False)
 
         return parsed_result
-
 
     def query_magstats(self, oid, format="json", index=None, sort=None):
         """
