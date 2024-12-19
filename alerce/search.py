@@ -181,19 +181,23 @@ class AlerceSearch(Client):
         # pero no es correcto.
 
         # all this extra code is to expand the extra fields.
+        complete_result = q.result(index, sort)
+
+        FIELDS_TO_REMOVE = ["extra_fields", "aid", "sid"]
+
         if format == "json":
-            complete_result = q.result(index, sort)
             parsed_result = []
             print(complete_result)
             for result in complete_result:
                 new_result = result.copy()
                 extra_fields = new_result.pop("extra_fields", {})
+                for f_t_r in FIELDS_TO_REMOVE:
+                    new_result.pop(f_t_r, None)
                 new_result.update(extra_fields)
                 parsed_result.append(new_result)
         if format == "pandas" or format == "csv":
-            complete_result = q.result(index, sort)
             extra_fields = complete_result["extra_fields"].copy()
-            complete_result = complete_result.drop(columns="extra_fields")
+            complete_result = complete_result.drop(columns=FIELDS_TO_REMOVE)
             # expand
             import pandas as pd
 
