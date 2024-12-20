@@ -187,7 +187,6 @@ class AlerceSearch(Client):
 
         if format == "json":
             parsed_result = []
-            print(complete_result)
             for result in complete_result:
                 new_result = result.copy()
                 extra_fields = new_result.pop("extra_fields", {})
