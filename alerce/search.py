@@ -160,6 +160,54 @@ class AlerceSearch(Client):
         )
         return q.result(index, sort)
 
+    def query_forced_photometry(self, oid, format="json", index=None, sort=None):
+        """
+        Gets all forced photometry epochs of a given object
+
+        Parameters
+        ----------
+        oid : str
+            The object identifier
+        format : str
+            Return format. Can be one of 'pandas' | 'votable' | 'json'
+        """
+        q = self._request(
+            "GET",
+            "https://api.alerce.online/v2/lightcurve/forced-photometry/%s" % oid,
+            result_format=format,
+        )
+
+        # NOTA: la api principal de ztf no tiene ruta de forced photometry, la v2 si tiene. Esto es lo mas facil
+        # pero no es correcto.
+
+        # all this extra code is to expand the extra fields.
+        complete_result = q.result(index, sort)
+
+        FIELDS_TO_REMOVE = ["extra_fields", "aid", "sid"]
+
+        if format == "json":
+            parsed_result = []
+            for result in complete_result:
+                new_result = result.copy()
+                extra_fields = new_result.pop("extra_fields", {})
+                for f_t_r in FIELDS_TO_REMOVE:
+                    new_result.pop(f_t_r, None)
+                new_result.update(extra_fields)
+                parsed_result.append(new_result)
+        if format == "pandas" or format == "csv":
+            extra_fields = complete_result["extra_fields"].copy()
+            complete_result = complete_result.drop(columns=FIELDS_TO_REMOVE)
+            # expand
+            import pandas as pd
+
+            extra_fields = pd.json_normalize(extra_fields)
+            # merge
+            parsed_result = complete_result.merge(extra_fields)
+            if format == "csv":
+                parsed_result = parsed_result.to_csv(index=False)
+
+        return parsed_result
+
     def query_magstats(self, oid, format="json", index=None, sort=None):
         """
         Gets magnitude statistics of a given object

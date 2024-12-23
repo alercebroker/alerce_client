@@ -175,3 +175,17 @@ def test_query_classes(mock_request):
     mock_request.return_value.status_code = 200
     r = alerce.query_classes("lc_classifier", "bulk_0.0.1")
     assert r is not None
+
+@patch.object(Session, "request")
+def test_query_detections(mock_request):
+    def mock_result():
+        return [
+            {"candid":"candid1","tid":"ztf","sid":None,"aid":None,"pid":1234,"oid":"oid"},
+            {"candid":"candid2","tid":"ztf","sid":None,"aid":None,"pid":1234,"oid":"oid"}
+        ]
+    
+    mock_request.return_value.status_code = 200
+    mock_request.return_value.json = mock_result
+
+    r = alerce.query_forced_photometry("oid")
+    assert r is not None
