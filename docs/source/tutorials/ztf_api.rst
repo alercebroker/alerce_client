@@ -94,6 +94,7 @@ Query Lightcurve
 
 To get the lightcurve for an object the method :func:`~alerce.core.Alerce.query_lightcurve` can be used, this will return
 a dictionary with Detections and Non-detections for that object, also we can get them separetly with :func:`~alerce.core.Alerce.query_detections` and :func:`~alerce.core.Alerce.query_non_detections`.
+Also, there is a method to access the forced photometries of an object :func:`~alerce.core.Alerce.query_forced_photometry`.
 
 .. code-block:: python
 
@@ -105,6 +106,9 @@ a dictionary with Detections and Non-detections for that object, also we can get
     non_detections = alerce.query_non_detections("ZTF18abbuksn",
                                                  format="json")
 
+    # Getting forced photometry for an object
+    non_detections = alerce.query_forced_photometry("ZTF18abbuksn",
+                                                 format="json")
     # Getting lightcurve for an object
     lightcurve = alerce.query_lightcurve("ZTF18abbuksn",
                                          format="json")
