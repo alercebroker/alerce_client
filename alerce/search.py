@@ -195,16 +195,20 @@ class AlerceSearch(Client):
                 new_result.update(extra_fields)
                 parsed_result.append(new_result)
         if format == "pandas" or format == "csv":
-            extra_fields = complete_result["extra_fields"].copy()
-            complete_result = complete_result.drop(columns=FIELDS_TO_REMOVE)
-            # expand
             import pandas as pd
 
-            extra_fields = pd.json_normalize(extra_fields)
-            # merge
-            parsed_result = complete_result.merge(extra_fields)
-            if format == "csv":
-                parsed_result = parsed_result.to_csv(index=False)
+            if len(complete_result) == 0:
+                # the object dont have any fp
+                return pd.DataFrame()
+            else: 
+                extra_fields = complete_result["extra_fields"].copy()
+                complete_result = complete_result.drop(columns=FIELDS_TO_REMOVE)
+                # expand
+                extra_fields = pd.json_normalize(extra_fields)
+                # merge
+                parsed_result = complete_result.merge(extra_fields)
+                if format == "csv":
+                    parsed_result = parsed_result.to_csv(index=False)
 
         return parsed_result
 
