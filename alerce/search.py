@@ -198,7 +198,7 @@ class AlerceSearch(Client):
             import pandas as pd
 
             if len(complete_result) == 0:
-                # the object dont have any fp
+                # early exit the object dont have any fp
                 return pd.DataFrame()
             else:
                 extra_fields = complete_result["extra_fields"].copy()
