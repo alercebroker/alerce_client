@@ -200,7 +200,7 @@ class AlerceSearch(Client):
             if len(complete_result) == 0:
                 # the object dont have any fp
                 return pd.DataFrame()
-            else: 
+            else:
                 extra_fields = complete_result["extra_fields"].copy()
                 complete_result = complete_result.drop(columns=FIELDS_TO_REMOVE)
                 # expand
