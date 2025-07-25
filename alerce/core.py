@@ -5,7 +5,9 @@ from .stamps import AlerceStamps
 from .direct import AlerceDirect
 
 
-class Alerce(AlerceSearchMultistream, AlerceSearch, AlerceXmatch, AlerceStamps, AlerceDirect):
+class Alerce(
+    AlerceSearchMultistream, AlerceSearch, AlerceXmatch, AlerceStamps, AlerceDirect
+):
     """
     The main client class that has all the methods for accessing the different services.
 
@@ -19,5 +21,5 @@ class Alerce(AlerceSearchMultistream, AlerceSearch, AlerceXmatch, AlerceStamps, 
     ztf_url
         The url of the ZTF API
     """
-        
+
     pass

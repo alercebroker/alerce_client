@@ -1,16 +1,10 @@
 survey_urls_routes = {
-            "ztf": {
-                "api": "ZTF_API_URL",
-                "route": "ZTF_ROUTES"
-            },
-            "lsst": {
-                "api": "LSST_API_URL",
-                "route": "LSST_ROUTES"
-            },
-        }
+    "ztf": {"api": "ZTF_API_URL", "route": "ZTF_ROUTES"},
+    "lsst": {"api": "LSST_API_URL", "route": "LSST_ROUTES"},
+}
 
 configs = {
-    'ztf': {
+    "ztf": {
         "ZTF_API_URL": "https://api.staging.alerce.online/multisurvey/",
         "ZTF_ROUTES": {
             "objects": "object_api/list_objects",
@@ -21,7 +15,7 @@ configs = {
             "lightcurve": "lightcurve_api/lightcurve",
         },
     },
-    'lsst': {
+    "lsst": {
         "LSST_API_URL": "http://127.0.0.1:",
         "LSST_ROUTES": {
             "objects": "8000//list_objects",
@@ -32,5 +26,5 @@ configs = {
             "lightcurve": "8001//lightcurve",
             "magstats": "8002//magstats",
         },
-    }
+    },
 }
