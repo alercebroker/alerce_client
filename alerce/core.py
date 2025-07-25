@@ -1,10 +1,11 @@
 from .search import AlerceSearch
+from .ms_search import AlerceSearchMultistream
 from .crossmatch import AlerceXmatch
 from .stamps import AlerceStamps
 from .direct import AlerceDirect
 
 
-class Alerce(AlerceSearch, AlerceXmatch, AlerceStamps, AlerceDirect):
+class Alerce(AlerceSearchMultistream, AlerceSearch, AlerceXmatch, AlerceStamps, AlerceDirect):
     """
     The main client class that has all the methods for accessing the different services.
 
@@ -18,5 +19,5 @@ class Alerce(AlerceSearch, AlerceXmatch, AlerceStamps, AlerceDirect):
     ztf_url
         The url of the ZTF API
     """
-
+        
     pass

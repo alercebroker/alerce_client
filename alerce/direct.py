@@ -1,6 +1,12 @@
 from .utils import Client
 
 
+"""
+
+Deprecated. Delete.
+
+"""
+
 class AlerceDirect(Client):
     """Handles direct request to the database using the available http API"""
 
