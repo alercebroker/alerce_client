@@ -6,34 +6,32 @@ VALID_SURVEYS = ["lsst", "ztf"]
 
 
 class AlerceSearchMultistream(Client):
-    def __init__(self, survey="ztf", **kwargs):
-        self.survey = survey
-        self.survey_urls_routes = survey_urls_routes
-
-        if survey not in configs:
-            raise ValueError(
-                f"Survey '{survey}' no soportado. Usar: {list(configs.keys())}"
-            )
-
-        default_config = configs[survey]
+    def __init__(self, **kwargs):
+        
+        default_config = configs
         default_config.update(kwargs)
         super().__init__(**default_config)
 
     @property
     def survey_url(self):
-        return self.config[f"{self.survey_urls_routes[self.survey].get('api')}"]
+        return self.config[self.survey][f"{self.survey_urls_routes[self.survey].get('api')}"]
 
     def _get_survey_url(self, resource, *args):
         return (
             self.survey_url
-            + self.config[f"{self.survey_urls_routes[self.survey].get('route')}"][
+            + self.config[self.survey][f"{self.survey_urls_routes[self.survey].get('route')}"][
                 resource
             ]
         )
+    
+    def _get_survey_param(self, params):
+        return params.get("survey_id") or params.get("survey")
 
     def check_survey_id(self, params):
+            
+        self.survey = self._get_survey_param(params)
 
-        if not params.get("survey_id", None) in VALID_SURVEYS:
+        if not self.survey in VALID_SURVEYS:
             raise Exception(
                 f'survey_id: {params.get("survey_id", None)} not in {VALID_SURVEYS}'
             )
@@ -88,6 +86,9 @@ class AlerceSearchMultistream(Client):
                 Available values : ASC, DESC
         """
 
+        self.check_survey_id(kwargs)
+        self.survey_urls_routes = survey_urls_routes
+
         q = self._request(
             "GET",
             url=self._get_survey_url("objects"),
@@ -116,6 +117,7 @@ class AlerceSearchMultistream(Client):
         """
 
         self.check_survey_id(kwargs)
+        self.survey_urls_routes = survey_urls_routes
 
         q = self._request(
             "GET",
@@ -144,6 +146,8 @@ class AlerceSearchMultistream(Client):
         """
 
         self.check_survey_id(kwargs)
+        self.survey_urls_routes = survey_urls_routes
+
         q = self._request(
             "GET",
             url=self._get_survey_url("lightcurve"),
@@ -176,6 +180,7 @@ class AlerceSearchMultistream(Client):
         """
 
         self.check_survey_id(kwargs)
+        self.survey_urls_routes = survey_urls_routes
 
         q = self._request(
             "GET",
@@ -205,6 +210,7 @@ class AlerceSearchMultistream(Client):
         """
 
         self.check_survey_id(kwargs)
+        self.survey_urls_routes = survey_urls_routes
 
         q = self._request(
             "GET",
@@ -234,6 +240,7 @@ class AlerceSearchMultistream(Client):
         """
 
         self.check_survey_id(kwargs)
+        self.survey_urls_routes = survey_urls_routes
 
         q = self._request(
             "GET",

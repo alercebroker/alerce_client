@@ -1,12 +1,12 @@
 survey_urls_routes = {
-    "ztf": {"api": "ZTF_API_URL", "route": "ZTF_ROUTES"},
+    "ztf": {"api": "ZTF_API_URL_MS", "route": "ZTF_ROUTES_MS"},
     "lsst": {"api": "LSST_API_URL", "route": "LSST_ROUTES"},
 }
 
 configs = {
     "ztf": {
-        "ZTF_API_URL": "https://api.staging.alerce.online/multisurvey/",
-        "ZTF_ROUTES": {
+        "ZTF_API_URL_MS": "https://api.staging.alerce.online/multisurvey/",
+        "ZTF_ROUTES_MS": {
             "objects": "object_api/list_objects",
             "single_object": "object_api/object",
             "detections": "lightcurve_api/detections",
