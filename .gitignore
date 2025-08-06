@@ -144,3 +144,5 @@ cython_debug/
 #pyenv
 Pipfile.lock
 Pipfile
+
+docs/html_output
