@@ -36,7 +36,8 @@ depending on your usecase check the following tutorials:
 .. toctree::
    :maxdepth: 2
    :glob:
-
+   
+   tutorials/multisurvey_api.rst
    tutorials/ztf_api.rst
    tutorials/stamps_api.rst
    tutorials/xmatch_api.rst
