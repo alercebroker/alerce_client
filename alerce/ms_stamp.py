@@ -7,6 +7,8 @@ from astropy.io.fits import open as fits_open
 from urllib.error import HTTPError
 from alerce.ms_search import AlerceSearchMultiSurvey
 from alerce.exceptions import CandidError
+from ms_stamp_utils import create_html_stamp_display, create_stamp_url
+from IPython.display import HTML
 
 
 VALID_SURVEYS = ["lsst", "ztf"]
@@ -75,52 +77,40 @@ class AlerceStamps(Client):
         Parameters
         ----------
         oid : :py:class:`str`
-            object ID in ALeRCE DBs.
-        candid : :py:class:`int`
-            Candid of the stamp to be displayed.
+            object ID in ALeRCE DBs. (must have)
+        survey: ztf or lsst (must have)
+
+        measurement_id : :py:class:`int`
+            measurement_id of the stamp to be displayed. (optional)
 
         Returns
         -------
             Display the stamps on a jupyter notebook.
         """
+        
+        self._check_survey_id(kwargs)
+
+        oid = kwargs.get("oid")
+        survey = kwargs.get("survey_id")
+        if kwargs.get("measurement_id"):
+            measurement_id = kwargs.get("measurement_id")
+        else:
+            measurement_id = self._get_first_detection(kwargs)
+
+        science = "cutoutScience"
+        template = "cutoutTemplate"
+        difference = "cutoutDifference"
+
         if not self._in_ipynb():
             warnings.warn("This method only works on Notebooks", RuntimeWarning)
             return
 
-        self._check_survey_id(kwargs)
+        science_url = create_stamp_url(oid, survey, measurement_id, science)
+        template_url = create_stamp_url(oid, survey, measurement_id, template)
+        difference_url = create_stamp_url(oid, survey, measurement_id, difference)
 
-        if candid is None:
-            candid = self._get_first_detection(kwargs)
-
-        from IPython.display import HTML
-
-        science = "%s?oid=%s&candid=%s&type=science&format=png" % (
-            self.config["AVRO_URL"] + self.config["AVRO_ROUTES"]["get_stamp"],
-            kwargs.get("oid"),
-            candid,
-        )
-        template = science.replace("science", "template")
-        difference = science.replace("science", "difference")
-        images = """
-        <div>ZTF oid: %s, candid: %s</div>
-        <div>&emsp;&emsp;&emsp;&emsp;&emsp;
-        Science
-        &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;
-        Template
-        &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;
-        Difference
-        <div class="container">
-        <div style="float:left;width:20%%"><img src="%s"></div>
-        <div style="float:left;width:20%%"><img src="%s"></div>
-        <div style="float:left;width:20%%"><img src="%s"></div>
-        </div>
-        """ % (
-            kwargs.get("oid"),
-            candid,
-            science,
-            template,
-            difference,
-        )
+        images = create_html_stamp_display(oid, survey, measurement_id, science_url, template_url, difference_url)
+        
         display(HTML(images))
 
     def get_stamps(self, **kwargs):
