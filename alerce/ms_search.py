@@ -2,10 +2,10 @@ from .utils import Client
 
 from .ms_search_utils import configs, survey_urls_routes
 
+
 VALID_SURVEYS = ["lsst", "ztf"]
 
-
-class AlerceSearchMultistream(Client):
+class AlerceSearchMultiSurvey(Client):
     def __init__(self, **kwargs):
         
         default_config = configs
@@ -13,12 +13,12 @@ class AlerceSearchMultistream(Client):
         super().__init__(**default_config)
 
     @property
-    def survey_url(self):
+    def _survey_url(self):
         return self.config[self.survey][f"{self.survey_urls_routes[self.survey].get('api')}"]
 
-    def _get_survey_url(self, resource, *args):
+    def _get_survey_url(self, resource):
         return (
-            self.survey_url
+            self._survey_url()
             + self.config[self.survey][f"{self.survey_urls_routes[self.survey].get('route')}"][
                 resource
             ]
@@ -27,7 +27,7 @@ class AlerceSearchMultistream(Client):
     def _get_survey_param(self, params):
         return params.get("survey_id") or params.get("survey")
 
-    def check_survey_id(self, params):
+    def _check_survey_id(self, params):
             
         self.survey = self._get_survey_param(params)
 
@@ -36,7 +36,7 @@ class AlerceSearchMultistream(Client):
                 f'survey_id: {params.get("survey_id", None)} not in {VALID_SURVEYS}'
             )
 
-    def query_objects_multisurvey(self, format="json", index=None, sort=None, **kwargs):
+    def multisurvey_query_objects(self, format="json", index=None, sort=None, **kwargs):
         """
         Gets a list of objects filtered by specified parameters.
         It is strongly advised to look at the documentation of `ALERCE ZTF API`_
@@ -86,7 +86,7 @@ class AlerceSearchMultistream(Client):
                 Available values : ASC, DESC
         """
 
-        self.check_survey_id(kwargs)
+        self._check_survey_id(kwargs)
         self.survey_urls_routes = survey_urls_routes
 
         q = self._request(
@@ -98,7 +98,7 @@ class AlerceSearchMultistream(Client):
         )
         return q.result(index, sort)
 
-    def query_object_multisurvey(self, format="json", **kwargs):
+    def multisurvey_query_object(self, format="json", **kwargs):
         """
         Gets a single object by object id
 
@@ -116,7 +116,7 @@ class AlerceSearchMultistream(Client):
 
         """
 
-        self.check_survey_id(kwargs)
+        self._check_survey_id(kwargs)
         self.survey_urls_routes = survey_urls_routes
 
         q = self._request(
@@ -128,7 +128,7 @@ class AlerceSearchMultistream(Client):
         )
         return q.result()
 
-    def query_lightcurve_multisurvey(self, format="json", **kwargs):
+    def multisurvey_query_lightcurve(self, format="json", **kwargs):
         """
         Gets the lightcurve (detections and non_detections) of a given object
 
@@ -145,7 +145,7 @@ class AlerceSearchMultistream(Client):
 
         """
 
-        self.check_survey_id(kwargs)
+        self._check_survey_id(kwargs)
         self.survey_urls_routes = survey_urls_routes
 
         q = self._request(
@@ -157,7 +157,7 @@ class AlerceSearchMultistream(Client):
         )
         return q.result()
 
-    def query_detections_multisurvey(
+    def multisurvey_query_detections(
         self, format="json", index=None, sort=None, **kwargs
     ):
         """
@@ -179,7 +179,7 @@ class AlerceSearchMultistream(Client):
             The name of the column to sort when format is 'pandas'
         """
 
-        self.check_survey_id(kwargs)
+        self._check_survey_id(kwargs)
         self.survey_urls_routes = survey_urls_routes
 
         q = self._request(
@@ -191,7 +191,7 @@ class AlerceSearchMultistream(Client):
         )
         return q.result(index, sort)
 
-    def query_non_detections_multisurvey(
+    def multisurvey_query_non_detections(
         self, format="json", index=None, sort=None, **kwargs
     ):
         """
@@ -209,7 +209,7 @@ class AlerceSearchMultistream(Client):
             Return format. Can be one of 'pandas' | 'votable' | 'json'
         """
 
-        self.check_survey_id(kwargs)
+        self._check_survey_id(kwargs)
         self.survey_urls_routes = survey_urls_routes
 
         q = self._request(
@@ -221,7 +221,7 @@ class AlerceSearchMultistream(Client):
         )
         return q.result(index, sort)
 
-    def query_forced_photometry_multisurvey(
+    def multisurvey_query_forced_photometry(
         self, format="json", index=None, sort=None, **kwargs
     ):
         """
@@ -239,7 +239,7 @@ class AlerceSearchMultistream(Client):
             Return format. Can be one of 'pandas' | 'votable' | 'json'
         """
 
-        self.check_survey_id(kwargs)
+        self._check_survey_id(kwargs)
         self.survey_urls_routes = survey_urls_routes
 
         q = self._request(
@@ -251,105 +251,3 @@ class AlerceSearchMultistream(Client):
         )
 
         return q.result(index, sort)
-
-    def query_magstats_multisurvey(self, oid, format="json", index=None, sort=None):
-        """
-        Gets magnitude statistics of a given object
-
-        Parameters
-        ----------
-        oid : str
-            The object identifier
-        format : str
-            Return format. Can be one of 'pandas' | 'votable' | 'json'
-        """
-        q = self._request(
-            "GET", self._get_survey_url("magstats", oid), result_format=format
-        )
-        return q.result(index, sort)
-
-    def query_probabilities_multisurvey(
-        self, oid, format="json", index=None, sort=None
-    ):
-        """
-        Gets probabilities of a given object
-
-        Parameters
-        ----------
-        oid : str
-            The object identifier
-        format : str
-            Return format. Can be one of 'pandas' | 'votable' | 'json'
-        """
-        q = self._request(
-            "GET", self._get_survey_url("probabilities", oid), result_format=format
-        )
-        return q.result(index, sort)
-
-    def query_features_multisurvey(self, oid, format="json", index=None, sort=None):
-        """
-        Gets features of a given object
-
-        Parameters
-        -----------
-        oid : str
-            The object identifier
-        format : str
-            Return format. Can be one of 'pandas' | 'votable' | 'json'
-        """
-        q = self._request(
-            "GET", self._get_survey_url("features", oid), result_format=format
-        )
-        return q.result(index, sort)
-
-    def query_feature_multisurvey(self, oid, name, format="json"):
-        """
-        Gets a single feature of a specified object id
-
-        Parameters
-        ----------
-        oid : str
-            The object identifier
-        name : str
-            The feature's name
-        format : str
-            Return format. Can be one of 'pandas' | 'votable' | 'json'
-        """
-        q = self._request(
-            "GET",
-            self._get_survey_url("single_feature", oid, name),
-            result_format=format,
-        )
-        return q.result()
-
-    def query_classifiers_multisurvey(self, format="json"):
-        """
-        Gets all classifiers and their classes
-        """
-        q = self._request(
-            "GET", self._get_survey_url("classifiers"), result_format=format
-        )
-        return q.result()
-
-    def query_classes_multisurvey(
-        self, classifier_name, classifier_version, format="json"
-    ):
-        """
-        Gets classes from a specified classifier
-
-        Parameters
-        ----------
-
-        classifier_name : str
-            The classifier unique name
-        classifier_version : str
-            The classifier's version
-        """
-        q = self._request(
-            "GET",
-            self._get_survey_url(
-                "classifier_classes", classifier_name, classifier_version
-            ),
-            result_format=format,
-        )
-        return q.result()
