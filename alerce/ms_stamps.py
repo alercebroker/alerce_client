@@ -73,7 +73,7 @@ class AlerceStampsMultisurvey(Client):
                 f'survey_id: {params.get("survey_id", None)} not in {VALID_SURVEYS}'
             )
 
-    def plot_stamps(self, **kwargs):
+    def multisurvey_plot_stamps(self, **kwargs):
         """
         Plot stamp in a notebook given oid. It uses IPython HTML.
 
