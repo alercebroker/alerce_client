@@ -7,7 +7,6 @@ VALID_SURVEYS = ["lsst", "ztf"]
 
 class AlerceSearchMultiSurvey(Client):
     def __init__(self, **kwargs):
-        
         default_config = configs
         default_config.update(kwargs)
         super().__init__(**default_config)
@@ -18,7 +17,7 @@ class AlerceSearchMultiSurvey(Client):
 
     def _get_survey_url(self, resource):
         return (
-            self._survey_url()
+            self._survey_url
             + self.config[self.survey][f"{self.survey_urls_routes[self.survey].get('route')}"][
                 resource
             ]
