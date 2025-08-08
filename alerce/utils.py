@@ -133,7 +133,7 @@ class Client:
         self.config = {}
         self.config.update(kwargs)
         self.allowed_formats = ["pandas", "votable", "json", "csv"]
-
+        
     def load_config_from_file(self, path):
         pass
 
