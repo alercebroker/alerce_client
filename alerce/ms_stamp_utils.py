@@ -1,7 +1,14 @@
 
+# Plot
+def create_stamp_parameters(oid, survey, measurement_id, stamp_type, avro_url, call):
+    if call == 'plot':
+        return avro_url + f"?oid={oid}&measurement_id={measurement_id}&stamp_type={stamp_type}&file_format=png&survey_id={survey}"
+    elif call == 'get':
+        print(avro_url + f"?oid={oid}&measurement_id={measurement_id}&stamp_type={stamp_type}&file_format=fit&survey_id={survey}")
+        return avro_url + f"?oid={oid}&measurement_id={measurement_id}&stamp_type={stamp_type}&file_format=fit&survey_id={survey}"
 
-def create_stamp_parameters(oid, survey, measurement_id, stamp_type, avro_url):
-    return avro_url + f"?oid={oid}&measurement_id={measurement_id}&stamp_type={stamp_type}&file_format=png&survey_id={survey}"
+
+
 
 def create_html_stamp_display(oid, measurement_id, science, template, difference):
     return f"""
