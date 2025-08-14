@@ -23,6 +23,13 @@ class AlerceStampsMultisurvey(Client):
             "AVRO_ROUTES": {"get_stamp": "/stamp", "get_avro": "/get_avro"},
         }
         default_config.update(kwargs)
+
+        self.ztf_types = {
+            "science": "cutoutScience",
+            "template": "cutoutTemplate",
+            "difference": "cutoutDifference"
+        }
+
         super().__init__(**default_config)
 
     def _in_ipynb(self):
@@ -55,9 +62,9 @@ class AlerceStampsMultisurvey(Client):
         
         """
         detections = self.search_client.multisurvey_query_detections(**kwargs, format="pandas")
-        first_detection = detections[detections.has_stamp].measurement_id.astype("int64").min()
+        first_detection = detections[detections.has_stamp].mjd.astype("int64").min()
 
-        # Este try debe cambiarse por una deteccion de error de measurement_id.
+        # Este try debe cambiarse por una deteccion de error de mjd.
         try:
             first_detection = int(first_detection) 
         except TypeError:
@@ -75,16 +82,17 @@ class AlerceStampsMultisurvey(Client):
 
     def multisurvey_plot_stamps(self, **kwargs):
         """
-        Plot stamp in a notebook given oid. It uses IPython HTML.
+        Plot stamp in a notebook given oid and survey, measurement_id is optional. It uses IPython HTML.
 
         Parameters
         ----------
-        oid : :py:class:`str`
-            object ID in ALeRCE DBs. (must have)
-        survey: ztf or lsst (must have)
+        oid (Required) : :py:class:`str`
+            object ID in ALeRCE DBs.
 
-        measurement_id : :py:class:`int`
-            measurement_id of the stamp to be displayed. (optional)
+        survey (Required): ztf or lsst
+        
+        measurement_id (optional) : :py:class:`int`
+            measurement_id of the avro to be downloaded.
 
         Returns
         -------
@@ -100,32 +108,33 @@ class AlerceStampsMultisurvey(Client):
         else:
             measurement_id = self._get_first_detection(**kwargs)
 
-        science = "cutoutScience"
-        template = "cutoutTemplate"
-        difference = "cutoutDifference"
+
+        avro_url = self.config["AVRO_URL"] + self.config["AVRO_ROUTES"]["get_stamp"]
+
+        science_url = create_stamp_parameters(oid, survey, measurement_id, self.ztf_types["science"], avro_url, 'plot')
+        template_url = create_stamp_parameters(oid, survey, measurement_id, self.ztf_types["template"], avro_url, 'plot')
+        difference_url = create_stamp_parameters(oid, survey, measurement_id, self.ztf_types["difference"], avro_url, 'plot')
 
         if not self._in_ipynb():
             warnings.warn("This method only works on Notebooks", RuntimeWarning)
             return
-
-        avro_url = self.config["AVRO_URL"] + self.config["AVRO_ROUTES"]["get_stamp"]
-
-        science_url = create_stamp_parameters(oid, survey, measurement_id, science, avro_url)
-        template_url = create_stamp_parameters(oid, survey, measurement_id, template, avro_url)
-        difference_url = create_stamp_parameters(oid, survey, measurement_id, difference, avro_url)
-
+        
         images = create_html_stamp_display(oid, measurement_id, science_url, template_url, difference_url)
         display(HTML(images))
 
-    def get_stamps(self, **kwargs):
-        """Download Stamps for an specific alert.
+    def multisurvey_get_stamps(self, **kwargs):
+        """Download Stamps for an specific alert given oid and survey, measurement_id is optional.
 
         Parameters
         ----------
-        oid : :py:class:`str`
+        oid (Required) : :py:class:`str`
             object ID in ALeRCE DBs.
-        candid : :py:class:`int`
-            Candid of the stamp to be displayed.
+
+        survey (Required): ztf or lsst
+        
+        measurement_id (optional) : :py:class:`int`
+            measurement_id of the avro to be downloaded.
+
         format : :py:class: `str`
             Output format [HDUList|numpy]
 
@@ -136,25 +145,34 @@ class AlerceStampsMultisurvey(Client):
 
         self._check_survey_id(kwargs)
 
-        if candid is None:
-            candid = self._get_first_detection(kwargs)
+        oid = kwargs.get("oid")
+        survey = kwargs.get("survey_id")
+
+        if kwargs.get("measurement_id"):
+            measurement_id = kwargs.get("measurement_id")
+        else:
+            measurement_id = self._get_first_detection(**kwargs)
+
+        avro_url = self.config["AVRO_URL"] + self.config["AVRO_ROUTES"]["get_stamp"]
+
         try:
-            stamp_types = ["science", "template", "difference"]
+            stamp_types = [self.ztf_types["science"], self.ztf_types["template"], self.ztf_types["difference"]]
             stamp_list = []
             for stamp_type in stamp_types:
-                url = "%s?oid=%s&candid=%s&type=%s&format=fits" % (
-                    self.config["AVRO_URL"] + self.config["AVRO_ROUTES"]["get_stamp"],
-                    kwargs.get("oid"),
-                    candid,
-                    stamp_type,
-                )
+
+                url = create_stamp_parameters(oid, survey, measurement_id, stamp_type, avro_url, 'get')
 
                 http_response = self.session.request("GET", url)
+                if survey == "ztf":
+                    fits_buffer = gzip.open(io.BytesIO(http_response.content))
+                elif survey == "lsst":
+                    fits_buffer = io.BytesIO(http_response.content)
+                else:
+                    raise Exception(f"survey {survey} not valid")
 
-                with gzip.open(io.BytesIO(http_response.content), "rb") as f:
-                    tmp_hdulist = fits_open(
-                        io.BytesIO(f.read()), ignore_missing_simple=True
-                    )
+                tmp_hdulist = fits_open(
+                    io.BytesIO(fits_buffer.read()), ignore_missing_simple=True
+                )
 
                 stamp_list.append(tmp_hdulist[0])
 
@@ -170,15 +188,18 @@ class AlerceStampsMultisurvey(Client):
             warnings.warn("AVRO File not found.", RuntimeWarning)
             return None
 
-    def get_avro(self, **kwargs):
-        """Download avro of some alert.
+    def multisurvey_get_avro(self, **kwargs):
+        """Download avro of some alert given oid and survey, measurement_id is optional.
 
         Parameters
         ----------
-        oid : :py:class:`str`
+        oid (Required) : :py:class:`str`
             object ID in ALeRCE DBs.
-        candid : :py:class:`int`
-            Candid of the avro to be downloaded.
+
+        survey (Required): ztf or lsst
+        
+        measurement_id (optional) : :py:class:`int`
+            measurement_id of the avro to be downloaded.
 
         Returns
         -------
@@ -187,11 +208,14 @@ class AlerceStampsMultisurvey(Client):
 
         self._check_survey_id(kwargs)
 
-        if candid is None:
-            candid = self._get_first_detection(kwargs.get("oid"))
+        measurement_id = kwargs.get("measurement_id")
+
+        if measurement_id is None:
+            measurement_id = self._get_first_detection(**kwargs)
+
         try:
             url = self.config["AVRO_URL"] + self.config["AVRO_ROUTES"]["get_avro"]
-            params = {"oid": kwargs.get("oid"), "candid": candid}
+            params = {"oid": kwargs.get("oid"), "measurement_id": measurement_id}
             http_response = self.session.request("GET", url, params=params)
             return http_response.content
         except HTTPError:
