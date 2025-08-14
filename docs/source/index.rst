@@ -39,7 +39,7 @@ depending on your usecase check the following tutorials:
    
    tutorials/multisurvey_api.rst
    tutorials/ztf_api.rst
-   tutorials/stamps_api.rst
+   tutorials/multisurvey_stamps_api.rst
    tutorials/xmatch_api.rst
 
 

@@ -240,10 +240,12 @@ All multi-survey methods now require a `survey` parameter:
     objects = alerce.multisurvey_query_objects(survey="ztf", class_name="SN")
 
 **Parameter Changes**
-- Add `survey="ztf"` or `survey="lsst"` to all multi-survey method calls
-- You can use either `survey` or `survey_id` parameter
-- Object ID format may vary between surveys (ZTF: "ZTF18abbuksn", LSST: 45121627560013211)
 
+- **New required parameter**: Add ``survey="ztf"`` or ``survey="lsst"`` to all multi-survey method calls
+- **Flexible survey specification**: You can use either ``survey`` or ``survey_id`` parameter
+- **Object ID formats vary by survey**:
+  - ZTF: ``"ZTF18abbuksn"`` (string format)
+  - LSST: ``45121627560013211`` (numeric format)
 Error Handling
 ===============
 
