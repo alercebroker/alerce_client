@@ -7,6 +7,9 @@ VALID_SURVEYS = ["lsst", "ztf"]
 
 class AlerceSearchMultiSurvey(Client):
     def __init__(self, **kwargs):
+
+        self.survey_urls_routes = survey_urls_routes
+
         default_config = configs
         default_config.update(kwargs)
         super().__init__(**default_config)
@@ -86,7 +89,6 @@ class AlerceSearchMultiSurvey(Client):
         """
 
         self._check_survey_id(kwargs)
-        self.survey_urls_routes = survey_urls_routes
 
         q = self._request(
             "GET",
@@ -116,7 +118,6 @@ class AlerceSearchMultiSurvey(Client):
         """
 
         self._check_survey_id(kwargs)
-        self.survey_urls_routes = survey_urls_routes
 
         q = self._request(
             "GET",
@@ -145,7 +146,6 @@ class AlerceSearchMultiSurvey(Client):
         """
 
         self._check_survey_id(kwargs)
-        self.survey_urls_routes = survey_urls_routes
 
         q = self._request(
             "GET",
@@ -177,9 +177,8 @@ class AlerceSearchMultiSurvey(Client):
         sort : str
             The name of the column to sort when format is 'pandas'
         """
-
         self._check_survey_id(kwargs)
-        self.survey_urls_routes = survey_urls_routes
+
 
         q = self._request(
             "GET",
@@ -209,7 +208,6 @@ class AlerceSearchMultiSurvey(Client):
         """
 
         self._check_survey_id(kwargs)
-        self.survey_urls_routes = survey_urls_routes
 
         q = self._request(
             "GET",
@@ -239,7 +237,6 @@ class AlerceSearchMultiSurvey(Client):
         """
 
         self._check_survey_id(kwargs)
-        self.survey_urls_routes = survey_urls_routes
 
         q = self._request(
             "GET",
