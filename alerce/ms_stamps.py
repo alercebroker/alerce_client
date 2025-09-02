@@ -9,7 +9,7 @@ from alerce.ms_search import AlerceSearchMultiSurvey
 from alerce.exceptions import CandidError
 from .ms_stamp_utils import create_html_stamp_display, create_stamp_parameters
 from IPython.display import HTML, display
-
+from .config import stamp_config
 
 VALID_SURVEYS = ["lsst", "ztf"]
 
@@ -17,12 +17,7 @@ class AlerceStampsMultisurvey(Client):
     search_client = AlerceSearchMultiSurvey()
 
     def __init__(self, **kwargs):
-        default_config = {
-            # "AVRO_URL": "https://avro.alerce.online",
-            "AVRO_URL": "http://127.0.0.1:8000",
-            "AVRO_ROUTES": {"get_stamp": "/stamp", "get_avro": "/get_avro"},
-        }
-        default_config.update(kwargs)
+        stamp_config.update(kwargs)
 
         self.ztf_types = {
             "science": "cutoutScience",
@@ -30,7 +25,7 @@ class AlerceStampsMultisurvey(Client):
             "difference": "cutoutDifference"
         }
 
-        super().__init__(**default_config)
+        super().__init__(**stamp_config)
 
     def _in_ipynb(self):
         try:
@@ -109,7 +104,7 @@ class AlerceStampsMultisurvey(Client):
             measurement_id = self._get_first_detection(**kwargs)
 
 
-        avro_url = self.config["AVRO_URL"] + self.config["AVRO_ROUTES"]["get_stamp"]
+        avro_url = self.config["STAMP_URL"] + self.config["AVRO_ROUTES"]["get_stamp"]
 
         science_url = create_stamp_parameters(oid, survey, measurement_id, self.ztf_types["science"], avro_url, 'plot')
         template_url = create_stamp_parameters(oid, survey, measurement_id, self.ztf_types["template"], avro_url, 'plot')
@@ -153,7 +148,7 @@ class AlerceStampsMultisurvey(Client):
         else:
             measurement_id = self._get_first_detection(**kwargs)
 
-        avro_url = self.config["AVRO_URL"] + self.config["AVRO_ROUTES"]["get_stamp"]
+        avro_url = self.config["STAMP_URL"] + self.config["AVRO_ROUTES"]["get_stamp"]
 
         try:
             stamp_types = [self.ztf_types["science"], self.ztf_types["template"], self.ztf_types["difference"]]
@@ -214,7 +209,7 @@ class AlerceStampsMultisurvey(Client):
             measurement_id = self._get_first_detection(**kwargs)
 
         try:
-            url = self.config["AVRO_URL"] + self.config["AVRO_ROUTES"]["get_avro"]
+            url = self.config["STAMP_URL"] + self.config["AVRO_ROUTES"]["get_avro"]
             params = {"oid": kwargs.get("oid"), "measurement_id": measurement_id}
             http_response = self.session.request("GET", url, params=params)
             return http_response.content
