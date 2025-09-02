@@ -119,7 +119,7 @@ class AlerceStampsMultisurvey(Client):
             warnings.warn("This method only works on Notebooks", RuntimeWarning)
             return
         
-        images = create_html_stamp_display(oid, measurement_id, science_url, template_url, difference_url)
+        images = create_html_stamp_display(oid, survey, measurement_id, science_url, template_url, difference_url)
         display(HTML(images))
 
     def multisurvey_get_stamps(self, **kwargs):
