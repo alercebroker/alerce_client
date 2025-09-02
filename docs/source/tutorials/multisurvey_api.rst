@@ -202,12 +202,43 @@ Also, there is a method to access the forced photometries of an object :func:`~a
 Query Magstats
 =================
 
-In development
+To get the magstats for an object using the different classifiers implemented by ALeRCE we wil use :func:`~alerce.core.Alerce.multisurvey_query_magstats`
+
+.. code-block:: python
+
+  # Getting detections for a ztf object
+  ztf_magstats = alerce.multisurvey_query_magstats(
+    survey = "ztf",
+    oid = "ZTF18abbuksn",
+    )
+
+  # Getting detections for a lsst object
+  lsst_magstats = alerce.multisurvey_query_magstats(
+    survey = "lsst",
+    oid = "45121627560013211"
+    )
 
 Query Probability
 ==================
 
-In development
+To get the probabilities for an object using the different classifiers implemented by ALeRCE we wil use :func:`~alerce.core.Alerce.multisurvey_query_probabilities`
+
+.. code-block:: python
+
+  # Getting detections for a ztf object
+  ztf_probabilities = alerce.multisurvey_query_probabilities(
+    survey = "ztf",
+    classifier = "LC_classifier_BHRF_forced_phot",
+    oid = "ZTF18abbuksn"
+    )
+
+  # Getting detections for a lsst object
+  lssst_probabilities = alerce.multisurvey_query_probabilities(
+    survey = "lsst",
+    classifier = "lc_classifier_lsst",
+    oid = "45121627560013211"
+    )
+
 
 Query Features
 ================
@@ -227,6 +258,8 @@ If you are migrating from the ZTF-only API, here are the main changes:
 - ``query_detections()`` → ``multisurvey_query_detections()``
 - ``query_non_detections()`` → ``multisurvey_query_non_detections()``
 - ``query_forced_photometry()`` → ``multisurvey_query_forced_photometry()``
+- ``query_magstats()`` → ``multisurvey_query_magstats()``
+- ``query_probabilities()`` → ``multisurvey_query_probabilities()``
 
 **Required Survey Parameter**
 All multi-survey methods now require a `survey` parameter:
