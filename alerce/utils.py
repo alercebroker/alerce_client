@@ -159,7 +159,6 @@ class Client:
         response_format="json",
     ):
         result_format = self._validate_format(result_format)
-
         resp = self.session.request(method, url, params=params, data=data)
         if resp.status_code >= 400:
             handle_error(resp, response_format)
