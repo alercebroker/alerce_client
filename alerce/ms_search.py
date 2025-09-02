@@ -1,6 +1,6 @@
 from .utils import Client
 
-from .ms_search_utils import configs, survey_urls_routes
+from .config import configs
 
 
 VALID_SURVEYS = ["lsst", "ztf"]
@@ -8,24 +8,26 @@ VALID_SURVEYS = ["lsst", "ztf"]
 class AlerceSearchMultiSurvey(Client):
     def __init__(self, **kwargs):
 
-        self.survey_urls_routes = survey_urls_routes
-
         default_config = configs
         default_config.update(kwargs)
         super().__init__(**default_config)
 
-    @property
-    def _survey_url(self):
-        return self.config[self.survey][f"{self.survey_urls_routes[self.survey].get('api')}"]
+        self.url_ms = self.config["multisurvey"]["URL_MS"]
+        self.routes_ms = self.config["multisurvey"]["ROUTES_MS"]
 
+        ####################################################################
+
+        # # Rutas de prueba para local
+        # self.url_local = self.config["local"]["URL_LOCAL"]
+        # self.routes_local = self.config["local"]["ROUTES_LOCAL"]
+
+        ####################################################################
     def _get_survey_url(self, resource):
         return (
-            self._survey_url
-            + self.config[self.survey][f"{self.survey_urls_routes[self.survey].get('route')}"][
-                resource
-            ]
+            self.url_ms + self.routes_ms[resource] 
+           #self.url_local + self.routes_local[resource] # Descomentar esto para probar en local (y comentar lo de arriba)
         )
-    
+        
     def _get_survey_param(self, params):
         return params.get("survey_id") or params.get("survey")
 
@@ -241,6 +243,60 @@ class AlerceSearchMultiSurvey(Client):
         q = self._request(
             "GET",
             url=self._get_survey_url("forced_photometry"),
+            params=kwargs,
+            result_format=format,
+            response_field="items",
+        )
+
+        return q.result(index, sort)
+    
+    def multisurvey_query_probabilities(self, format="json", index=None, sort=None, **kwargs):
+        """
+        Gets probabilities of a given object
+
+        Parameters
+        ----------
+        **kwargs
+            Keyword arguments
+
+            - oid (required) : str
+            - classifier (optional) : str 
+
+        format : str
+            Return format. Can be one of 'pandas' | 'votable' | 'json'
+        """
+        url = self._get_survey_url("probabilities")
+
+        q = self._request(
+            "GET",
+            url=url,
+            params=kwargs,
+            result_format=format,
+            response_field="items",
+        )
+
+        return q.result(index, sort)
+    
+    def multisurvey_query_magstats(self, format="json", index=None, sort=None, **kwargs):
+        """
+        Gets magnitude statistics of a given object
+
+        Parameters
+        ----------
+        **kwargs
+            Keyword arguments
+
+            - oid : str
+            - survey_id : str
+
+        format : str
+            Return format. Can be one of 'pandas' | 'votable' | 'json'
+        """
+        self._check_survey_id(kwargs)
+
+        q = self._request(
+            "GET",
+            url=self._get_survey_url("magstats"),
             params=kwargs,
             result_format=format,
             response_field="items",
