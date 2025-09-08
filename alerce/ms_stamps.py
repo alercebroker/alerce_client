@@ -109,7 +109,6 @@ class AlerceStampsMultisurvey(Client):
         science_url = create_stamp_parameters(oid, survey, measurement_id, self.ztf_types["science"], avro_url, 'plot')
         template_url = create_stamp_parameters(oid, survey, measurement_id, self.ztf_types["template"], avro_url, 'plot')
         difference_url = create_stamp_parameters(oid, survey, measurement_id, self.ztf_types["difference"], avro_url, 'plot')
-
         if not self._in_ipynb():
             warnings.warn("This method only works on Notebooks", RuntimeWarning)
             return
@@ -143,6 +142,9 @@ class AlerceStampsMultisurvey(Client):
         oid = kwargs.get("oid")
         survey = kwargs.get("survey_id")
 
+        if not kwargs.get("format"):
+            out_format = "HDUList"
+
         if kwargs.get("measurement_id"):
             measurement_id = kwargs.get("measurement_id")
         else:
@@ -156,21 +158,20 @@ class AlerceStampsMultisurvey(Client):
             for stamp_type in stamp_types:
 
                 url = create_stamp_parameters(oid, survey, measurement_id, stamp_type, avro_url, 'get')
-
                 http_response = self.session.request("GET", url)
+                
                 if survey == "ztf":
                     fits_buffer = gzip.open(io.BytesIO(http_response.content))
                 elif survey == "lsst":
                     fits_buffer = io.BytesIO(http_response.content)
                 else:
                     raise Exception(f"survey {survey} not valid")
-
                 tmp_hdulist = fits_open(
                     io.BytesIO(fits_buffer.read()), ignore_missing_simple=True
                 )
-
+                
                 stamp_list.append(tmp_hdulist[0])
-
+                
             if format == "HDUList":
                 hdulist = HDUList()
                 for stamp, stamp_type in zip(stamp_list, stamp_types):
