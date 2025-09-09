@@ -152,6 +152,13 @@ class AlerceStampsMultisurvey(Client):
         else:
             measurement_id = self._get_first_detection(**kwargs)
 
+        if kwargs.get("include_variance_and_mask"):
+            include_variance_and_mask = kwargs.get("include_variance_and_mask")
+            if include_variance_and_mask == "true":
+                include_variance_and_mask == True
+        else:
+            include_variance_and_mask = False
+
         avro_url = self.config["STAMP_URL"] + self.config["AVRO_ROUTES"]["get_stamp"]
 
         try:
@@ -173,7 +180,11 @@ class AlerceStampsMultisurvey(Client):
                 tmp_hdulist = fits_open(
                     io.BytesIO(fits_buffer.read()), ignore_missing_simple=True
                 )
-                stamp_list.append(tmp_hdulist)
+
+                if include_variance_and_mask:
+                    stamp_list.append(tmp_hdulist)
+                else:
+                    stamp_list.append(tmp_hdulist[0])
 
             if out_format == "HDUList":
                 hdudict = {}
