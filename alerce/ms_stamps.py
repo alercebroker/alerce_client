@@ -98,6 +98,7 @@ class AlerceStampsMultisurvey(Client):
 
         oid = kwargs.get("oid")
         survey = kwargs.get("survey_id")
+        
         if kwargs.get("measurement_id"):
             measurement_id = kwargs.get("measurement_id")
         else:
@@ -109,6 +110,7 @@ class AlerceStampsMultisurvey(Client):
         science_url = create_stamp_parameters(oid, survey, measurement_id, self.ztf_types["science"], avro_url, 'plot')
         template_url = create_stamp_parameters(oid, survey, measurement_id, self.ztf_types["template"], avro_url, 'plot')
         difference_url = create_stamp_parameters(oid, survey, measurement_id, self.ztf_types["difference"], avro_url, 'plot')
+
         if not self._in_ipynb():
             warnings.warn("This method only works on Notebooks", RuntimeWarning)
             return
@@ -155,6 +157,7 @@ class AlerceStampsMultisurvey(Client):
         try:
             stamp_types = [self.ztf_types["science"], self.ztf_types["template"], self.ztf_types["difference"]]
             stamp_list = []
+
             for stamp_type in stamp_types:
 
                 url = create_stamp_parameters(oid, survey, measurement_id, stamp_type, avro_url, 'get')
@@ -166,19 +169,20 @@ class AlerceStampsMultisurvey(Client):
                     fits_buffer = io.BytesIO(http_response.content)
                 else:
                     raise Exception(f"survey {survey} not valid")
+                
                 tmp_hdulist = fits_open(
                     io.BytesIO(fits_buffer.read()), ignore_missing_simple=True
                 )
-                
-                stamp_list.append(tmp_hdulist[0])
+                stamp_list.append(tmp_hdulist)
+
             if out_format == "HDUList":
-                hdulist = HDUList()
+                hdudict = {}
                 for stamp, stamp_type in zip(stamp_list, stamp_types):
-                    stamp.header["STAMP_TYPE"] = stamp_type
-                    hdulist.append(stamp)
-                return hdulist
+                    hdudict[stamp_type] = stamp
+                return hdudict
             elif out_format == "numpy":
                 return [stamp.data.copy() for stamp in stamp_list]
+            
         except HTTPError:
             warnings.warn("AVRO File not found.", RuntimeWarning)
             return None
