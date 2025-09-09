@@ -171,14 +171,13 @@ class AlerceStampsMultisurvey(Client):
                 )
                 
                 stamp_list.append(tmp_hdulist[0])
-                
-            if format == "HDUList":
+            if out_format == "HDUList":
                 hdulist = HDUList()
                 for stamp, stamp_type in zip(stamp_list, stamp_types):
                     stamp.header["STAMP_TYPE"] = stamp_type
                     hdulist.append(stamp)
                 return hdulist
-            elif format == "numpy":
+            elif out_format == "numpy":
                 return [stamp.data.copy() for stamp in stamp_list]
         except HTTPError:
             warnings.warn("AVRO File not found.", RuntimeWarning)
