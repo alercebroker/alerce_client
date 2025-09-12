@@ -131,6 +131,9 @@ class AlerceStampsMultisurvey(Client):
         measurement_id (optional) : :py:class:`int`
             measurement_id of the avro to be downloaded.
 
+        include_variance_and_mask (optional): False, True or "true" (False by default)
+            This paremeter says to multisurvey_get_stamps if include variance and mask on HDUList output. 
+
         format : :py:class: `str`
             Output format [HDUList|numpy]
 
