@@ -66,6 +66,9 @@ class AlerceStampsMultisurvey(Client):
             raise CandidError()
         return first_detection
     
+    def _get_survey_param(self, params):
+        return params.get("survey_id") or params.get("survey")
+    
     def _check_survey_id(self, params):
             
         self.survey = self._get_survey_param(params)
@@ -105,7 +108,7 @@ class AlerceStampsMultisurvey(Client):
             measurement_id = self._get_first_detection(**kwargs)
 
 
-        avro_url = self.config["STAMP_URL"] + self.config["AVRO_ROUTES"]["get_stamp"]
+        avro_url = self.config[survey]["STAMP_URL"] + self.config["survey"]["AVRO_ROUTES"]["get_stamp"]
 
         science_url = create_stamp_parameters(oid, survey, measurement_id, self.ztf_types["science"], avro_url, 'plot')
         template_url = create_stamp_parameters(oid, survey, measurement_id, self.ztf_types["template"], avro_url, 'plot')
@@ -117,6 +120,32 @@ class AlerceStampsMultisurvey(Client):
         
         images = create_html_stamp_display(oid, survey, measurement_id, science_url, template_url, difference_url)
         display(HTML(images))
+
+    def _get_pgn_stamps(self, **kwargs):
+        self._check_survey_id(kwargs)
+
+        oid = kwargs.get("oid")
+        survey = kwargs.get("survey_id")
+        
+        if kwargs.get("measurement_id"):
+            measurement_id = kwargs.get("measurement_id")
+        else:
+            measurement_id = self._get_first_detection(**kwargs)
+
+        avro_url = self.config[survey]["STAMP_URL"] + self.config[survey]["AVRO_ROUTES"]["get_stamp"]
+        if survey == 'ztf':
+            science_url = create_stamp_parameters(oid, survey, measurement_id, "science", avro_url, 'plot')
+            template_url = create_stamp_parameters(oid, survey, measurement_id, "template", avro_url, 'plot')
+            difference_url = create_stamp_parameters(oid, survey, measurement_id, "difference", avro_url, 'plot')
+        else:
+            science_url = create_stamp_parameters(oid, survey, measurement_id, self.ztf_types["science"], avro_url, 'plot')
+            template_url = create_stamp_parameters(oid, survey, measurement_id, self.ztf_types["template"], avro_url, 'plot')
+            difference_url = create_stamp_parameters(oid, survey, measurement_id, self.ztf_types["difference"], avro_url, 'plot')
+
+        return [science_url, template_url, difference_url]
+
+
+
 
     def multisurvey_get_stamps(self, **kwargs):
         """Download Stamps for an specific alert given oid and survey, measurement_id is optional.
@@ -229,6 +258,7 @@ class AlerceStampsMultisurvey(Client):
         try:
             url = self.config["STAMP_URL"] + self.config["AVRO_ROUTES"]["get_avro"]
             params = {"oid": kwargs.get("oid"), "measurement_id": measurement_id}
+            print(url,params)
             http_response = self.session.request("GET", url, params=params)
             return http_response.content
         except HTTPError:
