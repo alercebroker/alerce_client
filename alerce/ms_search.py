@@ -12,9 +12,6 @@ class AlerceSearchMultiSurvey(Client):
         default_config.update(kwargs)
         super().__init__(**default_config)
 
-        self.url_ms = self.config["multisurvey"]["URL_MS"]
-        self.routes_ms = self.config["multisurvey"]["ROUTES_MS"]
-
         ####################################################################
 
         # # Rutas de prueba para local
@@ -23,6 +20,7 @@ class AlerceSearchMultiSurvey(Client):
 
         ####################################################################
     def _get_survey_url(self, resource):
+
         return (
             self.url_ms + self.routes_ms[resource] 
            #self.url_local + self.routes_local[resource] # Descomentar esto para probar en local (y comentar lo de arriba)
@@ -39,6 +37,13 @@ class AlerceSearchMultiSurvey(Client):
             raise Exception(
                 f'survey_id: {params.get("survey_id", None)} not in {VALID_SURVEYS}'
             )
+        
+    def _get_urls(self, params):
+
+        survey = params.get("survey_id")
+
+        self.url_ms = self.config[survey]["URL"]
+        self.routes_ms = self.config[survey]["ROUTES"]
 
     def multisurvey_query_objects(self, format="json", index=None, sort=None, **kwargs):
         """
@@ -91,6 +96,7 @@ class AlerceSearchMultiSurvey(Client):
         """
 
         self._check_survey_id(kwargs)
+        self._get_urls(kwargs)
 
         q = self._request(
             "GET",
@@ -120,6 +126,8 @@ class AlerceSearchMultiSurvey(Client):
         """
 
         self._check_survey_id(kwargs)
+        self._get_urls(kwargs)
+
 
         q = self._request(
             "GET",
@@ -148,6 +156,8 @@ class AlerceSearchMultiSurvey(Client):
         """
 
         self._check_survey_id(kwargs)
+        self._get_urls(kwargs)
+
 
         q = self._request(
             "GET",
@@ -180,12 +190,13 @@ class AlerceSearchMultiSurvey(Client):
             The name of the column to sort when format is 'pandas'
         """
         self._check_survey_id(kwargs)
-
+        self._get_urls(kwargs)
+        params = {'oid': kwargs.get('oid')}
 
         q = self._request(
             "GET",
             url=self._get_survey_url("detections"),
-            params=kwargs,
+            params=params,
             result_format=format,
             response_field="items",
         )
@@ -210,6 +221,8 @@ class AlerceSearchMultiSurvey(Client):
         """
 
         self._check_survey_id(kwargs)
+        self._get_urls(kwargs)
+
 
         q = self._request(
             "GET",
@@ -239,6 +252,8 @@ class AlerceSearchMultiSurvey(Client):
         """
 
         self._check_survey_id(kwargs)
+        self._get_urls(kwargs)
+
 
         q = self._request(
             "GET",
@@ -265,7 +280,9 @@ class AlerceSearchMultiSurvey(Client):
         format : str
             Return format. Can be one of 'pandas' | 'votable' | 'json'
         """
+        self._get_urls(kwargs)
         url = self._get_survey_url("probabilities")
+        
 
         q = self._request(
             "GET",
