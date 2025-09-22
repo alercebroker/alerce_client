@@ -1,12 +1,11 @@
-from .search import AlerceSearch
-from .ms_search import AlerceSearchMultiSurvey
 from .crossmatch import AlerceXmatch
 from .ms_stamps import AlerceStampsMultisurvey
 from .direct import AlerceDirect
+from .global_search import AlerceSearch
 
 
 class Alerce(
-    AlerceSearchMultiSurvey, AlerceSearch, AlerceXmatch, AlerceStampsMultisurvey, AlerceDirect
+    AlerceSearch, AlerceXmatch, AlerceStampsMultisurvey, AlerceDirect
 ):
     """
     The main client class that has all the methods for accessing the different services.
