@@ -5,15 +5,12 @@ from .config import configs
 
 VALID_SURVEYS = ["lsst", "ztf"]
 
-class AlerceSearchMultiSurvey(Client):
+class AlerceLsstSearch(Client):
     def __init__(self, **kwargs):
 
         default_config = configs
         default_config.update(kwargs)
         super().__init__(**default_config)
-
-        self.url_ms = self.config["multisurvey"]["URL_MS"]
-        self.routes_ms = self.config["multisurvey"]["ROUTES_MS"]
 
         ####################################################################
 
@@ -23,6 +20,7 @@ class AlerceSearchMultiSurvey(Client):
 
         ####################################################################
     def _get_survey_url(self, resource):
+
         return (
             self.url_ms + self.routes_ms[resource] 
            #self.url_local + self.routes_local[resource] # Descomentar esto para probar en local (y comentar lo de arriba)
@@ -39,8 +37,15 @@ class AlerceSearchMultiSurvey(Client):
             raise Exception(
                 f'survey_id: {params.get("survey_id", None)} not in {VALID_SURVEYS}'
             )
+        
+    def _get_urls(self, params):
 
-    def multisurvey_query_objects(self, format="json", index=None, sort=None, **kwargs):
+        survey = params.get("survey_id")
+
+        self.url_ms = self.config[survey]["URL"]
+        self.routes_ms = self.config[survey]["ROUTES"]
+
+    def lsst_query_objects(self, format="json", index=None, sort=None, **kwargs):
         """
         Gets a list of objects filtered by specified parameters.
         It is strongly advised to look at the documentation of `ALERCE ZTF API`_
@@ -91,6 +96,7 @@ class AlerceSearchMultiSurvey(Client):
         """
 
         self._check_survey_id(kwargs)
+        self._get_urls(kwargs)
 
         q = self._request(
             "GET",
@@ -101,7 +107,7 @@ class AlerceSearchMultiSurvey(Client):
         )
         return q.result(index, sort)
 
-    def multisurvey_query_object(self, format="json", **kwargs):
+    def lsst_query_object(self, format="json", **kwargs):
         """
         Gets a single object by object id
 
@@ -120,6 +126,8 @@ class AlerceSearchMultiSurvey(Client):
         """
 
         self._check_survey_id(kwargs)
+        self._get_urls(kwargs)
+
 
         q = self._request(
             "GET",
@@ -130,7 +138,7 @@ class AlerceSearchMultiSurvey(Client):
         )
         return q.result()
 
-    def multisurvey_query_lightcurve(self, format="json", **kwargs):
+    def lsst_query_lightcurve(self, format="json", **kwargs):
         """
         Gets the lightcurve (detections and non_detections) of a given object
 
@@ -148,6 +156,8 @@ class AlerceSearchMultiSurvey(Client):
         """
 
         self._check_survey_id(kwargs)
+        self._get_urls(kwargs)
+
 
         q = self._request(
             "GET",
@@ -158,7 +168,7 @@ class AlerceSearchMultiSurvey(Client):
         )
         return q.result()
 
-    def multisurvey_query_detections(
+    def lsst_query_detections(
         self, format="json", index=None, sort=None, **kwargs
     ):
         """
@@ -180,7 +190,7 @@ class AlerceSearchMultiSurvey(Client):
             The name of the column to sort when format is 'pandas'
         """
         self._check_survey_id(kwargs)
-
+        self._get_urls(kwargs)
 
         q = self._request(
             "GET",
@@ -191,7 +201,7 @@ class AlerceSearchMultiSurvey(Client):
         )
         return q.result(index, sort)
 
-    def multisurvey_query_non_detections(
+    def lsst_query_non_detections(
         self, format="json", index=None, sort=None, **kwargs
     ):
         """
@@ -210,6 +220,8 @@ class AlerceSearchMultiSurvey(Client):
         """
 
         self._check_survey_id(kwargs)
+        self._get_urls(kwargs)
+
 
         q = self._request(
             "GET",
@@ -220,7 +232,7 @@ class AlerceSearchMultiSurvey(Client):
         )
         return q.result(index, sort)
 
-    def multisurvey_query_forced_photometry(
+    def lsst_query_forced_photometry(
         self, format="json", index=None, sort=None, **kwargs
     ):
         """
@@ -239,6 +251,8 @@ class AlerceSearchMultiSurvey(Client):
         """
 
         self._check_survey_id(kwargs)
+        self._get_urls(kwargs)
+
 
         q = self._request(
             "GET",
@@ -250,7 +264,7 @@ class AlerceSearchMultiSurvey(Client):
 
         return q.result(index, sort)
     
-    def multisurvey_query_probabilities(self, format="json", index=None, sort=None, **kwargs):
+    def lsst_query_probabilities(self, format="json", index=None, sort=None, **kwargs):
         """
         Gets probabilities of a given object
 
@@ -265,7 +279,9 @@ class AlerceSearchMultiSurvey(Client):
         format : str
             Return format. Can be one of 'pandas' | 'votable' | 'json'
         """
+        self._get_urls(kwargs)
         url = self._get_survey_url("probabilities")
+        
 
         q = self._request(
             "GET",
@@ -277,7 +293,7 @@ class AlerceSearchMultiSurvey(Client):
 
         return q.result(index, sort)
     
-    def multisurvey_query_magstats(self, format="json", index=None, sort=None, **kwargs):
+    def lsst_query_magstats(self, format="json", index=None, sort=None, **kwargs):
         """
         Gets magnitude statistics of a given object
 
@@ -293,6 +309,7 @@ class AlerceSearchMultiSurvey(Client):
             Return format. Can be one of 'pandas' | 'votable' | 'json'
         """
         self._check_survey_id(kwargs)
+        self._get_urls(kwargs)
 
         q = self._request(
             "GET",

@@ -1,7 +1,7 @@
 from .utils import Client
 
 
-class AlerceSearch(Client):
+class AlerceZtfSearch(Client):
     def __init__(self, **kwargs):
         default_config = {
             "ZTF_API_URL": "https://api.alerce.online/ztf/v1/",
@@ -29,7 +29,7 @@ class AlerceSearch(Client):
     def __get_url(self, resource, *args):
         return self.ztf_url + self.config["ZTF_ROUTES"][resource] % args
 
-    def query_objects(self, format="pandas", index=None, sort=None, **kwargs):
+    def ztf_query_objects(self, format="pandas", index=None, sort=None, **kwargs):
         """
         Gets a list of objects filtered by specified parameters.
         It is strongly advised to look at the documentation of `ALERCE ZTF API`_
@@ -90,7 +90,7 @@ class AlerceSearch(Client):
         )
         return q.result(index, sort)
 
-    def query_object(self, oid, format="json"):
+    def ztf_query_object(self, oid, format="json"):
         """
         Gets a single object by object id
 
@@ -107,7 +107,7 @@ class AlerceSearch(Client):
         )
         return q.result()
 
-    def query_lightcurve(self, oid, format="json"):
+    def ztf_query_lightcurve(self, oid, format="json"):
         """
         Gets the lightcurve (detections and non_detections) of a given object
 
@@ -124,7 +124,7 @@ class AlerceSearch(Client):
         )
         return q.result()
 
-    def query_detections(self, oid, format="json", index=None, sort=None):
+    def ztf_query_detections(self, oid, format="json", index=None, sort=None):
         """
         Gets all detections of a given object
 
@@ -144,7 +144,7 @@ class AlerceSearch(Client):
         )
         return q.result(index, sort)
 
-    def query_non_detections(self, oid, format="json", index=None, sort=None):
+    def ztf_query_non_detections(self, oid, format="json", index=None, sort=None):
         """
         Gets all non detections of a given object
 
@@ -160,7 +160,7 @@ class AlerceSearch(Client):
         )
         return q.result(index, sort)
 
-    def query_forced_photometry(self, oid, format="json", index=None, sort=None):
+    def ztf_query_forced_photometry(self, oid, format="json", index=None, sort=None):
         """
         Gets all forced photometry epochs of a given object
 
@@ -212,7 +212,7 @@ class AlerceSearch(Client):
 
         return parsed_result
 
-    def query_magstats(self, oid, format="json", index=None, sort=None):
+    def ztf_query_magstats(self, oid, format="json", index=None, sort=None):
         """
         Gets magnitude statistics of a given object
 
@@ -226,7 +226,7 @@ class AlerceSearch(Client):
         q = self._request("GET", self.__get_url("magstats", oid), result_format=format)
         return q.result(index, sort)
 
-    def query_probabilities(self, oid, format="json", index=None, sort=None):
+    def ztf_query_probabilities(self, oid, format="json", index=None, sort=None):
         """
         Gets probabilities of a given object
 

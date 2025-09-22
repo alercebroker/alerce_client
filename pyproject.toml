@@ -1,0 +1,17 @@
+[tool.poetry]
+  name = "alerce"
+  version = "1.4.0"
+  description = "ALeRCE Client"
+  authors = ["Claudio Mansilla <c.mansillabrito@gmail.com>"]
+  readme = "README.md"
+  packages = [{include = "alerce"}]
+
+  [tool.poetry.dependencies]
+  python = "^3.8"
+  pandas = ">=1.1.2"
+  astropy = ">=4.0.1"
+  requests = ">=2.24.0"
+
+  [build-system]
+  requires = ["poetry-core"]
+  build-backend = "poetry.core.masonry.api"

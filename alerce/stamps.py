@@ -5,7 +5,7 @@ from .utils import Client
 from astropy.io.fits import HDUList
 from astropy.io.fits import open as fits_open
 from urllib.error import HTTPError
-from alerce.search import AlerceSearch
+from alerce.ztf_search import AlerceSearch
 from alerce.exceptions import CandidError
 
 
