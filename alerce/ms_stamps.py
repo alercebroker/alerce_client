@@ -5,7 +5,7 @@ from .utils import Client
 from astropy.io.fits import HDUList
 from astropy.io.fits import open as fits_open
 from urllib.error import HTTPError
-from alerce.ms_search import AlerceSearchMultiSurvey
+from alerce.lsst_search import AlerceLsstSearch
 from alerce.exceptions import CandidError
 from .ms_stamp_utils import create_html_stamp_display, create_stamp_parameters
 from IPython.display import HTML, display
@@ -14,7 +14,7 @@ from .config import stamp_config
 VALID_SURVEYS = ["lsst", "ztf"]
 
 class AlerceStampsMultisurvey(Client):
-    search_client = AlerceSearchMultiSurvey()
+    search_client = AlerceLsstSearch()
 
     def __init__(self, **kwargs):
         stamp_config.update(kwargs)
