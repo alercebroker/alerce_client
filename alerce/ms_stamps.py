@@ -137,7 +137,7 @@ class AlerceStampsMultisurvey(Client):
             science_url = create_stamp_parameters(oid, survey, measurement_id, "science", avro_url, 'plot')
             template_url = create_stamp_parameters(oid, survey, measurement_id, "template", avro_url, 'plot')
             difference_url = create_stamp_parameters(oid, survey, measurement_id, "difference", avro_url, 'plot')
-        else:
+        elif survey == "lsst":
             science_url = create_stamp_parameters(oid, survey, measurement_id, self.ztf_types["science"], avro_url, 'plot')
             template_url = create_stamp_parameters(oid, survey, measurement_id, self.ztf_types["template"], avro_url, 'plot')
             difference_url = create_stamp_parameters(oid, survey, measurement_id, self.ztf_types["difference"], avro_url, 'plot')
