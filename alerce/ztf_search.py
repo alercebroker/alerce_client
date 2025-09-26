@@ -1,7 +1,7 @@
 from .utils import Client
 
 
-class AlerceSearch(Client):
+class ZTFSearch(Client):
     def __init__(self, **kwargs):
         default_config = {
             "ZTF_API_URL": "https://api.alerce.online/ztf/v1/",

@@ -5,12 +5,12 @@ from .utils import Client
 from astropy.io.fits import HDUList
 from astropy.io.fits import open as fits_open
 from urllib.error import HTTPError
-from alerce.search import AlerceSearch
+from alerce.ztf_search import ZTFSearch
 from alerce.exceptions import CandidError
 
 
 class AlerceStamps(Client):
-    search_client = AlerceSearch()
+    search_client = ZTFSearch()
 
     def __init__(self, **kwargs):
         default_config = {
