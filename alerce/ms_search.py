@@ -40,7 +40,7 @@ class AlerceSearchMultiSurvey(Client):
                 f'survey_id: {params.get("survey_id", None)} not in {VALID_SURVEYS}'
             )
 
-    def multisurvey_query_objects(self, format="json", index=None, sort=None, **kwargs):
+    def query_objects(self, format="json", index=None, sort=None, **kwargs):
         """
         Gets a list of objects filtered by specified parameters.
         It is strongly advised to look at the documentation of `ALERCE ZTF API`_
@@ -101,7 +101,7 @@ class AlerceSearchMultiSurvey(Client):
         )
         return q.result(index, sort)
 
-    def multisurvey_query_object(self, format="json", **kwargs):
+    def query_object(self, format="json", **kwargs):
         """
         Gets a single object by object id
 
@@ -130,7 +130,7 @@ class AlerceSearchMultiSurvey(Client):
         )
         return q.result()
 
-    def multisurvey_query_lightcurve(self, format="json", **kwargs):
+    def query_lightcurve(self, format="json", **kwargs):
         """
         Gets the lightcurve (detections and non_detections) of a given object
 
@@ -158,7 +158,7 @@ class AlerceSearchMultiSurvey(Client):
         )
         return q.result()
 
-    def multisurvey_query_detections(
+    def query_detections(
         self, format="json", index=None, sort=None, **kwargs
     ):
         """
@@ -191,7 +191,7 @@ class AlerceSearchMultiSurvey(Client):
         )
         return q.result(index, sort)
 
-    def multisurvey_query_non_detections(
+    def query_non_detections(
         self, format="json", index=None, sort=None, **kwargs
     ):
         """
@@ -220,7 +220,7 @@ class AlerceSearchMultiSurvey(Client):
         )
         return q.result(index, sort)
 
-    def multisurvey_query_forced_photometry(
+    def query_forced_photometry(
         self, format="json", index=None, sort=None, **kwargs
     ):
         """
@@ -250,7 +250,7 @@ class AlerceSearchMultiSurvey(Client):
 
         return q.result(index, sort)
     
-    def multisurvey_query_probabilities(self, format="json", index=None, sort=None, **kwargs):
+    def query_probabilities(self, format="json", index=None, sort=None, **kwargs):
         """
         Gets probabilities of a given object
 
@@ -277,7 +277,7 @@ class AlerceSearchMultiSurvey(Client):
 
         return q.result(index, sort)
     
-    def multisurvey_query_magstats(self, format="json", index=None, sort=None, **kwargs):
+    def query_magstats(self, format="json", index=None, sort=None, **kwargs):
         """
         Gets magnitude statistics of a given object
 
