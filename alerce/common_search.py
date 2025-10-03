@@ -20,17 +20,68 @@ class AlerceCommonSearch(Client):
         self.valid_surveys = ["ztf", "lsst"]
 
     def query_objects(
-        self, survey_id, format="pandas", index=None, sort=None, **kwargs
+        self,
+        format="pandas",
+        index=None,
+        sort=None,
+        use_multisurvey_api: bool = False,
+        survey: str | None = None,
+        **kwargs
     ):
-        return self.surveys_clients[survey_id].query_objects(
-            format=format, index=index, sort=sort, **kwargs
-        )
+        if use_multisurvey_api:
+            if survey is None:
+                raise ValueError(
+                    "survey must be provided when use_multisurvey_api is True"
+                )
+            if not hasattr(self.multisurvey_client, "query_objects"):
+                raise NotImplementedError("Multisurvey query_objects not implemented.")
+            return self.multisurvey_client.query_objects(
+                survey=survey, format=format, index=index, sort=sort, **kwargs
+            )
+        else:
+            return self.legacy_ztf_client.query_objects(
+                format=format, index=index, sort=sort, **kwargs
+            )
 
-    def query_object(self, survey_id, oid, format="json"):
-        return self.surveys_clients[survey_id].query_object(oid, format=format)
+    def query_object(
+        self,
+        oid,
+        format="json",
+        use_multisurvey_api: bool = False,
+        survey: str | None = None,
+        **kwargs
+    ):
+        if use_multisurvey_api:
+            if survey is None:
+                raise ValueError(
+                    "survey must be provided when use_multisurvey_api is True"
+                )
+            if not hasattr(self.multisurvey_client, "query_object"):
+                raise NotImplementedError("Multisurvey query_object not implemented.")
+            return self.multisurvey_client.query_object(
+                survey=survey, oid=oid, format=format, **kwargs
+            )
+        else:
+            return self.legacy_ztf_client.query_object(oid, format=format, **kwargs)
 
-    def query_lightcurve(self, survey_id, oid, format="json"):
-        return self.surveys_clients[survey_id].query_lightcurve(oid, format=format)
+    def query_lightcurve(
+        self,
+        oid,
+        format="json",
+        use_multisurvey_api: bool = False,
+        survey: str | None = None,
+        **kwargs
+    ):
+        if use_multisurvey_api:
+            if survey is None:
+                raise ValueError(
+                    "survey must be provided when use_multisurvey_api is True"
+                )
+            return self.multisurvey_client.query_lightcurve(
+                survey=survey, oid=oid, format=format, **kwargs
+            )
+        else:
+            return self.legacy_ztf_client.query_lightcurve(oid, format=format, **kwargs)
 
     def query_detections(
         self,
@@ -40,59 +91,212 @@ class AlerceCommonSearch(Client):
         survey: str | None = None,
         index=None,
         sort=None,
+        **kwargs
     ):
         if use_multisurvey_api:
             if survey is None:
                 raise ValueError(
                     "survey must be provided when use_multisurvey_api is True"
                 )
-            else:
-                return self.multisurvey_client.query_detections(
-                    survey, oid, format=format, index=index, sort=sort
-                )
+            return self.multisurvey_client.query_detections(
+                survey, oid, format=format, index=index, sort=sort, **kwargs
+            )
         else:
             return self.legacy_ztf_client.query_detections(
-                oid, format=format, index=index, sort=sort
+                oid, format=format, index=index, sort=sort, **kwargs
             )
 
     def query_non_detections(
-        self, survey_id, oid, format="json", index=None, sort=None
+        self,
+        oid,
+        format="json",
+        use_multisurvey_api: bool = False,
+        survey: str | None = None,
+        index=None,
+        sort=None,
+        **kwargs
     ):
-        return self.surveys_clients[survey_id].query_non_detections(
-            oid, format=format, index=index, sort=sort
-        )
+        if use_multisurvey_api:
+            if survey is None:
+                raise ValueError(
+                    "survey must be provided when use_multisurvey_api is True"
+                )
+            return self.multisurvey_client.query_non_detections(
+                survey=survey, oid=oid, format=format, index=index, sort=sort, **kwargs
+            )
+        else:
+            return self.legacy_ztf_client.query_non_detections(
+                oid, format=format, index=index, sort=sort, **kwargs
+            )
 
     def query_forced_photometry(
-        self, survey_id, oid, format="json", index=None, sort=None
+        self,
+        oid,
+        format="json",
+        use_multisurvey_api: bool = False,
+        survey: str | None = None,
+        index=None,
+        sort=None,
+        **kwargs
     ):
-        return self.surveys_clients[survey_id].query_forced_photometry(
-            oid, format=format, index=index, sort=sort
-        )
+        if use_multisurvey_api:
+            if survey is None:
+                raise ValueError(
+                    "survey must be provided when use_multisurvey_api is True"
+                )
+            return self.multisurvey_client.query_forced_photometry(
+                survey=survey, oid=oid, format=format, index=index, sort=sort, **kwargs
+            )
+        else:
+            return self.legacy_ztf_client.query_forced_photometry(
+                oid, format=format, index=index, sort=sort, **kwargs
+            )
 
-    def query_magstats(self, survey_id, oid, format="json", index=None, sort=None):
-        return self.surveys_clients[survey_id].query_magstats(
-            oid, format=format, index=index, sort=sort
-        )
+    def query_magstats(
+        self,
+        oid,
+        format="json",
+        use_multisurvey_api: bool = False,
+        survey: str | None = None,
+        index=None,
+        sort=None,
+        **kwargs
+    ):
+        if use_multisurvey_api:
+            if survey is None:
+                raise ValueError(
+                    "survey must be provided when use_multisurvey_api is True"
+                )
+            return self.multisurvey_client.query_magstats(
+                survey=survey, oid=oid, format=format, index=index, sort=sort, **kwargs
+            )
+        else:
+            return self.legacy_ztf_client.query_magstats(
+                oid, format=format, index=index, sort=sort, **kwargs
+            )
 
-    def query_probabilities(self, survey_id, oid, format="json", index=None, sort=None):
-        return self.surveys_clients[survey_id].query_probabilities(
-            oid, format=format, index=index, sort=sort
-        )
+    def query_probabilities(
+        self,
+        oid,
+        format="json",
+        use_multisurvey_api: bool = False,
+        survey: str | None = None,
+        index=None,
+        sort=None,
+        **kwargs
+    ):
+        if use_multisurvey_api:
+            if survey is None:
+                raise ValueError(
+                    "survey must be provided when use_multisurvey_api is True"
+                )
+            if not hasattr(self.multisurvey_client, "query_probabilities"):
+                raise NotImplementedError(
+                    "Multisurvey query_probabilities not implemented."
+                )
+            return self.multisurvey_client.query_probabilities(
+                survey=survey, oid=oid, format=format, index=index, sort=sort, **kwargs
+            )
+        else:
+            return self.legacy_ztf_client.query_probabilities(
+                oid, format=format, index=index, sort=sort, **kwargs
+            )
 
-    def query_features(self, survey_id, oid, format="json", index=None, sort=None):
-        return self.surveys_clients[survey_id].query_features(
-            oid, format=format, index=index, sort=sort
-        )
+    def query_features(
+        self,
+        oid,
+        format="json",
+        use_multisurvey_api: bool = False,
+        survey: str | None = None,
+        index=None,
+        sort=None,
+        **kwargs
+    ):
+        if use_multisurvey_api:
+            if survey is None:
+                raise ValueError(
+                    "survey must be provided when use_multisurvey_api is True"
+                )
+            if not hasattr(self.multisurvey_client, "query_features"):
+                raise NotImplementedError("Multisurvey query_features not implemented.")
+            return self.multisurvey_client.query_features(
+                survey=survey, oid=oid, format=format, index=index, sort=sort, **kwargs
+            )
+        else:
+            return self.legacy_ztf_client.query_features(
+                oid, format=format, index=index, sort=sort, **kwargs
+            )
 
-    def query_feature(self, survey_id, oid, name, format="json"):
-        return self.surveys_clients[survey_id].query_feature(oid, name, format=format)
+    def query_feature(
+        self,
+        oid,
+        name,
+        format="json",
+        use_multisurvey_api: bool = False,
+        survey: str | None = None,
+        **kwargs
+    ):
+        if use_multisurvey_api:
+            if survey is None:
+                raise ValueError(
+                    "survey must be provided when use_multisurvey_api is True"
+                )
+            if not hasattr(self.multisurvey_client, "query_feature"):
+                raise NotImplementedError("Multisurvey query_feature not implemented.")
+            return self.multisurvey_client.query_feature(
+                survey=survey, oid=oid, name=name, format=format, **kwargs
+            )
+        else:
+            return self.legacy_ztf_client.query_feature(
+                oid, name, format=format, **kwargs
+            )
 
-    def query_classifiers(self, survey_id, format="json"):
-        return self.surveys_clients[survey_id].query_classifiers(format=format)
+    def query_classifiers(
+        self,
+        format="json",
+        use_multisurvey_api: bool = False,
+        survey: str | None = None,
+        **kwargs
+    ):
+        if use_multisurvey_api:
+            if survey is None:
+                raise ValueError(
+                    "survey must be provided when use_multisurvey_api is True"
+                )
+            if not hasattr(self.multisurvey_client, "query_classifiers"):
+                raise NotImplementedError(
+                    "Multisurvey query_classifiers not implemented."
+                )
+            return self.multisurvey_client.query_classifiers(
+                survey=survey, format=format, **kwargs
+            )
+        else:
+            return self.legacy_ztf_client.query_classifiers(format=format, **kwargs)
 
     def query_classes(
-        self, survey_id, classifier_name, classifier_version, format="json"
+        self,
+        classifier_name,
+        classifier_version,
+        format="json",
+        use_multisurvey_api: bool = False,
+        survey: str | None = None,
+        **kwargs
     ):
-        return self.surveys_clients[survey_id].query_classes(
-            classifier_name, classifier_version, format=format
-        )
+        if use_multisurvey_api:
+            if survey is None:
+                raise ValueError(
+                    "survey must be provided when use_multisurvey_api is True"
+                )
+            if not hasattr(self.multisurvey_client, "query_classes"):
+                raise NotImplementedError("Multisurvey query_classes not implemented.")
+            return self.multisurvey_client.query_classes(
+                survey=survey,
+                classifier_name=classifier_name,
+                classifier_version=classifier_version,
+                format=format,
+                **kwargs
+            )
+        else:
+            return self.legacy_ztf_client.query_classes(
+                classifier_name, classifier_version, format=format, **kwargs
+            )

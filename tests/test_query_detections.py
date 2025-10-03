@@ -2,7 +2,7 @@ import pytest
 from alerce.core import Alerce
 
 # Dummy OIDs for testing
-ZTF_OID = "ZTF20aaelulu"
+ZTF_OID = "ZTF18abeqwzl"
 LSST_OID = 169298433191444990
 
 

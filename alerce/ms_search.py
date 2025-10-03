@@ -43,7 +43,15 @@ class AlerceSearchMultiSurvey(Client):
         if survey not in VALID_SURVEYS:
             raise ValueError(f"survey must be one of {VALID_SURVEYS}")
 
-    def query_objects(self, format="json", index=None, sort=None, **kwargs):
+    def _check_survey_id(self, kwargs):
+        survey_id = kwargs.get("survey_id")
+        if survey_id is None:
+            raise ValueError("survey_id must be provided for multisurvey queries.")
+        self._check_survey_validity(survey_id)
+
+    def query_objects(
+        self, survey: str, format: str = "json", index=None, sort=None, **kwargs
+    ):
         """
         Gets a list of objects filtered by specified parameters.
         It is strongly advised to look at the documentation of `ALERCE ZTF API`_
@@ -93,18 +101,19 @@ class AlerceSearchMultiSurvey(Client):
                 Available values : ASC, DESC
         """
 
-        self._check_survey_id(kwargs)
-
+        self._check_survey_validity(survey)
+        params = {"survey_id": survey}
+        params.update(kwargs)
         q = self._request(
             "GET",
             url=self._get_survey_url("objects"),
-            params=kwargs,
+            params=params,
             result_format=format,
-            response_field="items",
+            response_field=None,
         )
         return q.result(index, sort)
 
-    def query_object(self, format="json", **kwargs):
+    def query_object(self, survey: str, oid, format: str = "json", **kwargs):
         """
         Gets a single object by object id
 
@@ -122,18 +131,19 @@ class AlerceSearchMultiSurvey(Client):
 
         """
 
-        self._check_survey_id(kwargs)
-
+        self._check_survey_validity(survey)
+        params = {"survey_id": survey, "oid": oid}
+        params.update(kwargs)
         q = self._request(
             "GET",
             url=self._get_survey_url("single_object"),
-            params=kwargs,
+            params=params,
             result_format=format,
-            response_field="items",
+            response_field=None,
         )
         return q.result()
 
-    def query_lightcurve(self, format="json", **kwargs):
+    def query_lightcurve(self, survey: str, oid, format: str = "json", **kwargs):
         """
         Gets the lightcurve (detections and non_detections) of a given object
 
@@ -150,14 +160,15 @@ class AlerceSearchMultiSurvey(Client):
 
         """
 
-        self._check_survey_id(kwargs)
-
+        self._check_survey_validity(survey)
+        params = {"survey_id": survey, "oid": oid}
+        params.update(kwargs)
         q = self._request(
             "GET",
             url=self._get_survey_url("lightcurve"),
-            params=kwargs,
+            params=params,
             result_format=format,
-            response_field="items",
+            response_field=None,
         )
         return q.result()
 
@@ -201,7 +212,9 @@ class AlerceSearchMultiSurvey(Client):
         )
         return q.result(index, sort)
 
-    def query_non_detections(self, format="json", index=None, sort=None, **kwargs):
+    def query_non_detections(
+        self, survey: str, oid, format: str = "json", index=None, sort=None, **kwargs
+    ):
         """
         Gets all non detections of a given object
 
@@ -217,18 +230,21 @@ class AlerceSearchMultiSurvey(Client):
             Return format. Can be one of 'pandas' | 'votable' | 'json'
         """
 
-        self._check_survey_id(kwargs)
-
+        self._check_survey_validity(survey)
+        params = {"survey_id": survey, "oid": oid}
+        params.update(kwargs)
         q = self._request(
             "GET",
             url=self._get_survey_url("non_detections"),
-            params=kwargs,
+            params=params,
             result_format=format,
-            response_field="items",
+            response_field=None,
         )
         return q.result(index, sort)
 
-    def query_forced_photometry(self, format="json", index=None, sort=None, **kwargs):
+    def query_forced_photometry(
+        self, survey: str, oid, format: str = "json", index=None, sort=None, **kwargs
+    ):
         """
         Gets all forced photometry epochs of a given object
 
@@ -244,19 +260,22 @@ class AlerceSearchMultiSurvey(Client):
             Return format. Can be one of 'pandas' | 'votable' | 'json'
         """
 
-        self._check_survey_id(kwargs)
-
+        self._check_survey_validity(survey)
+        params = {"survey_id": survey, "oid": oid}
+        params.update(kwargs)
         q = self._request(
             "GET",
             url=self._get_survey_url("forced_photometry"),
-            params=kwargs,
+            params=params,
             result_format=format,
-            response_field="items",
+            response_field=None,
         )
 
         return q.result(index, sort)
 
-    def query_probabilities(self, format="json", index=None, sort=None, **kwargs):
+    def query_probabilities(
+        self, survey: str, oid, format: str = "json", index=None, sort=None, **kwargs
+    ):
         """
         Gets probabilities of a given object
 
@@ -271,41 +290,42 @@ class AlerceSearchMultiSurvey(Client):
         format : str
             Return format. Can be one of 'pandas' | 'votable' | 'json'
         """
+        self._check_survey_validity(survey)
+        params = {"survey_id": survey, "oid": oid}
+        params.update(kwargs)
         url = self._get_survey_url("probabilities")
-
         q = self._request(
             "GET",
             url=url,
-            params=kwargs,
+            params=params,
             result_format=format,
-            response_field="items",
+            response_field=None,
         )
 
         return q.result(index, sort)
 
-    def query_magstats(self, format="json", index=None, sort=None, **kwargs):
-        """
-        Gets magnitude statistics of a given object
+    def query_magstats(
+        self, survey: str, oid, format: str = "json", index=None, sort=None, **kwargs
+    ):
+        raise NotImplementedError("Multisurvey query_magstats not implemented.")
 
-        Parameters
-        ----------
-        **kwargs
-            Keyword arguments
+    def query_features(
+        self, survey: str, oid, format: str = "json", index=None, sort=None, **kwargs
+    ):
+        raise NotImplementedError("Multisurvey query_features not implemented.")
 
-            - oid : str
-            - survey_id : str
+    def query_feature(self, survey: str, oid, name, format: str = "json", **kwargs):
+        raise NotImplementedError("Multisurvey query_feature not implemented.")
 
-        format : str
-            Return format. Can be one of 'pandas' | 'votable' | 'json'
-        """
-        self._check_survey_id(kwargs)
+    def query_classifiers(self, survey: str, format: str = "json", **kwargs):
+        raise NotImplementedError("Multisurvey query_classifiers not implemented.")
 
-        q = self._request(
-            "GET",
-            url=self._get_survey_url("magstats"),
-            params=kwargs,
-            result_format=format,
-            response_field="items",
-        )
-
-        return q.result(index, sort)
+    def query_classes(
+        self,
+        survey: str,
+        classifier_name,
+        classifier_version,
+        format: str = "json",
+        **kwargs,
+    ):
+        raise NotImplementedError("Multisurvey query_classes not implemented.")
