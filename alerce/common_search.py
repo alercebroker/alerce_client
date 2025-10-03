@@ -33,8 +33,6 @@ class AlerceCommonSearch(Client):
                 raise ValueError(
                     "survey must be provided when use_multisurvey_api is True"
                 )
-            if not hasattr(self.multisurvey_client, "query_objects"):
-                raise NotImplementedError("Multisurvey query_objects not implemented.")
             return self.multisurvey_client.query_objects(
                 survey=survey, format=format, index=index, sort=sort, **kwargs
             )

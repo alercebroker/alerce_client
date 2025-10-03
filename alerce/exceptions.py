@@ -18,11 +18,7 @@ def handle_error(response, response_format="json"):
     code = response.status_code
     data = error
 
-    # raise codes.get(code, APIError)(
-    #     message=message, code=code, data=data, response=response
-    # )
-
-    raise APIError(
+    raise codes.get(code, APIError)(
         message=message, code=code, data=data, response=response
     )
 
