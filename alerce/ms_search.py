@@ -161,33 +161,43 @@ class AlerceSearchMultiSurvey(Client):
         )
         return q.result()
 
-    def query_detections(self, format="json", index=None, sort=None, **kwargs):
+    def query_detections(
+        self,
+        survey: str,
+        oid: int,
+        format: str = "json",
+        index=None,
+        sort=None,
+        **kwargs,
+    ):
         """
         Gets all detections of a given object
 
         Parameters
         ----------
-        **kwargs
-            Keyword arguments.
-
-            - oid : str
-            - survey_id : str
-
+        survey : str
+            Survey name.
+        oid: int
+            Object ID.
         format : str
             Return format. Can be one of 'pandas' | 'votable' | 'json'
         index : str
             The name of the column to use as index when format is 'pandas'
         sort : str
             The name of the column to sort when format is 'pandas'
+        **kwargs
+            Keyword arguments
         """
-        self._check_survey_id(kwargs)
+        self._check_survey_validity(survey)
 
+        params = {"survey_id": survey, "oid": oid}
+        params.update(kwargs)
         q = self._request(
             "GET",
             url=self._get_survey_url("detections"),
-            params=kwargs,
+            params=params,
             result_format=format,
-            response_field="items",
+            response_field=None,
         )
         return q.result(index, sort)
 

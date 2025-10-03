@@ -10,7 +10,7 @@ from .utils import Client
 #   Se puede hacer un catch de los metodos que no existan
 
 
-class CommonSearch(Client):
+class AlerceCommonSearch(Client):
 
     def __init__(self, **kwargs):
         ztf_config = kwargs.get("ztf_config", {})
