@@ -146,3 +146,5 @@ Pipfile.lock
 Pipfile
 
 docs/html_output
+
+alerce/config.py

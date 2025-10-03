@@ -1,9 +1,11 @@
 from .utils import Client
 
 from .config import configs
+import warnings
 
 
 VALID_SURVEYS = ["lsst", "ztf"]
+
 
 class AlerceSearchMultiSurvey(Client):
     def __init__(self, **kwargs):
@@ -22,23 +24,24 @@ class AlerceSearchMultiSurvey(Client):
         # self.routes_local = self.config["local"]["ROUTES_LOCAL"]
 
         ####################################################################
+
     def _get_survey_url(self, resource):
         return (
-            self.url_ms + self.routes_ms[resource] 
-           #self.url_local + self.routes_local[resource] # Descomentar esto para probar en local (y comentar lo de arriba)
+            self.url_ms
+            + self.routes_ms[resource]
+            # self.url_local + self.routes_local[resource] # Descomentar esto para probar en local (y comentar lo de arriba)
         )
-        
-    def _get_survey_param(self, params):
-        return params.get("survey_id") or params.get("survey")
 
-    def _check_survey_id(self, params):
-            
-        self.survey = self._get_survey_param(params)
-
-        if not self.survey in VALID_SURVEYS:
-            raise Exception(
-                f'survey_id: {params.get("survey_id", None)} not in {VALID_SURVEYS}'
+    def _check_survey_validity(self, survey):
+        if survey == "ztf":
+            warnings.warn(
+                "ZTF is not yet supported in the multisurvey API.", UserWarning
             )
+            raise NotImplementedError(
+                "ZTF is not yet supported in the multisurvey API."
+            )
+        if survey not in VALID_SURVEYS:
+            raise ValueError(f"survey must be one of {VALID_SURVEYS}")
 
     def query_objects(self, format="json", index=None, sort=None, **kwargs):
         """
@@ -158,9 +161,7 @@ class AlerceSearchMultiSurvey(Client):
         )
         return q.result()
 
-    def query_detections(
-        self, format="json", index=None, sort=None, **kwargs
-    ):
+    def query_detections(self, format="json", index=None, sort=None, **kwargs):
         """
         Gets all detections of a given object
 
@@ -181,7 +182,6 @@ class AlerceSearchMultiSurvey(Client):
         """
         self._check_survey_id(kwargs)
 
-
         q = self._request(
             "GET",
             url=self._get_survey_url("detections"),
@@ -191,9 +191,7 @@ class AlerceSearchMultiSurvey(Client):
         )
         return q.result(index, sort)
 
-    def query_non_detections(
-        self, format="json", index=None, sort=None, **kwargs
-    ):
+    def query_non_detections(self, format="json", index=None, sort=None, **kwargs):
         """
         Gets all non detections of a given object
 
@@ -220,9 +218,7 @@ class AlerceSearchMultiSurvey(Client):
         )
         return q.result(index, sort)
 
-    def query_forced_photometry(
-        self, format="json", index=None, sort=None, **kwargs
-    ):
+    def query_forced_photometry(self, format="json", index=None, sort=None, **kwargs):
         """
         Gets all forced photometry epochs of a given object
 
@@ -249,7 +245,7 @@ class AlerceSearchMultiSurvey(Client):
         )
 
         return q.result(index, sort)
-    
+
     def query_probabilities(self, format="json", index=None, sort=None, **kwargs):
         """
         Gets probabilities of a given object
@@ -260,7 +256,7 @@ class AlerceSearchMultiSurvey(Client):
             Keyword arguments
 
             - oid (required) : str
-            - classifier (optional) : str 
+            - classifier (optional) : str
 
         format : str
             Return format. Can be one of 'pandas' | 'votable' | 'json'
@@ -276,7 +272,7 @@ class AlerceSearchMultiSurvey(Client):
         )
 
         return q.result(index, sort)
-    
+
     def query_magstats(self, format="json", index=None, sort=None, **kwargs):
         """
         Gets magnitude statistics of a given object
