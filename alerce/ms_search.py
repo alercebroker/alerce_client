@@ -43,12 +43,6 @@ class AlerceSearchMultiSurvey(Client):
         if survey not in VALID_SURVEYS:
             raise ValueError(f"survey must be one of {VALID_SURVEYS}")
 
-    def _check_survey_id(self, kwargs):
-        survey_id = kwargs.get("survey_id")
-        if survey_id is None:
-            raise ValueError("survey_id must be provided for multisurvey queries.")
-        self._check_survey_validity(survey_id)
-
     def query_objects(
         self, survey: str, format: str = "json", index=None, sort=None, **kwargs
     ):

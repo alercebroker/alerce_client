@@ -1,9 +1,9 @@
 from .common_search import AlerceCommonSearch
 from .crossmatch import AlerceXmatch
-from .ms_stamps import AlerceStampsMultisurvey
+from .common_stamps import AlerceCommonStamps
 
 
-class Alerce(AlerceCommonSearch, AlerceXmatch, AlerceStampsMultisurvey):
+class Alerce(AlerceCommonSearch, AlerceXmatch, AlerceCommonStamps):
     """
     The main client class that has all the methods for accessing the different services.
 
@@ -18,4 +18,7 @@ class Alerce(AlerceCommonSearch, AlerceXmatch, AlerceStampsMultisurvey):
         The url of the ZTF API
     """
 
-    pass
+    def __init__(self, **kwargs):
+        AlerceCommonSearch.__init__(self, **kwargs)
+        AlerceXmatch.__init__(self, **kwargs)
+        AlerceCommonStamps.__init__(self, **kwargs)

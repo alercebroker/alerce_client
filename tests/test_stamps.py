@@ -1,7 +1,7 @@
 import pytest
 from unittest.mock import patch
 import numpy as np
-from astropy.io.fits import HDUList
+from astropy.io.fits import HDUList, PrimaryHDU
 from urllib.error import HTTPError
 import sys
 import os
@@ -59,3 +59,81 @@ def test_exception_stamp(mock_fits):
     with pytest.warns(RuntimeWarning):
         r = alerce.plot_stamps(oid="ZTF18abjpdlh", candid="570448435315010001")
         assert r is None
+
+
+@patch("requests.Session.request", return_value=EXAMPLE_FITS)
+def test_get_stamp_invalid_oid(mock_fits):
+    alerce = Alerce()
+    # Simulate an invalid OID by patching the response to empty content
+    with patch("alerce.stamps.fits_open", side_effect=OSError("No FITS data")):
+        with pytest.raises(OSError):
+            alerce.get_stamps(oid="INVALID_OID", candid="570448435315010000")
+
+
+def test_get_stamp_lsst():
+    alerce = Alerce()
+    r = alerce.get_stamps(
+        survey="lsst",
+        oid=169298436520149069,
+        measurement_id=169298436520149069,
+        use_multisurvey_api=True,
+    )
+    assert isinstance(r, dict)
+    for hdu in r.values():
+        assert isinstance(hdu, PrimaryHDU)
+
+
+def test_get_stamp_lsst_without_measurement_id():
+    alerce = Alerce()
+    r = alerce.get_stamps(
+        survey="lsst",
+        oid=169298436520149069,
+        use_multisurvey_api=True,
+    )
+    assert isinstance(r, dict)
+    for hdu in r.values():
+        assert isinstance(hdu, PrimaryHDU)
+
+
+@patch("requests.Session.request", return_value=EXAMPLE_FITS)
+def test_get_avro_valid_oid(mock_fits):
+    alerce = Alerce()
+    with patch("alerce.stamps.open", return_value=EXAMPLE_FITS):
+        result = alerce.get_avro(oid="ZTF18abjpdlh", candid="570448435315010000")
+        assert isinstance(result, bytes) or result is not None
+
+
+@patch(
+    "requests.Session.request",
+    side_effect=HTTPError(url="mock://test", code=404, msg="mock", hdrs={}, fp=None),
+)
+def test_get_avro_invalid_oid(mock_fits):
+    alerce = Alerce()
+    with pytest.warns(RuntimeWarning):
+        result = alerce.get_avro(oid="INVALID_OID", candid="570448435315010000")
+        assert result is None
+
+
+def test_multisurvey_not_implemented():
+    alerce = Alerce()
+    with pytest.raises(NotImplementedError):
+        alerce.get_stamps(
+            oid="ZTF18abjpdlh",
+            candid="570448435315010000",
+            use_multisurvey_api=True,
+            survey="lsst",
+        )
+    with pytest.raises(NotImplementedError):
+        alerce.plot_stamps(
+            oid="ZTF18abjpdlh",
+            candid="570448435315010000",
+            use_multisurvey_api=True,
+            survey="lsst",
+        )
+    with pytest.raises(NotImplementedError):
+        alerce.get_avro(
+            oid="ZTF18abjpdlh",
+            candid="570448435315010000",
+            use_multisurvey_api=True,
+            survey="lsst",
+        )
