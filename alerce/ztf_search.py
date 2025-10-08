@@ -226,7 +226,7 @@ class ZTFSearch(Client):
         q = self._request("GET", self.__get_url("magstats", oid), result_format=format)
         return q.result(index, sort)
 
-    def query_probabilities(self, oid, format="json", index=None, sort=None):
+    def query_probabilities(self, oid, format="json", index=None, sort=None, **kwargs):
         """
         Gets probabilities of a given object
 
@@ -238,7 +238,10 @@ class ZTFSearch(Client):
             Return format. Can be one of 'pandas' | 'votable' | 'json'
         """
         q = self._request(
-            "GET", self.__get_url("probabilities", oid), result_format=format
+            "GET",
+            self.__get_url("probabilities", oid),
+            result_format=format,
+            params=kwargs,
         )
         return q.result(index, sort)
 

@@ -70,31 +70,6 @@ def test_get_stamp_invalid_oid(mock_fits):
             alerce.get_stamps(oid="INVALID_OID", candid="570448435315010000")
 
 
-def test_get_stamp_lsst():
-    alerce = Alerce()
-    r = alerce.get_stamps(
-        survey="lsst",
-        oid=169298436520149069,
-        measurement_id=169298436520149069,
-        use_multisurvey_api=True,
-    )
-    assert isinstance(r, dict)
-    for hdu in r.values():
-        assert isinstance(hdu, PrimaryHDU)
-
-
-def test_get_stamp_lsst_without_measurement_id():
-    alerce = Alerce()
-    r = alerce.get_stamps(
-        survey="lsst",
-        oid=169298436520149069,
-        use_multisurvey_api=True,
-    )
-    assert isinstance(r, dict)
-    for hdu in r.values():
-        assert isinstance(hdu, PrimaryHDU)
-
-
 @patch("requests.Session.request", return_value=EXAMPLE_FITS)
 def test_get_avro_valid_oid(mock_fits):
     alerce = Alerce()

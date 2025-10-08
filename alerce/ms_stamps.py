@@ -56,6 +56,8 @@ class AlerceStampsMultisurvey(Client):
 
         """
         detections = self.search_client.query_detections(survey, oid, format="pandas")
+
+        # TODO: adapt API to retrieve has_stamp for lsst
         first_detection = detections[detections.has_stamp].mjd.astype("int64").min()
 
         # Este try debe cambiarse por una deteccion de error de mjd.
