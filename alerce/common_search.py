@@ -67,7 +67,6 @@ class AlerceCommonSearch(Client):
         oid,
         format="json",
         survey: str | None = None,
-        **kwargs,
     ):
         if survey is None:
             survey = "ztf"
@@ -77,10 +76,10 @@ class AlerceCommonSearch(Client):
             )
 
         if survey == "ztf":
-            return self.legacy_ztf_client.query_lightcurve(oid, format=format, **kwargs)
+            return self.legacy_ztf_client.query_lightcurve(oid, format=format)
         elif survey in self.valid_surveys:
             return self.multisurvey_client.query_lightcurve(
-                survey, oid, format=format, **kwargs
+                survey, oid, format=format
             )
         else:
             raise ValueError(f"survey must be one of {self.valid_surveys}")
@@ -92,7 +91,6 @@ class AlerceCommonSearch(Client):
         survey: str | None = None,
         index=None,
         sort=None,
-        **kwargs,
     ):
 
         if survey is None:
@@ -108,7 +106,7 @@ class AlerceCommonSearch(Client):
             )
         elif survey in self.valid_surveys:
             return self.multisurvey_client.query_detections(
-                survey, oid, format=format, index=index, sort=sort, **kwargs
+                survey, oid, format=format, index=index, sort=sort
             )
         else:
             raise ValueError(f"survey must be one of {self.valid_surveys}")
@@ -120,7 +118,6 @@ class AlerceCommonSearch(Client):
         survey: str | None = None,
         index=None,
         sort=None,
-        **kwargs,
     ):
         if survey is None:
             survey = "ztf"
@@ -131,11 +128,11 @@ class AlerceCommonSearch(Client):
 
         if survey == "ztf":
             return self.legacy_ztf_client.query_non_detections(
-                oid, format=format, index=index, sort=sort, **kwargs
+                oid, format=format, index=index, sort=sort
             )
         elif survey in self.valid_surveys:
             return self.multisurvey_client.query_non_detections(
-                survey, oid, format=format, index=index, sort=sort, **kwargs
+                survey, oid, format=format, index=index, sort=sort
             )
         else:
             raise ValueError(f"survey must be one of {self.valid_surveys}")
@@ -147,7 +144,6 @@ class AlerceCommonSearch(Client):
         survey: str | None = None,
         index=None,
         sort=None,
-        **kwargs,
     ):
         if survey is None:
             survey = "ztf"
@@ -158,11 +154,11 @@ class AlerceCommonSearch(Client):
 
         if survey == "ztf":
             return self.legacy_ztf_client.query_forced_photometry(
-                oid, format=format, index=index, sort=sort, **kwargs
+                oid, format=format, index=index, sort=sort
             )
         elif survey in self.valid_surveys:
             return self.multisurvey_client.query_forced_photometry(
-                survey, oid, format=format, index=index, sort=sort, **kwargs
+                survey, oid, format=format, index=index, sort=sort
             )
         else:
             raise ValueError(f"survey must be one of {self.valid_surveys}")
@@ -174,7 +170,6 @@ class AlerceCommonSearch(Client):
         survey: str | None = None,
         index=None,
         sort=None,
-        **kwargs,
     ):
         if survey is None:
             survey = "ztf"
@@ -185,14 +180,15 @@ class AlerceCommonSearch(Client):
 
         if survey == "ztf":
             return self.legacy_ztf_client.query_magstats(
-                oid, format=format, index=index, sort=sort, **kwargs
+                oid, format=format, index=index, sort=sort
             )
         elif survey in self.valid_surveys:
             return self.multisurvey_client.query_magstats(
-                survey, oid, format=format, index=index, sort=sort, **kwargs
+                survey, oid, format=format, index=index, sort=sort
             )
         else:
             raise ValueError(f"survey must be one of {self.valid_surveys}")
+
 
     def query_probabilities(
         self,
@@ -201,18 +197,17 @@ class AlerceCommonSearch(Client):
         survey: str | None = None,
         index=None,
         sort=None,
-        **kwargs,
     ):
         if survey is None:
-            survey = "ztf"
+            survey = 'ztf'
             warnings.warn(
                 "survey not provided, defaulting to 'ztf'. This will use the legacy ZTF client. This behavior will be deprecated in future versions.",
                 DeprecationWarning,
             )
 
-        if survey == "ztf":
+        if survey == "ztf": 
             return self.legacy_ztf_client.query_probabilities(
-                oid, format=format, index=index, sort=sort, **kwargs
+                oid, format=format, index=index, sort=sort
             )
         elif survey in self.valid_surveys:
             if not hasattr(self.multisurvey_client, "query_probabilities"):
@@ -220,7 +215,7 @@ class AlerceCommonSearch(Client):
                     "Multisurvey query_probabilities not implemented."
                 )
             return self.multisurvey_client.query_probabilities(
-                survey, oid, format=format, index=index, sort=sort, **kwargs
+                survey, oid, format=format, index=index, sort=sort
             )
         else:
             raise ValueError(f"survey must be one of {self.valid_surveys}")
@@ -232,7 +227,6 @@ class AlerceCommonSearch(Client):
         survey: str | None = None,
         index=None,
         sort=None,
-        **kwargs,
     ):
         if survey is None:
             survey = "ztf"
@@ -243,13 +237,13 @@ class AlerceCommonSearch(Client):
 
         if survey == "ztf":
             return self.legacy_ztf_client.query_features(
-                oid, format=format, index=index, sort=sort, **kwargs
+                oid, format=format, index=index, sort=sort
             )
         elif survey in self.valid_surveys:
             if not hasattr(self.multisurvey_client, "query_features"):
                 raise NotImplementedError("Multisurvey query_features not implemented.")
             return self.multisurvey_client.query_features(
-                survey, oid, format=format, index=index, sort=sort, **kwargs
+                survey, oid, format=format, index=index, sort=sort
             )
         else:
             raise ValueError(f"survey must be one of {self.valid_surveys}")
@@ -260,7 +254,6 @@ class AlerceCommonSearch(Client):
         name,
         format="json",
         survey: str | None = None,
-        **kwargs,
     ):
         if survey is None:
             survey = "ztf"
@@ -271,13 +264,13 @@ class AlerceCommonSearch(Client):
 
         if survey == "ztf":
             return self.legacy_ztf_client.query_feature(
-                oid, name, format=format, **kwargs
+                oid, name, format=format
             )
         elif survey in self.valid_surveys:
             if not hasattr(self.multisurvey_client, "query_feature"):
                 raise NotImplementedError("Multisurvey query_feature not implemented.")
             return self.multisurvey_client.query_feature(
-                survey, oid, name, format=format, **kwargs
+                survey, oid, name, format=format
             )
         else:
             raise ValueError(f"survey must be one of {self.valid_surveys}")
