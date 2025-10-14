@@ -78,9 +78,7 @@ class AlerceCommonSearch(Client):
         if survey == "ztf":
             return self.legacy_ztf_client.query_lightcurve(oid, format=format)
         elif survey in self.valid_surveys:
-            return self.multisurvey_client.query_lightcurve(
-                survey, oid, format=format
-            )
+            return self.multisurvey_client.query_lightcurve(survey, oid, format=format)
         else:
             raise ValueError(f"survey must be one of {self.valid_surveys}")
 
@@ -189,7 +187,6 @@ class AlerceCommonSearch(Client):
         else:
             raise ValueError(f"survey must be one of {self.valid_surveys}")
 
-
     def query_probabilities(
         self,
         oid,
@@ -199,13 +196,13 @@ class AlerceCommonSearch(Client):
         sort=None,
     ):
         if survey is None:
-            survey = 'ztf'
+            survey = "ztf"
             warnings.warn(
                 "survey not provided, defaulting to 'ztf'. This will use the legacy ZTF client. This behavior will be deprecated in future versions.",
                 DeprecationWarning,
             )
 
-        if survey == "ztf": 
+        if survey == "ztf":
             return self.legacy_ztf_client.query_probabilities(
                 oid, format=format, index=index, sort=sort
             )
@@ -263,9 +260,7 @@ class AlerceCommonSearch(Client):
             )
 
         if survey == "ztf":
-            return self.legacy_ztf_client.query_feature(
-                oid, name, format=format
-            )
+            return self.legacy_ztf_client.query_feature(oid, name, format=format)
         elif survey in self.valid_surveys:
             if not hasattr(self.multisurvey_client, "query_feature"):
                 raise NotImplementedError("Multisurvey query_feature not implemented.")

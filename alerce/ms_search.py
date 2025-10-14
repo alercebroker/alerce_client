@@ -254,7 +254,7 @@ class AlerceSearchMultiSurvey(Client):
 
         self._check_survey_validity(survey)
         params = {"survey_id": survey, "oid": oid}
-       
+
         q = self._request(
             "GET",
             url=self._get_survey_url("forced_photometry"),
@@ -286,7 +286,7 @@ class AlerceSearchMultiSurvey(Client):
         params = {"survey_id": survey, "oid": oid}
 
         url = self._get_survey_url("probabilities")
-        
+
         q = self._request(
             "GET",
             url=url,

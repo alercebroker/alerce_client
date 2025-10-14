@@ -102,7 +102,7 @@ class AlerceStampsMultisurvey(Client):
         if candid is not None:
             measurement_id = candid
         else:
-            measurement_id = self._get_first_detection(survey, oid) 
+            measurement_id = self._get_first_detection(survey, oid)
 
         avro_url = self.config["STAMP_URL"] + self.config["AVRO_ROUTES"]["get_stamp"]
 
@@ -126,7 +126,12 @@ class AlerceStampsMultisurvey(Client):
         display(HTML(images))
 
     def multisurvey_get_stamps(
-        self, survey, oid, candid=None, include_variance_and_mask=False, out_format="HDUList"
+        self,
+        survey,
+        oid,
+        candid=None,
+        include_variance_and_mask=False,
+        out_format="HDUList",
     ):
         """Download Stamps for an specific alert given oid and survey, measurement_id is optional.
 
