@@ -78,7 +78,7 @@ class AlerceStampsMultisurvey(Client):
         if survey not in VALID_SURVEYS:
             raise ValueError(f"survey must be one of {VALID_SURVEYS}")
 
-    def multisurvey_plot_stamps(self, survey, oid, candid=None, **kwargs):
+    def multisurvey_plot_stamps(self, survey, oid, candid=None):
         """
         Plot stamp in a notebook given oid and survey, measurement_id is optional. It uses IPython HTML.
 
@@ -98,18 +98,11 @@ class AlerceStampsMultisurvey(Client):
         """
 
         self._check_survey_validity(survey)
-        params = {"survey_id": survey, "oid": oid}
+
         if candid is not None:
-            params["candid"] = candid
-        params.update(kwargs)
-
-        oid = kwargs.get("oid")
-        survey = kwargs.get("survey_id")
-
-        if kwargs.get("measurement_id"):
-            measurement_id = kwargs.get("measurement_id")
+            measurement_id = candid
         else:
-            measurement_id = self._get_first_detection(survey, oid)
+            measurement_id = self._get_first_detection(survey, oid) 
 
         avro_url = self.config["STAMP_URL"] + self.config["AVRO_ROUTES"]["get_stamp"]
 
@@ -133,7 +126,7 @@ class AlerceStampsMultisurvey(Client):
         display(HTML(images))
 
     def multisurvey_get_stamps(
-        self, survey, oid, candid=None, format="HDUList", **kwargs
+        self, survey, oid, candid=None, include_variance_and_mask=False, out_format="HDUList"
     ):
         """Download Stamps for an specific alert given oid and survey, measurement_id is optional.
 
@@ -154,24 +147,12 @@ class AlerceStampsMultisurvey(Client):
         -------
             Science, Template and Difference stamps for an specific alert.
         """
-
         self._check_survey_validity(survey)
-        params = {"survey_id": survey, "oid": oid, "format": format}
+
         if candid is not None:
-            params["candid"] = candid
-        params.update(kwargs)
-
-        out_format = format
-
-        if kwargs.get("measurement_id"):
-            measurement_id = kwargs.get("measurement_id")
+            measurement_id = candid
         else:
             measurement_id = self._get_first_detection(survey, oid)
-
-        if kwargs.get("include_variance_and_mask"):
-            include_variance_and_mask = kwargs.get("include_variance_and_mask")
-        else:
-            include_variance_and_mask = False
 
         avro_url = self.config["STAMP_URL"] + self.config["AVRO_ROUTES"]["get_stamp"]
 
