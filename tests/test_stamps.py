@@ -95,20 +95,17 @@ def test_multisurvey_not_implemented():
         alerce.get_stamps(
             oid="ZTF18abjpdlh",
             candid="570448435315010000",
-            use_multisurvey_api=True,
             survey="lsst",
         )
     with pytest.raises(NotImplementedError):
         alerce.plot_stamps(
             oid="ZTF18abjpdlh",
             candid="570448435315010000",
-            use_multisurvey_api=True,
             survey="lsst",
         )
     with pytest.raises(NotImplementedError):
         alerce.get_avro(
             oid="ZTF18abjpdlh",
             candid="570448435315010000",
-            use_multisurvey_api=True,
             survey="lsst",
         )
