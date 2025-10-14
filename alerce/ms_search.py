@@ -137,7 +137,7 @@ class AlerceSearchMultiSurvey(Client):
         )
         return q.result()
 
-    def query_lightcurve(self, survey: str, oid, format: str = "json", **kwargs):
+    def query_lightcurve(self, survey: str, oid, format: str = "json"):
         """
         Gets the lightcurve (detections and non_detections) of a given object
 
@@ -156,7 +156,6 @@ class AlerceSearchMultiSurvey(Client):
 
         self._check_survey_validity(survey)
         params = {"survey_id": survey, "oid": oid}
-        params.update(kwargs)
         q = self._request(
             "GET",
             url=self._get_survey_url("lightcurve"),
@@ -173,7 +172,6 @@ class AlerceSearchMultiSurvey(Client):
         format: str = "json",
         index=None,
         sort=None,
-        **kwargs,
     ):
         """
         Gets all detections of a given object
@@ -196,7 +194,7 @@ class AlerceSearchMultiSurvey(Client):
         self._check_survey_validity(survey)
 
         params = {"survey_id": survey, "oid": oid}
-        params.update(kwargs)
+
         q = self._request(
             "GET",
             url=self._get_survey_url("detections"),
@@ -207,7 +205,7 @@ class AlerceSearchMultiSurvey(Client):
         return q.result(index, sort)
 
     def query_non_detections(
-        self, survey: str, oid, format: str = "json", index=None, sort=None, **kwargs
+        self, survey: str, oid, format: str = "json", index=None, sort=None
     ):
         """
         Gets all non detections of a given object
@@ -226,7 +224,7 @@ class AlerceSearchMultiSurvey(Client):
 
         self._check_survey_validity(survey)
         params = {"survey_id": survey, "oid": oid}
-        params.update(kwargs)
+
         q = self._request(
             "GET",
             url=self._get_survey_url("non_detections"),
@@ -237,7 +235,7 @@ class AlerceSearchMultiSurvey(Client):
         return q.result(index, sort)
 
     def query_forced_photometry(
-        self, survey: str, oid, format: str = "json", index=None, sort=None, **kwargs
+        self, survey: str, oid, format: str = "json", index=None, sort=None
     ):
         """
         Gets all forced photometry epochs of a given object
@@ -256,7 +254,7 @@ class AlerceSearchMultiSurvey(Client):
 
         self._check_survey_validity(survey)
         params = {"survey_id": survey, "oid": oid}
-        params.update(kwargs)
+       
         q = self._request(
             "GET",
             url=self._get_survey_url("forced_photometry"),
@@ -268,7 +266,7 @@ class AlerceSearchMultiSurvey(Client):
         return q.result(index, sort)
 
     def query_probabilities(
-        self, survey: str, oid, format: str = "json", index=None, sort=None, **kwargs
+        self, survey: str, oid, format: str = "json", index=None, sort=None
     ):
         """
         Gets probabilities of a given object
@@ -286,8 +284,9 @@ class AlerceSearchMultiSurvey(Client):
         """
         self._check_survey_validity(survey)
         params = {"survey_id": survey, "oid": oid}
-        params.update(kwargs)
+
         url = self._get_survey_url("probabilities")
+        
         q = self._request(
             "GET",
             url=url,
@@ -299,12 +298,12 @@ class AlerceSearchMultiSurvey(Client):
         return q.result(index, sort)
 
     def query_magstats(
-        self, survey: str, oid, format: str = "json", index=None, sort=None, **kwargs
+        self, survey: str, oid, format: str = "json", index=None, sort=None
     ):
         raise NotImplementedError("Multisurvey query_magstats not implemented.")
 
     def query_features(
-        self, survey: str, oid, format: str = "json", index=None, sort=None, **kwargs
+        self, survey: str, oid, format: str = "json", index=None, sort=None
     ):
         raise NotImplementedError("Multisurvey query_features not implemented.")
 
