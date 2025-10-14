@@ -23,11 +23,11 @@ class AlerceCommonStamps(Client):
 
         if survey == "ztf":
             return self.legacy_stamps_client.plot_stamps(
-                oid=oid, candid=candid, format=format
+                oid=oid, candid=candid
             )
         elif survey in self.valid_surveys:
             return self.multisurvey_stamps_client.multisurvey_plot_stamps(
-                oid=oid, candid=candid, survey=survey, format=format
+                oid=oid, candid=candid, survey=survey
             )
         else:
             raise ValueError(f"survey must be one of {self.valid_surveys}")
@@ -52,7 +52,7 @@ class AlerceCommonStamps(Client):
             )
         elif survey in self.valid_surveys:
             return self.multisurvey_stamps_client.multisurvey_get_stamps(
-                oid=oid, candid=candid, survey=survey, format=format
+                oid=oid, candid=candid, survey=survey
             )
         else:
             raise ValueError(f"survey must be one of {self.valid_surveys}")
