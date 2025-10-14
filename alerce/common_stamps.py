@@ -11,9 +11,11 @@ class AlerceCommonStamps(Client):
         self.multisurvey_stamps_client = AlerceStampsMultisurvey(**ms_stamp_config)
 
     def plot_stamps(
-        self, oid, candid=None, survey=None
+        self, oid, candid=None, measurement_id=None, survey=None
     ):
         
+        candid = candid or measurement_id
+
         if survey is None:
             survey = "ztf"
             warnings.warn(
@@ -36,9 +38,13 @@ class AlerceCommonStamps(Client):
         self,
         oid,
         candid=None,
+        measurement_id=None,
         format="HDUList",
         survey=None,
     ):
+        
+        candid = candid or measurement_id
+
         if survey is None:
             survey = "ztf"
             warnings.warn(
