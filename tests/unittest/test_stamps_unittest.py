@@ -6,12 +6,11 @@ from urllib.error import HTTPError
 import sys
 import os
 
-sys.path.append("..")
 from alerce.core import Alerce
 
 
 FILE_PATH = os.path.dirname(__file__)
-EXAMPLE_PATH = os.path.join(FILE_PATH, "examples/example.fits.gz")
+EXAMPLE_PATH = os.path.join(FILE_PATH, "../examples/example.fits.gz")
 
 
 class Dummy:
@@ -92,23 +91,20 @@ def test_get_avro_invalid_oid(mock_fits):
 def test_multisurvey_not_implemented():
     alerce = Alerce()
     with pytest.raises(NotImplementedError):
-        alerce.get_stamps(
+        alerce.multisurvey_stamps_client.multisurvey_get_stamps(
             oid="ZTF18abjpdlh",
             candid="570448435315010000",
-            use_multisurvey_api=True,
-            survey="lsst",
+            survey="ztf",
         )
     with pytest.raises(NotImplementedError):
-        alerce.plot_stamps(
+        alerce.multisurvey_stamps_client.multisurvey_plot_stamps(
             oid="ZTF18abjpdlh",
             candid="570448435315010000",
-            use_multisurvey_api=True,
-            survey="lsst",
+            survey="ztf",
         )
     with pytest.raises(NotImplementedError):
-        alerce.get_avro(
+        alerce.multisurvey_stamps_client.multisurvey_get_avro(
             oid="ZTF18abjpdlh",
             candid="570448435315010000",
-            use_multisurvey_api=True,
-            survey="lsst",
+            survey="ztf",
         )

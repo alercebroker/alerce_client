@@ -43,29 +43,32 @@ class AlerceStampsMultisurvey(Client):
         else:  # pragma: no cover
             return True
 
-    def _get_first_detection(self, survey, oid):
+    def _get_first_detection(self, survey: str, oid: int):
         """
-        Kwargs must have:
-
-        survey: ztf | lsst
-        oid: some_oid
-
-        Kwargs may have:
-
-        measurement_id: some_measurement_id
+        Get the first detection with stamps available for a given object.
+        Parameters
+        ----------
+        survey : str
+            Survey name, either 'ztf' or 'lsst'.
+        oid : int
+            Object ID in ALeRCE DBs.
+        Returns
+        -------
+        int
+            Measurement ID of the first detection with stamps available.
 
         """
         detections = self.search_client.query_detections(survey, oid, format="pandas")
 
-        # TODO: adapt API to retrieve has_stamp for lsst
-        first_detection = detections[detections.has_stamp].mjd.astype("int64").min()
+        detections_with_stamps = detections[detections.has_stamp]
 
-        # Este try debe cambiarse por una deteccion de error de mjd.
-        try:
-            first_detection = int(first_detection)
-        except TypeError:
+        if detections_with_stamps.empty:
             raise CandidError()
-        return first_detection
+
+        measurement_id = detections_with_stamps.sort_values("mjd").iloc[0][
+            "measurement_id"
+        ]
+        return int(measurement_id)
 
     def _check_survey_validity(self, survey):
         if survey == "ztf":
@@ -78,7 +81,7 @@ class AlerceStampsMultisurvey(Client):
         if survey not in VALID_SURVEYS:
             raise ValueError(f"survey must be one of {VALID_SURVEYS}")
 
-    def multisurvey_plot_stamps(self, survey, oid, candid=None, **kwargs):
+    def multisurvey_plot_stamps(self, survey, oid, candid=None):
         """
         Plot stamp in a notebook given oid and survey, measurement_id is optional. It uses IPython HTML.
 
@@ -98,16 +101,9 @@ class AlerceStampsMultisurvey(Client):
         """
 
         self._check_survey_validity(survey)
-        params = {"survey_id": survey, "oid": oid}
+
         if candid is not None:
-            params["candid"] = candid
-        params.update(kwargs)
-
-        oid = kwargs.get("oid")
-        survey = kwargs.get("survey_id")
-
-        if kwargs.get("measurement_id"):
-            measurement_id = kwargs.get("measurement_id")
+            measurement_id = candid
         else:
             measurement_id = self._get_first_detection(survey, oid)
 
@@ -133,7 +129,12 @@ class AlerceStampsMultisurvey(Client):
         display(HTML(images))
 
     def multisurvey_get_stamps(
-        self, survey, oid, candid=None, format="HDUList", **kwargs
+        self,
+        survey,
+        oid,
+        candid=None,
+        include_variance_and_mask=False,
+        out_format="HDUList",
     ):
         """Download Stamps for an specific alert given oid and survey, measurement_id is optional.
 
@@ -154,24 +155,12 @@ class AlerceStampsMultisurvey(Client):
         -------
             Science, Template and Difference stamps for an specific alert.
         """
-
         self._check_survey_validity(survey)
-        params = {"survey_id": survey, "oid": oid, "format": format}
+
         if candid is not None:
-            params["candid"] = candid
-        params.update(kwargs)
-
-        out_format = format
-
-        if kwargs.get("measurement_id"):
-            measurement_id = kwargs.get("measurement_id")
+            measurement_id = candid
         else:
             measurement_id = self._get_first_detection(survey, oid)
-
-        if kwargs.get("include_variance_and_mask"):
-            include_variance_and_mask = kwargs.get("include_variance_and_mask")
-        else:
-            include_variance_and_mask = False
 
         avro_url = self.config["STAMP_URL"] + self.config["AVRO_ROUTES"]["get_stamp"]
 

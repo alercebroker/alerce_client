@@ -30,16 +30,35 @@ def test_query_objects_ztf_legacy_signature(client):
     assert result is not None
 
 
-def test_query_objects_lsst_multisurvey_1(client):
-    params = {"firstmjd": [60000, 61000], "n_det": [5, 10]}
-    result = client.query_objects(index="oid", sort="firstmjd", survey="lsst", **params)
+def test_query_objects_lsst_multisurvey_empty_classifier(client):
+    params = {"firstmjd": [60000, 61000], "n_det": [5, 10], "classifier": ""}
+    result = client.query_objects(
+        index="oid", sort="firstmjd", survey="lsst", format="json", **params
+    )
     print("Multisurvey LSST objects:", result)
     assert result is not None
 
 
-def test_query_objects_lsst_multisurvey_2(client):
-    params = {"classifier": "rubin_stamp_1", "class_name": "SN"}
+def test_query_objects_lsst_multisurvey_1(client):
+    params = {"classifier": "stamp_classifier_rubin", "class_name": "SN"}
     result = client.query_objects(survey="lsst", **params)
+    print("Multisurvey LSST objects:", result)
+    assert result is not None
+
+
+def test_query_objects_lsst_multisurvey_no_classifier(client):
+    params = {
+        "firstmjd": [60000, 61000],
+        "n_det": [5, 10],
+        "ranking": 1,
+        "page_size": 20,
+        "page": 1,
+        "order_by": "probability",
+        "order_mode": "DESC",
+    }
+    result = client.query_objects(
+        index="oid", sort="firstmjd", survey="lsst", format="json", **params
+    )
     print("Multisurvey LSST objects:", result)
     assert result is not None
 
