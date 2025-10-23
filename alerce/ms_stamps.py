@@ -43,29 +43,32 @@ class AlerceStampsMultisurvey(Client):
         else:  # pragma: no cover
             return True
 
-    def _get_first_detection(self, survey, oid):
+    def _get_first_detection(self, survey: str, oid: int):
         """
-        Kwargs must have:
-
-        survey: ztf | lsst
-        oid: some_oid
-
-        Kwargs may have:
-
-        measurement_id: some_measurement_id
+        Get the first detection with stamps available for a given object.
+        Parameters
+        ----------
+        survey : str
+            Survey name, either 'ztf' or 'lsst'.
+        oid : int
+            Object ID in ALeRCE DBs.
+        Returns
+        -------
+        int
+            Measurement ID of the first detection with stamps available.
 
         """
         detections = self.search_client.query_detections(survey, oid, format="pandas")
 
-        # TODO: adapt API to retrieve has_stamp for lsst
-        first_detection = detections[detections.has_stamp].mjd.astype("int64").min()
+        detections_with_stamps = detections[detections.has_stamp]
 
-        # Este try debe cambiarse por una deteccion de error de mjd.
-        try:
-            first_detection = int(first_detection)
-        except TypeError:
+        if detections_with_stamps.empty:
             raise CandidError()
-        return first_detection
+
+        measurement_id = detections_with_stamps.sort_values("mjd").iloc[0][
+            "measurement_id"
+        ]
+        return int(measurement_id)
 
     def _check_survey_validity(self, survey):
         if survey == "ztf":

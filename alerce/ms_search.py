@@ -96,7 +96,7 @@ class AlerceSearchMultiSurvey(Client):
         """
 
         self._check_survey_validity(survey)
-        params = {"survey_id": survey}
+        params = {"survey": survey}
         params.update(kwargs)
         q = self._request(
             "GET",
