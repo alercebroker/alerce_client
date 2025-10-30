@@ -1,10 +1,9 @@
 from .ms_stamps import AlerceStampsMultisurvey
 from .stamps import AlerceStamps
-from .utils import Client
 import warnings
 
 
-class AlerceCommonStamps(Client):
+class AlerceCommonStamps:
     def __init__(self, **kwargs):
         legacy_config = kwargs.get("legacy_config", {})
         ms_stamp_config = kwargs.get("ms_stamp_config", {})

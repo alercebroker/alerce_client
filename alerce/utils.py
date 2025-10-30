@@ -129,13 +129,12 @@ class ResultCsv(Result):
 
 class Client:
     def __init__(self, **kwargs):
+        print(f"Initializing {self.__class__.__name__} client")
+        print(f"Configuration: {kwargs}")
         self.session = requests.Session()
         self.config = {}
         self.config.update(kwargs)
         self.allowed_formats = ["pandas", "votable", "json", "csv"]
-
-    def load_config_from_file(self, path):
-        pass
 
     def load_config_from_object(self, object):
         self.config.update(object)

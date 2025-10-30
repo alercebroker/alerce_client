@@ -67,7 +67,9 @@ class AlerceSearchMultiSurvey(Client):
                 classifier name
             - class_name : str
                 class name
-            - ndet : int[]
+            - ranking : int
+                Class ordering by probability from highest to lowest (Default 1).
+            - n_det : int[]
                 Range of detections.
             - probability : float
                 Minimum probability.
@@ -91,13 +93,33 @@ class AlerceSearchMultiSurvey(Client):
             - order_by : str
                 Column used for ordering. Available values : oid, ndethist, ncovhist, mjdstarthist, mjdendhist, corrected, stellar, ndet, g_r_max, g_r_max_corr, g_r_mean, g_r_mean_corr, meanra, meandec, sigmara, sigmadec, deltamjd, firstmjd, lastmjd, step_id_corr, object, classifier_name, class_name, probability, probabilities
             - order_mode : str
-                Ordering could be ascendent or descendent.
+                Ordering could be ascendant or descendant.
                 Available values : ASC, DESC
         """
-
+        valid_params = [
+            "survey",
+            "classifier",
+            "class_name",
+            "ranking",
+            "n_det",
+            "probability",
+            "firstmjd",
+            "lastmjd",
+            "ra",
+            "dec",
+            "radius",
+            "page",
+            "page_size",
+            "count",
+            "order_by",
+            "order_mode",
+        ]
         self._check_survey_validity(survey)
         params = {"survey": survey}
         params.update(kwargs)
+        for key in params.keys():
+            if key not in valid_params:
+                raise ValueError(f"Invalid parameter: {key}")
         q = self._request(
             "GET",
             url=self._get_survey_url("objects"),

@@ -1,10 +1,9 @@
 from .ztf_search import ZTFSearch
 from .ms_search import AlerceSearchMultiSurvey
-from .utils import Client
 import warnings
 
 
-class AlerceCommonSearch(Client):
+class AlerceCommonSearch:
 
     def __init__(self, **kwargs):
         ztf_config = kwargs.get("ztf_config", {})

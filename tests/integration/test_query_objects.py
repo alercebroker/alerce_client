@@ -1,3 +1,4 @@
+import pandas as pd
 import pytest
 from alerce.core import Alerce
 
@@ -30,19 +31,22 @@ def test_query_objects_ztf_legacy_signature(client):
     assert result is not None
 
 
-def test_query_objects_lsst_multisurvey_empty_classifier(client):
-    params = {"firstmjd": [60000, 61000], "n_det": [5, 10], "classifier": ""}
-    result = client.query_objects(
-        index="oid", sort="firstmjd", survey="lsst", format="json", **params
-    )
-    print("Multisurvey LSST objects:", result)
+def test_query_objects_lsst_multisurvey_1(client):
+    params = {"classifier": "stamp_classifier_rubin", "class_name": "SN"}
+    result = client.query_objects(survey="lsst", format="json", **params)
+    result_items = result["items"]
+    for item in result_items:
+        assert item["class_name"] == "SN"
+    print("Multisurvey LSST objects:", result["items"])
     assert result is not None
 
 
-def test_query_objects_lsst_multisurvey_1(client):
-    params = {"classifier": "stamp_classifier_rubin", "class_name": "SN"}
-    result = client.query_objects(survey="lsst", **params)
-    print("Multisurvey LSST objects:", result)
+def test_query_objects_lsst_multisurvey_classifier_without_class_name(client):
+    params = {"classifier": "stamp_classifier_rubin", "n_det": [5, 10]}
+    result = client.query_objects(survey="lsst", format="json", **params)
+    result_items_df = pd.DataFrame(result["items"])
+    print("Multisurvey LSST objects:")
+    print(result_items_df)
     assert result is not None
 
 
