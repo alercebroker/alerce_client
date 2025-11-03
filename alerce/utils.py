@@ -129,8 +129,6 @@ class ResultCsv(Result):
 
 class Client:
     def __init__(self, **kwargs):
-        print(f"Initializing {self.__class__.__name__} client")
-        print(f"Configuration: {kwargs}")
         self.session = requests.Session()
         self.config = {}
         self.config.update(kwargs)

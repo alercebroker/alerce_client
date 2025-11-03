@@ -16,7 +16,6 @@ class AlerceXmatch(Client):
     }
 
     def __init__(self, **kwargs):
-        print(f"Initializing AlerceXmatch client...")
         self.session = requests.Session()
         default_config = {
             "CATSHTM_API_URL": "https://catshtm.alerce.online",
