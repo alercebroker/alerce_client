@@ -3,28 +3,26 @@ survey_urls_routes = {
     "lsst": {"api": "LSST_API_URL", "route": "LSST_ROUTES"},
 }
 
-configs = {
-    "ztf": {
-        "ZTF_API_URL_MS": "https://api.staging.alerce.online/multisurvey/",
-        "ZTF_ROUTES_MS": {
-            "objects": "object_api/list_objects",
-            "single_object": "object_api/object",
-            "detections": "lightcurve_api/detections",
-            "forced_photometry": "lightcurve_api/forced-photometry",
-            "non_detections": "lightcurve_api/non_detections",
-            "lightcurve": "lightcurve_api/lightcurve",
-        },
-    },
-    "lsst": {
-        "LSST_API_URL": "http://127.0.0.1:",
-        "LSST_ROUTES": {
-            "objects": "8000//list_objects",
-            "single_object": "8000//object",
-            "detections": "8001//detections",
-            "forced_photometry": "8001//forced-photometry",
-            "non_detections": "8001//non_detections",
-            "lightcurve": "8001//lightcurve",
-            "magstats": "8002//magstats",
-        },
-    },
-}
+
+def get_service_config(service: str):
+    """Return a minimal mapping with api and route keys for the given service.
+
+    This function intentionally keeps the small legacy shape expected by callers of
+    `ms_search_utils` while sourcing values from the canonical config module.
+    """
+    from .config import load_config
+
+    svc = service.lower()
+    if svc == "ztf":
+        cfg = load_config(service="ztf")
+        return {
+            "ZTF_API_URL_MS": cfg.get("ZTF_API_URL", ""),
+            "ZTF_ROUTES_MS": cfg.get("ZTF_ROUTES", {}),
+        }
+    if svc == "lsst":
+        # no dedicated lsst section in canonical config; return sensible defaults
+        return {
+            "LSST_API_URL": "http://127.0.0.1:",
+            "LSST_ROUTES": {},
+        }
+    raise ValueError(f"Unknown service {service}")

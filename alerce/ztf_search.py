@@ -1,26 +1,19 @@
 from .utils import Client
+from .config import load_config
 
 
 class ZTFSearch(Client):
-    def __init__(self, **kwargs):
-        default_config = {
-            "ZTF_API_URL": "https://api.alerce.online/ztf/v1/",
-            "ZTF_ROUTES": {
-                "objects": "/objects",
-                "single_object": "/objects/%s",
-                "detections": "/objects/%s/detections",
-                "non_detections": "/objects/%s/non_detections",
-                "lightcurve": "/objects/%s/lightcurve",
-                "magstats": "/objects/%s/magstats",
-                "probabilities": "/objects/%s/probabilities",
-                "features": "/objects/%s/features",
-                "single_feature": "/objects/%s/features/%s",
-                "classifiers": "/classifiers",
-                "classifier_classes": "/classifiers/%s/%s/classes",
-            },
-        }
-        default_config.update(kwargs)
-        super().__init__(**default_config)
+    def __init__(self, config_path: str = None, **overrides):
+        """
+        ZTF client.
+
+        Parameters
+        ----------
+        config_path: optional path to a JSON file containing partial or full config to merge
+        **overrides: explicit configuration overrides (shallow/deep merge)
+        """
+        cfg = load_config(service="ztf", path=config_path, overrides=overrides)
+        super().__init__(**cfg)
 
     @property
     def ztf_url(self):
@@ -185,6 +178,8 @@ class ZTFSearch(Client):
 
         FIELDS_TO_REMOVE = ["extra_fields", "aid", "sid"]
 
+        parsed_result = None
+
         if format == "json":
             parsed_result = []
             for result in complete_result:
@@ -210,7 +205,7 @@ class ZTFSearch(Client):
                 if format == "csv":
                     parsed_result = parsed_result.to_csv(index=False)
 
-        return parsed_result
+        return parsed_result if parsed_result is not None else complete_result
 
     def query_magstats(self, oid, format="json", index=None, sort=None):
         """

@@ -14,8 +14,7 @@ class Alerce(AlerceCommonSearch, AlerceXmatch, AlerceCommonStamps):
 
     Attributes
     -----------
-    ztf_url
-        The url of the ZTF API
+    - ztf_url: the URL used by the ZTF API client
     """
 
     def __init__(self, **kwargs):

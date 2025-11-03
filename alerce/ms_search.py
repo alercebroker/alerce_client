@@ -1,6 +1,6 @@
 from .utils import Client
 
-from .config import configs
+from .config import load_config
 import warnings
 
 
@@ -8,29 +8,16 @@ VALID_SURVEYS = ["lsst", "ztf"]
 
 
 class AlerceSearchMultiSurvey(Client):
-    def __init__(self, **kwargs):
+    def __init__(self, config_path: str = None, **overrides):
 
-        default_config = configs
-        default_config.update(kwargs)
-        super().__init__(**default_config)
+        cfg = load_config(service="multisurvey", path=config_path, overrides=overrides)
+        super().__init__(**cfg)
 
-        self.url_ms = self.config["multisurvey"]["URL_MS"]
-        self.routes_ms = self.config["multisurvey"]["ROUTES_MS"]
-
-        ####################################################################
-
-        # # Rutas de prueba para local
-        # self.url_local = self.config["local"]["URL_LOCAL"]
-        # self.routes_local = self.config["local"]["ROUTES_LOCAL"]
-
-        ####################################################################
+        self.url_ms = self.config["URL_MS"]
+        self.routes_ms = self.config["ROUTES_MS"]
 
     def _get_survey_url(self, resource):
-        return (
-            self.url_ms
-            + self.routes_ms[resource]
-            # self.url_local + self.routes_local[resource] # Descomentar esto para probar en local (y comentar lo de arriba)
-        )
+        return self.url_ms + self.routes_ms[resource]
 
     def _check_survey_validity(self, survey):
         if survey == "ztf":
@@ -46,56 +33,6 @@ class AlerceSearchMultiSurvey(Client):
     def query_objects(
         self, survey: str, format: str = "json", index=None, sort=None, **kwargs
     ):
-        """
-        Gets a list of objects filtered by specified parameters.
-        It is strongly advised to look at the documentation of `ALERCE ZTF API`_
-
-        Parameters
-        ----------
-        format : str
-            Return format. Can be one of 'pandas' | 'votable' | 'json'
-        index : str
-            Name of the column to use as index when format is 'pandas'
-        sort : str
-            Name of the column to sort when format is 'pandas'
-
-        **kwargs
-            Keyword arguments. Each argument can be one of the `ALERCE ZTF API`_
-            object query parameters.
-
-            - classifier : str
-                classifier name
-            - class_name : str
-                class name
-            - ranking : int
-                Class ordering by probability from highest to lowest (Default 1).
-            - n_det : int[]
-                Range of detections.
-            - probability : float
-                Minimum probability.
-            - firstmjd : float[]
-                First detection date range in mjd.
-            - lastmjd : float[]
-                Last detection date range in mjd.
-            - ra : float
-                Ra in degrees for conesearch.
-            - dec : float
-                Dec in degrees for conesearch.
-            - radius : float
-                Radius in arcsec for conesearch.
-            - page : int
-                Page or offset to retrieve. Default value : 1
-            - page_size : int
-                Number of objects to retrieve in each page. Default value: 10
-            - count : str (bool like)
-                Whether to count total objects or not. Can be a string representation of boolean
-                like "True", "true", "yes", "false", ...
-            - order_by : str
-                Column used for ordering. Available values : oid, ndethist, ncovhist, mjdstarthist, mjdendhist, corrected, stellar, ndet, g_r_max, g_r_max_corr, g_r_mean, g_r_mean_corr, meanra, meandec, sigmara, sigmadec, deltamjd, firstmjd, lastmjd, step_id_corr, object, classifier_name, class_name, probability, probabilities
-            - order_mode : str
-                Ordering could be ascendant or descendant.
-                Available values : ASC, DESC
-        """
         valid_params = [
             "survey",
             "classifier",
@@ -130,23 +67,6 @@ class AlerceSearchMultiSurvey(Client):
         return q.result(index, sort)
 
     def query_object(self, survey: str, oid, format: str = "json", **kwargs):
-        """
-        Gets a single object by object id
-
-        Parameters
-        ----------
-        **kwargs
-            Keyword arguments. Each argument can be one of the `ALERCE ZTF API`_
-            object query parameters.
-
-            - oid : str
-            - survey_id : str
-
-        format : str
-            Return format. Can be one of 'pandas' | 'votable' | 'json'
-
-        """
-
         self._check_survey_validity(survey)
         params = {"survey_id": survey, "oid": oid}
         params.update(kwargs)
@@ -160,22 +80,6 @@ class AlerceSearchMultiSurvey(Client):
         return q.result()
 
     def query_lightcurve(self, survey: str, oid, format: str = "json"):
-        """
-        Gets the lightcurve (detections and non_detections) of a given object
-
-        Parameters
-        ----------
-        **kwargs
-            Keyword arguments.
-
-            - oid : str
-            - survey_id : str
-
-        format : str
-            Return format. Can be one of 'pandas' | 'votable' | 'json'
-
-        """
-
         self._check_survey_validity(survey)
         params = {"survey_id": survey, "oid": oid}
         q = self._request(
@@ -195,24 +99,6 @@ class AlerceSearchMultiSurvey(Client):
         index=None,
         sort=None,
     ):
-        """
-        Gets all detections of a given object
-
-        Parameters
-        ----------
-        survey : str
-            Survey name.
-        oid: int
-            Object ID.
-        format : str
-            Return format. Can be one of 'pandas' | 'votable' | 'json'
-        index : str
-            The name of the column to use as index when format is 'pandas'
-        sort : str
-            The name of the column to sort when format is 'pandas'
-        **kwargs
-            Keyword arguments
-        """
         self._check_survey_validity(survey)
 
         params = {"survey_id": survey, "oid": oid}
@@ -229,21 +115,6 @@ class AlerceSearchMultiSurvey(Client):
     def query_non_detections(
         self, survey: str, oid, format: str = "json", index=None, sort=None
     ):
-        """
-        Gets all non detections of a given object
-
-        Parameters
-        ----------
-        **kwargs
-            Keyword arguments
-
-            - oid : str
-            - survey_id : str
-
-        format : str
-            Return format. Can be one of 'pandas' | 'votable' | 'json'
-        """
-
         self._check_survey_validity(survey)
         params = {"survey_id": survey, "oid": oid}
 
@@ -259,21 +130,6 @@ class AlerceSearchMultiSurvey(Client):
     def query_forced_photometry(
         self, survey: str, oid, format: str = "json", index=None, sort=None
     ):
-        """
-        Gets all forced photometry epochs of a given object
-
-        Parameters
-        ----------
-        **kwargs
-            Keyword arguments
-
-            - oid : str
-            - survey_id : str
-
-        format : str
-            Return format. Can be one of 'pandas' | 'votable' | 'json'
-        """
-
         self._check_survey_validity(survey)
         params = {"survey_id": survey, "oid": oid}
 
@@ -290,20 +146,6 @@ class AlerceSearchMultiSurvey(Client):
     def query_probabilities(
         self, survey: str, oid, format: str = "json", index=None, sort=None
     ):
-        """
-        Gets probabilities of a given object
-
-        Parameters
-        ----------
-        **kwargs
-            Keyword arguments
-
-            - oid (required) : str
-            - classifier (optional) : str
-
-        format : str
-            Return format. Can be one of 'pandas' | 'votable' | 'json'
-        """
         self._check_survey_validity(survey)
         params = {"survey_id": survey, "oid": oid}
 

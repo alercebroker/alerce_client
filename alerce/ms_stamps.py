@@ -8,16 +8,15 @@ from alerce.ms_search import AlerceSearchMultiSurvey
 from alerce.exceptions import CandidError
 from .ms_stamp_utils import create_html_stamp_display, create_stamp_parameters
 from IPython.display import HTML, display
-from .config import stamp_config
+from .config import load_config
 
 VALID_SURVEYS = ["lsst", "ztf"]
 
 
 class AlerceStampsMultisurvey(Client):
-    search_client = AlerceSearchMultiSurvey()
-
-    def __init__(self, **kwargs):
-        stamp_config.update(kwargs)
+    def __init__(self, config_path: str = None, **overrides):
+        # load stamps-specific config and pass to Client
+        cfg = load_config(service="stamps", path=config_path, overrides=overrides)
 
         self.ztf_types = {
             "science": "cutoutScience",
@@ -25,20 +24,23 @@ class AlerceStampsMultisurvey(Client):
             "difference": "cutoutDifference",
         }
 
-        super().__init__(**stamp_config)
+        super().__init__(**cfg)
+
+        # create a search client per instance so it can receive different configs if needed
+        self.search_client = AlerceSearchMultiSurvey(config_path=config_path)
 
     def _in_ipynb(self):
         try:
             from IPython import get_ipython
             import os
 
-            if "IPKernelApp" not in get_ipython().config:  # pragma: no cover
+            if "IPKernelApp" not in get_ipynb().config:  # pragma: no cover
                 raise ImportError("console")
                 return False
             if "VSCODE_PID" in os.environ:  # pragma: no cover
                 raise ImportError("vscode")
                 return False
-        except Exception as e:
+        except Exception:
             return False
         else:  # pragma: no cover
             return True
@@ -46,17 +48,6 @@ class AlerceStampsMultisurvey(Client):
     def _get_first_detection(self, survey: str, oid: int):
         """
         Get the first detection with stamps available for a given object.
-        Parameters
-        ----------
-        survey : str
-            Survey name, either 'ztf' or 'lsst'.
-        oid : int
-            Object ID in ALeRCE DBs.
-        Returns
-        -------
-        int
-            Measurement ID of the first detection with stamps available.
-
         """
         detections = self.search_client.query_detections(survey, oid, format="pandas")
 
@@ -83,23 +74,8 @@ class AlerceStampsMultisurvey(Client):
 
     def multisurvey_plot_stamps(self, survey, oid, candid=None):
         """
-        Plot stamp in a notebook given oid and survey, measurement_id is optional. It uses IPython HTML.
-
-        Parameters
-        ----------
-        oid (Required) : :py:class:`str`
-            object ID in ALeRCE DBs.
-
-        survey (Required): ztf or lsst
-
-        measurement_id (optional) : :py:class:`int`
-            measurement_id of the avro to be downloaded.
-
-        Returns
-        -------
-            Display the stamps on a jupyter notebook.
+        Plot stamp in a notebook given oid and survey, measurement_id is optional.
         """
-
         self._check_survey_validity(survey)
 
         if candid is not None:
@@ -136,25 +112,7 @@ class AlerceStampsMultisurvey(Client):
         include_variance_and_mask=False,
         out_format="HDUList",
     ):
-        """Download Stamps for an specific alert given oid and survey, measurement_id is optional.
-
-        Parameters
-        ----------
-        oid (Required) : :py:class:`str`
-            object ID in ALeRCE DBs.
-
-        survey (Required): ztf or lsst
-
-        measurement_id (optional) : :py:class:`int`
-            measurement_id of the avro to be downloaded.
-
-        format : :py:class: `str`
-            Output format [HDUList|numpy]
-
-        Returns
-        -------
-            Science, Template and Difference stamps for an specific alert.
-        """
+        """Download Stamps for an specific alert given oid and survey, measurement_id is optional."""
         self._check_survey_validity(survey)
 
         if candid is not None:
@@ -208,22 +166,7 @@ class AlerceStampsMultisurvey(Client):
             return None
 
     def multisurvey_get_avro(self, survey, oid, candid=None, **kwargs):
-        """Download avro of some alert given oid and survey, measurement_id is optional.
-
-        Parameters
-        ----------
-        oid (Required) : :py:class:`str`
-            object ID in ALeRCE DBs.
-
-        survey (Required): ztf or lsst
-
-        measurement_id (optional) : :py:class:`int`
-            measurement_id of the avro to be downloaded.
-
-        Returns
-        -------
-            Avro of a given alert.
-        """
+        """Download avro of some alert given oid and survey, measurement_id is optional."""
 
         self._check_survey_validity(survey)
         params = {"survey_id": survey, "oid": oid}

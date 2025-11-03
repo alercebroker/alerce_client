@@ -53,7 +53,8 @@ class AlerceCommonSearch:
             )
 
         if survey == "ztf":
-            return self.legacy_ztf_client.query_object(oid, format=format, **kwargs)
+            # legacy ZTFSearch.query_object does not accept arbitrary kwargs; forward only supported args
+            return self.legacy_ztf_client.query_object(oid, format=format)
         elif survey in self.valid_surveys:
             return self.multisurvey_client.query_object(
                 survey, oid, format=format, **kwargs
@@ -283,7 +284,8 @@ class AlerceCommonSearch:
             )
 
         if survey == "ztf":
-            return self.legacy_ztf_client.query_classifiers(format=format, **kwargs)
+            # legacy ZTFSearch.query_classifiers signature only expects format
+            return self.legacy_ztf_client.query_classifiers(format=format)
         elif survey in self.valid_surveys:
             if not hasattr(self.multisurvey_client, "query_classifiers"):
                 raise NotImplementedError(
@@ -311,8 +313,9 @@ class AlerceCommonSearch:
             )
 
         if survey == "ztf":
+            # legacy ZTFSearch.query_classes accepts only classifier_name, classifier_version and format
             return self.legacy_ztf_client.query_classes(
-                classifier_name, classifier_version, format=format, **kwargs
+                classifier_name, classifier_version, format=format
             )
         elif survey in self.valid_surveys:
             if not hasattr(self.multisurvey_client, "query_classes"):
