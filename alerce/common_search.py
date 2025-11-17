@@ -4,12 +4,23 @@ import warnings
 
 
 class AlerceCommonSearch:
+    """
+    AlerceCommonSearch provides a unified interface for querying astronomical data
+    from multiple surveys, including ZTF and LSST. It supports querying objects,
+    lightcurves, detections, non-detections, and other related data.
+
+    This class routes queries to the appropriate survey-specific client based on the
+    survey parameter. Users interact with the Alerce class which inherits from this,
+    providing a single entry point for all queries.
+    """
 
     def __init__(self, **kwargs):
-        ztf_config = kwargs.get("ztf_config", {})
-        lsst_config = kwargs.get("lsst_config", {})
-        self.legacy_ztf_client = ZTFSearch(**ztf_config)
-        self.multisurvey_client = AlerceSearchMultiSurvey(**lsst_config)
+        """
+        Initializes the AlerceCommonSearch class with clients for legacy ZTF
+        and multisurvey data.
+        """
+        self.legacy_ztf_client = ZTFSearch()
+        self.multisurvey_client = AlerceSearchMultiSurvey()
         self.valid_surveys = ["ztf", "lsst"]
 
     def query_objects(
@@ -20,6 +31,35 @@ class AlerceCommonSearch:
         survey: str | None = None,
         **kwargs,
     ):
+        """
+        Gets a list of objects filtered by specified parameters.
+
+        Parameters
+        ----------
+        format : str
+            Return format. Can be one of 'pandas' | 'votable' | 'json'
+        index : str
+            Name of the column to use as index when format is 'pandas'
+        sort : str
+            Name of the column to sort when format is 'pandas'
+        survey : str | None
+            The survey to query. If None, defaults to 'ztf'. Note: relying on
+            the default (omitting the `survey` parameter) is deprecated and will be removed in
+            a future release; callers should explicitly pass the desired survey (e.g. `survey='ztf'`).
+        **kwargs
+            Keyword arguments specific to the survey being queried. For ZTF, these can include:
+            classifier, class_name, ndet, probability, firstmjd, lastmjd, ra, dec, radius,
+            page, page_size, count, order_by, order_mode.
+
+        Returns
+        -------
+        The queried objects data in the specified format
+
+        Raises
+        ------
+        ValueError
+            If the survey is not in the list of valid surveys.
+        """
         if survey is None:
             survey = "ztf"
             warnings.warn(
@@ -45,6 +85,28 @@ class AlerceCommonSearch:
         survey: str | None = None,
         **kwargs,
     ):
+        """
+        Gets a single object by object id
+
+        Parameters
+        ----------
+        oid : str
+            The object identifier
+        format : str
+            Return format. Can be one of 'pandas' | 'votable' |
+            'json'
+        survey: str | None
+            The survey to query. If None, defaults to 'ztf'. Note: relying on the default
+            (omitting the `survey` parameter) is deprecated and will be removed in a future
+            release; callers should explicitly pass the desired survey (e.g. `survey='ztf'`).
+        kwargs: dict
+            Additional parameters specific to the multisurvey API
+
+        Returns
+        -------
+        The object data in the specified format
+
+        """
         if survey is None:
             survey = "ztf"
             warnings.warn(
@@ -68,6 +130,25 @@ class AlerceCommonSearch:
         format="json",
         survey: str | None = None,
     ):
+        """
+        Gets the lightcurve (detections and non_detections) of a given object
+
+        Parameters
+        ----------
+        oid : str
+            The object identifier
+        format : str
+            Return format. Can be one of 'pandas' | 'votable' | 'json'
+        survey : str | None
+            The survey to query. If None, defaults to 'ztf'. Note: relying on the default
+            (omitting the `survey` parameter) is deprecated and will be removed in a future
+            release; callers should explicitly pass the desired survey (e.g. `survey='ztf'`).
+
+        Returns
+        -------
+        The lightcurve data in the specified format
+
+        """
         if survey is None:
             survey = "ztf"
             warnings.warn(
@@ -90,7 +171,29 @@ class AlerceCommonSearch:
         index=None,
         sort=None,
     ):
+        """
+        Gets all detections of a given object
 
+        Parameters
+        ----------
+        oid : str | int
+            The object identifier
+        format : str
+            Return format. Can be one of 'pandas' | 'votable' | 'json'
+        survey : str | None
+            The survey to query. If None, defaults to 'ztf'. Note: relying on
+            the default (omitting the `survey` parameter) is deprecated and will be removed in a future
+            release; callers should explicitly pass the desired survey (e.g. `survey='ztf'`).
+        index : str
+            The name of the column to use as index when format is 'pandas'
+        sort : str
+            The name of the column to sort when format is 'pandas'
+
+        Returns
+        -------
+        The detections data in the specified format
+
+        """
         if survey is None:
             survey = "ztf"
             warnings.warn(
@@ -117,6 +220,29 @@ class AlerceCommonSearch:
         index=None,
         sort=None,
     ):
+        """
+        Gets all non detections of a given object
+
+        Parameters
+        ----------
+        oid : str | int
+            The object identifier
+        format : str
+            Return format. Can be one of 'pandas' | 'votable' | 'json'
+        survey : str | None
+            The survey to query. If None, defaults to 'ztf'. Note: relying on
+            the default (omitting the `survey` parameter) is deprecated and will be removed in
+            future release; callers should explicitly pass the desired survey (e.g. `survey='ztf'`).
+        index : str
+            The name of the column to use as index when format is 'pandas'
+        sort : str
+            The name of the column to sort when format is 'pandas'
+
+        Returns
+        -------
+        The non-detections data in the specified format
+
+        """
         if survey is None:
             survey = "ztf"
             warnings.warn(
@@ -143,6 +269,29 @@ class AlerceCommonSearch:
         index=None,
         sort=None,
     ):
+        """
+        Gets all forced photometry of a given object
+
+        Parameters
+        ----------
+        oid : str
+            The object identifier
+        format : str
+            Return format. Can be one of 'pandas' | 'votable' | 'json'
+        survey : str | None
+            The survey to query. If None, defaults to 'ztf'. Note: relying on
+            the default (omitting the `survey` parameter) is deprecated and will be removed in
+            future release; callers should explicitly pass the desired survey (e.g. `survey='ztf'`).
+        index : str
+            The name of the column to use as index when format is 'pandas'
+        sort : str
+            The name of the column to sort when format is 'pandas'
+
+        Returns
+        -------
+        The forced photometry data in the specified format
+
+        """
         if survey is None:
             survey = "ztf"
             warnings.warn(
@@ -169,6 +318,29 @@ class AlerceCommonSearch:
         index=None,
         sort=None,
     ):
+        """
+        Gets all magnitude statistics of a given object
+
+        Parameters
+        ----------
+        oid : str
+            The object identifier
+        format : str
+            Return format. Can be one of 'pandas' | 'votable' | 'json'
+        survey : str | None
+            The survey to query. If None, defaults to 'ztf'. Note: relying on
+            the default (omitting the `survey` parameter) is deprecated and will be removed in
+            future release; callers should explicitly pass the desired survey (e.g. `survey='ztf'`).
+        index : str
+            The name of the column to use as index when format is 'pandas'
+        sort : str
+            The name of the column to sort when format is 'pandas'
+
+        Returns
+        -------
+        The magnitude statistics data in the specified format
+
+        """
         if survey is None:
             survey = "ztf"
             warnings.warn(
@@ -195,6 +367,29 @@ class AlerceCommonSearch:
         index=None,
         sort=None,
     ):
+        """
+        Gets all probabilities of a given object
+
+        Parameters
+        ----------
+        oid : str
+            The object identifier
+        format : str
+            Return format. Can be one of 'pandas' | 'votable' | 'json'
+        survey : str | None
+            The survey to query. If None, defaults to 'ztf'. Note: relying on
+            the default (omitting the `survey` parameter) is deprecated and will be removed in
+            future release; callers should explicitly pass the desired survey (e.g. `survey='ztf'`).
+        index : str
+            The name of the column to use as index when format is 'pandas'
+        sort : str
+            The name of the column to sort when format is 'pandas'
+
+        Returns
+        -------
+        The probabilities data in the specified format
+
+        """
         if survey is None:
             survey = "ztf"
             warnings.warn(
@@ -225,6 +420,29 @@ class AlerceCommonSearch:
         index=None,
         sort=None,
     ):
+        """
+        Gets features of a given object
+
+        Parameters
+        ----------
+        oid : str
+            The object identifier
+        format : str
+            Return format. Can be one of 'pandas' | 'votable' | 'json'
+        survey : str | None
+            The survey to query. If None, defaults to 'ztf'. Note: relying on
+            the default (omitting the `survey` parameter) is deprecated and will be removed in
+            a future release; callers should explicitly pass the desired survey (e.g. `survey='ztf'`).
+        index : str
+            The name of the column to use as index when format is 'pandas'
+        sort : str
+            The name of the column to sort when format is 'pandas'
+
+        Returns
+        -------
+        The features data in the specified format
+        """
+
         if survey is None:
             survey = "ztf"
             warnings.warn(
@@ -252,6 +470,26 @@ class AlerceCommonSearch:
         format="json",
         survey: str | None = None,
     ):
+        """
+        Gets a single feature of a specified object id
+
+        Parameters
+        ----------
+        oid : str
+            The object identifier
+        name : str
+            The feature's name
+        format : str
+            Return format. Can be one of 'pandas' | 'votable' | 'json'
+        survey : str | None
+            The survey to query. If None, defaults to 'ztf'. Note: relying on
+            the default (omitting the `survey` parameter) is deprecated and will be removed in
+            a future release; callers should explicitly pass the desired survey (e.g. `survey='ztf'`).
+
+        Returns
+        -------
+        The feature data in the specified format
+        """
         if survey is None:
             survey = "ztf"
             warnings.warn(
@@ -276,6 +514,24 @@ class AlerceCommonSearch:
         survey: str | None = None,
         **kwargs,
     ):
+        """
+        Gets all classifiers and their classes
+
+        Parameters
+        ----------
+        format : str
+            Return format. Can be one of 'pandas' | 'votable' | 'json'
+        survey : str | None
+            The survey to query. If None, defaults to 'ztf'. Note: relying on
+            the default (omitting the `survey` parameter) is deprecated and will be removed in
+            a future release; callers should explicitly pass the desired survey (e.g. `survey='ztf'`).
+        **kwargs
+            Additional keyword arguments for the multisurvey API
+
+        Returns
+        -------
+        The classifiers data in the specified format
+        """
         if survey is None:
             survey = "ztf"
             warnings.warn(
@@ -305,6 +561,28 @@ class AlerceCommonSearch:
         survey: str | None = None,
         **kwargs,
     ):
+        """
+        Gets classes from a specified classifier
+
+        Parameters
+        ----------
+        classifier_name : str
+            The classifier unique name
+        classifier_version : str
+            The classifier's version
+        format : str
+            Return format. Can be one of 'pandas' | 'votable' | 'json'
+        survey : str | None
+            The survey to query. If None, defaults to 'ztf'. Note: relying on
+            the default (omitting the `survey` parameter) is deprecated and will be removed in
+            a future release; callers should explicitly pass the desired survey (e.g. `survey='ztf'`).
+        **kwargs
+            Additional keyword arguments for the multisurvey API
+
+        Returns
+        -------
+        The classes data in the specified format
+        """
         if survey is None:
             survey = "ztf"
             warnings.warn(

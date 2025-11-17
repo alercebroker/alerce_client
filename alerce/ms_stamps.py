@@ -1,22 +1,21 @@
 import warnings
 import gzip
 import io
-from .utils import Client
+from .utils import Client, load_config
 from astropy.io.fits import open as fits_open
 from urllib.error import HTTPError
 from alerce.ms_search import AlerceSearchMultiSurvey
 from alerce.exceptions import CandidError
 from .ms_stamp_utils import create_html_stamp_display, create_stamp_parameters
 from IPython.display import HTML, display
-from .config import load_config
 
 VALID_SURVEYS = ["lsst", "ztf"]
 
 
 class AlerceStampsMultisurvey(Client):
-    def __init__(self, config_path: str = None, **overrides):
+    def __init__(self):
         # load stamps-specific config and pass to Client
-        cfg = load_config(service="stamps", path=config_path, overrides=overrides)
+        cfg = load_config(service="stamps")
 
         self.ztf_types = {
             "science": "cutoutScience",
@@ -27,7 +26,7 @@ class AlerceStampsMultisurvey(Client):
         super().__init__(**cfg)
 
         # create a search client per instance so it can receive different configs if needed
-        self.search_client = AlerceSearchMultiSurvey(config_path=config_path)
+        self.search_client = AlerceSearchMultiSurvey()
 
     def _in_ipynb(self):
         try:

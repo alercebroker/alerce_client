@@ -24,6 +24,12 @@ def test_query_object_lsst(client):
     assert result is not None
 
 
+def test_query_object_lsst_with_extra(client):
+    result = client.query_object(LSST_OID, survey="lsst", return_survey_extra=True)
+    print("Multisurvey LSST object with extra:", result)
+    assert result is not None
+
+
 def test_query_object_invalid_survey(client):
     with pytest.raises(ValueError):
         client.query_object(ZTF_OID, survey="invalid")

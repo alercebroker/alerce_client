@@ -2,6 +2,7 @@ import warnings
 import gzip
 import io
 from .utils import Client
+from .utils import load_config
 from astropy.io.fits import HDUList
 from astropy.io.fits import open as fits_open
 from urllib.error import HTTPError
@@ -12,13 +13,9 @@ from alerce.exceptions import CandidError
 class AlerceStamps(Client):
     search_client = ZTFSearch()
 
-    def __init__(self, **kwargs):
-        default_config = {
-            "AVRO_URL": "https://avro.alerce.online",
-            "AVRO_ROUTES": {"get_stamp": "/get_stamp", "get_avro": "/get_avro"},
-        }
-        default_config.update(kwargs)
-        super().__init__(**default_config)
+    def __init__(self):
+        cfg = load_config(service="stamps_ztf")
+        super().__init__(**cfg)
 
     def _in_ipynb(self):
         try:

@@ -1,0 +1,40 @@
+{
+    "multisurvey": {
+        "URL_MS": "https://ms-api.alerce.online/",
+        "ROUTES_MS": {
+            "objects": "/list_objects",
+            "single_object": "/object",
+            "detections": "/detections",
+            "forced_photometry": "/forced-photometry",
+            "non_detections": "/non_detections",
+            "lightcurve": "/lightcurve",
+            "probabilities": "/probability"
+        }
+    },
+    "ztf": {
+        "ZTF_API_URL": "https://api.alerce.online/ztf/v1/",
+        "ZTF_ROUTES": {
+            "objects": "/objects",
+            "single_object": "/objects/%s",
+            "detections": "/objects/%s/detections",
+            "non_detections": "/objects/%s/non_detections",
+            "lightcurve": "/objects/%s/lightcurve",
+            "magstats": "/objects/%s/magstats",
+            "probabilities": "/objects/%s/probabilities",
+            "features": "/objects/%s/features",
+            "single_feature": "/objects/%s/features/%s",
+            "classifiers": "/classifiers",
+            "classifier_classes": "/classifiers/%s/%s/classes"
+        }
+    },
+    "stamps": {
+        "STAMP_URL": "https://ms-stamps.alerce.online",
+        "AVRO_ROUTES": {"get_stamp": "/stamp", "get_avro": "/get_avro"}
+    },
+    "stamps_ztf": {
+            "AVRO_URL": "https://avro.alerce.online",
+            "AVRO_ROUTES": {
+              "get_stamp": "/get_stamp",
+              "get_avro": "/get_avro"}
+        }
+}

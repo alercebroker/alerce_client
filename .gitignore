@@ -148,3 +148,4 @@ Pipfile
 docs/html_output
 
 alerce/config.py
+alerce/local_config.json

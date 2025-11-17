@@ -1,6 +1,5 @@
-from .utils import Client
+from .utils import Client, load_config
 
-from .config import load_config
 import warnings
 
 
@@ -8,9 +7,9 @@ VALID_SURVEYS = ["lsst", "ztf"]
 
 
 class AlerceSearchMultiSurvey(Client):
-    def __init__(self, config_path: str = None, **overrides):
+    def __init__(self):
 
-        cfg = load_config(service="multisurvey", path=config_path, overrides=overrides)
+        cfg = load_config(service="multisurvey")
         super().__init__(**cfg)
 
         self.url_ms = self.config["URL_MS"]

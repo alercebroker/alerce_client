@@ -3,6 +3,8 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
+.. _ALERCE ZTF API: https://api.alerce.online/ztf/v1
+
 ALeRCE Client
 ================================================
 `ALeRCE <http://alerce.science>`_ client is a Python library to interact with ALeRCE services and databases.
@@ -41,6 +43,14 @@ depending on your usecase check the following tutorials:
    tutorials/ztf_api.rst
    tutorials/multisurvey_stamps_api.rst
    tutorials/xmatch_api.rst
+
+Migration Guide
+###############
+
+.. toctree::
+   :maxdepth: 2
+
+   migration_guide
 
 
 API Reference

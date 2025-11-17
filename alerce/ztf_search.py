@@ -1,18 +1,14 @@
-from .utils import Client
-from .config import load_config
+from .utils import Client, load_config
 
 
 class ZTFSearch(Client):
-    def __init__(self, config_path: str = None, **overrides):
+    def __init__(self):
         """
-        ZTF client.
-
-        Parameters
-        ----------
-        config_path: optional path to a JSON file containing partial or full config to merge
-        **overrides: explicit configuration overrides (shallow/deep merge)
+        ZTF search client to query objects, lightcurves, detections,
+        non-detections, magnitude statistics, probabilities, features,
+        classifiers and classes from the ALeRCE ZTF API_.
         """
-        cfg = load_config(service="ztf", path=config_path, overrides=overrides)
+        cfg = load_config(service="ztf")
         super().__init__(**cfg)
 
     @property

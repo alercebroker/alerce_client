@@ -1,0 +1,34 @@
+{
+    "multisurvey": {
+        "URL_MS": "http://mock.multisurvey.lan:",
+        "ROUTES_MS": {
+            "objects": "8000/list_objects",
+            "single_object": "8000/object",
+            "detections": "8001/detections",
+            "forced_photometry": "8001/forced-photometry",
+            "non_detections": "8001/non_detections",
+            "lightcurve": "8001/lightcurve",
+            "probabilities": "8003/probability"
+        }
+    },
+    "ztf": {
+        "ZTF_API_URL": "http://mock.ztf.lan",
+        "ZTF_ROUTES": {
+            "objects": "/objects",
+            "single_object": "/objects/%s",
+            "detections": "/objects/%s/detections",
+            "non_detections": "/objects/%s/non_detections",
+            "lightcurve": "/objects/%s/lightcurve",
+            "magstats": "/objects/%s/magstats",
+            "probabilities": "/objects/%s/probabilities",
+            "features": "/objects/%s/features",
+            "single_feature": "/objects/%s/features/%s",
+            "classifiers": "/classifiers",
+            "classifier_classes": "/classifiers/%s/%s/classes"
+        }
+    },
+    "stamps": {
+        "STAMP_URL": "http://mock.stamps.lan",
+        "AVRO_ROUTES": {"get_stamp": "/stamp", "get_avro": "/get_avro"}
+    }
+}

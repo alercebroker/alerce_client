@@ -4,13 +4,54 @@ import warnings
 
 
 class AlerceCommonStamps:
+    """
+    AlerceCommonStamps provides a unified interface for retrieving and displaying
+    stamps from multiple surveys, including ZTF and LSST.
+
+    This class routes stamp queries to the appropriate survey-specific client based on the
+    survey parameter. Users interact with the Alerce class which inherits from this,
+    providing a single entry point for all stamp operations.
+    """
+
     def __init__(self, **kwargs):
-        legacy_config = kwargs.get("legacy_config", {})
-        ms_stamp_config = kwargs.get("ms_stamp_config", {})
-        self.legacy_stamps_client = AlerceStamps(**legacy_config)
-        self.multisurvey_stamps_client = AlerceStampsMultisurvey(**ms_stamp_config)
+        """
+        Initializes the AlerceCommonStamps class with clients for legacy ZTF
+        and multisurvey stamps.
+
+        Parameters
+        ----------
+        """
+        self.legacy_stamps_client = AlerceStamps()
+        self.multisurvey_stamps_client = AlerceStampsMultisurvey()
+        self.valid_surveys = ["ztf", "lsst"]
 
     def plot_stamps(self, oid, candid=None, measurement_id=None, survey=None):
+        """
+        Plot stamp in a notebook given oid. It uses IPython HTML.
+
+        Parameters
+        ----------
+        oid : str
+            Object ID in ALeRCE DBs.
+        candid : int, optional
+            Candid of the stamp to be displayed. If None, uses the first detection.
+        measurement_id : int, optional
+            Alias for candid parameter (for multisurvey compatibility).
+        survey : str, optional
+            The survey to query. If None, defaults to 'ztf'. Note: relying on
+            the default (omitting the `survey` parameter) is deprecated and will be removed in
+            a future release; callers should explicitly pass the desired survey (e.g. `survey='ztf'`).
+
+        Returns
+        -------
+        None
+            Displays the stamps on a jupyter notebook.
+
+        Raises
+        ------
+        ValueError
+            If the survey is not in the list of valid surveys.
+        """
 
         candid = candid or measurement_id
 
@@ -38,6 +79,35 @@ class AlerceCommonStamps:
         format="HDUList",
         survey=None,
     ):
+        """
+        Download Stamps for a specific alert.
+
+        Parameters
+        ----------
+        oid : str
+            Object ID in ALeRCE DBs.
+        candid : int, optional
+            Candid of the stamp to be downloaded. If None, uses the first detection.
+        measurement_id : int, optional
+            Alias for candid parameter (for multisurvey compatibility).
+        format : str
+            Output format. Options: 'HDUList' | 'numpy'
+        survey : str, optional
+            The survey to query. If None, defaults to 'ztf'. Note: relying on
+            the default (omitting the `survey` parameter) is deprecated and will be removed in
+            a future release; callers should explicitly pass the desired survey (e.g. `survey='ztf'`).
+
+        Returns
+        -------
+        HDUList or list
+            Science, Template and Difference stamps for a specific alert.
+            Returns HDUList if format='HDUList', otherwise list of numpy arrays.
+
+        Raises
+        ------
+        ValueError
+            If the survey is not in the list of valid surveys.
+        """
 
         candid = candid or measurement_id
 
@@ -60,6 +130,32 @@ class AlerceCommonStamps:
             raise ValueError(f"survey must be one of {self.valid_surveys}")
 
     def get_avro(self, oid, candid=None, use_multisurvey_api=False, survey=None):
+        """
+        Download avro of some alert.
+
+        Parameters
+        ----------
+        oid : str
+            Object ID in ALeRCE DBs.
+        candid : int, optional
+            Candid of the avro to be downloaded. If None, uses the first detection.
+        use_multisurvey_api : bool
+            If True, uses the multisurvey API. Requires `survey` parameter.
+        survey : str, optional
+            The survey to query. Required when use_multisurvey_api is True.
+
+        Returns
+        -------
+        bytes
+            Avro data of a given alert.
+
+        Raises
+        ------
+        ValueError
+            If use_multisurvey_api is True and survey is not provided.
+        NotImplementedError
+            If multisurvey get_avro is not implemented.
+        """
         if use_multisurvey_api:
             if survey is None:
                 raise ValueError(
