@@ -1,0 +1,18 @@
+/* Custom CSS to hide internal implementation details from documentation */
+
+/* Hide the "Bases:" line that shows internal parent classes in Alerce class documentation */
+/* This targets only paragraphs that contain class cross-references (internal base classes) */
+.class dd > p:first-child:has(code.xref.py.py-class) {
+    display: none;
+}
+
+/* Fallback for browsers that don't support :has() selector */
+@supports not (selector(:has(*))) {
+    .class dd > p:first-child {
+        /* Only hide if it contains "Bases:" text */
+    }
+    .class dd > p:first-child:contains("Bases:") {
+        display: none;
+    }
+}
+

@@ -9,7 +9,7 @@ def handle_error(response, response_format="json"):
     if response_format == "json":
         try:
             error = response.json().get("errors", {})
-            message = response.json().get("message")
+            message = response.json().get("detail")
         except requests.exceptions.JSONDecodeError:
             pass
     elif response_format == "csv":

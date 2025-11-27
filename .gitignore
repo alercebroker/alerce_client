@@ -114,6 +114,7 @@ venv/
 ENV/
 env.bak/
 venv.bak/
+client_venv
 
 # Spyder project settings
 .spyderproject
@@ -143,3 +144,8 @@ cython_debug/
 #pyenv
 Pipfile.lock
 Pipfile
+
+docs/html_output
+
+alerce/config.py
+alerce/local_config.json

@@ -98,24 +98,25 @@ class AlerceXmatch(Client):
 
         Parameters
         ----------
-        ra : :py:class:`float`
+        ra : float
             Right ascension in Degrees.
-        dec : :py:class:`float`
+        dec : float
             Declination in Degrees.
-        catalog_name : :py:class:`str`
-            catsHTM Catalog name, `"all"` can be used to query all available catalogs. List of available catalogs can be found in `here <https://alerceapi.readthedocs.io/en/latest/catshtm.html#id1>`_.
-        radius : :py:class:`float`
+        catalog_name : str
+            catsHTM Catalog name. Use "all" to query all available catalogs.
+            A list of available catalogs can be found on the catsHTM docs.
+        radius : float
             Conesearch radius in arcsec.
-        format : :py:class:`str`
-            Output format [votable|pandas]
+        format : str
+            Output format: "votable" or "pandas".
 
         Returns
         -------
-        :py:class:`dict`
-            Dictionary with the following structure:
-            {
-                <catalog_name>: :class:`astropy.table.Table` or :class:`pandas.DataFrame` or :py:class:`dict`
-            }
+        dict or astropy.table.Table or pandas.DataFrame or None
+            If `catalog_name` is "all", returns a dictionary mapping catalog
+            name to an astropy Table or pandas DataFrame. If a single catalog
+            is requested, returns the Table/DataFrame for that catalog. Returns
+            None when an empty response is received for a single catalog.
         """
         params = {
             "catalog": "%s" % self.catshtm_catalog_translator(catalog_name),
@@ -151,24 +152,24 @@ class AlerceXmatch(Client):
 
         Parameters
         ----------
-        ra : :py:class:`float`
+        ra : float
             Right ascension in Degrees.
-        dec: :py:class:`float`
+        dec : float
             Declination in Degrees.
-        catalog_name : :py:class:`str`
-            catsHTM Catalog name, `"all"` can be used to query all available catalogs. List of available catalogs can be found in `here <https://alerceapi.readthedocs.io/en/latest/catshtm.html#id1>`_.
-        radius : :py:class:`float`
-            Crossmatch radius in arcsec. (Default 100 arcsec)
-        format : :py:class:`str`
-            Output format [votable|pandas]
+        catalog_name : str
+            catsHTM Catalog name. Use "all" to query all available catalogs.
+            A list of available catalogs can be found on the catsHTM docs.
+        radius : float
+            Crossmatch radius in arcsec.
+        format : str
+            Output format: "votable" or "pandas".
 
         Returns
         -------
-        :py:class:`dict`
-            Dictionary with the following structure:
-            {
-                <catalog_name>: :class:`astropy.table.Table` or :class:`pandas.Series`
-            }
+        dict or astropy.table.Table or pandas.Series
+            If `catalog_name` is "all", returns a dictionary mapping catalog
+            name to an astropy Table or pandas DataFrame/Series. If a single
+            catalog is requested, returns the Table/Series for that catalog.
         """
         params = {
             "catalog": "%s" % self.catshtm_catalog_translator(catalog_name),
@@ -203,19 +204,19 @@ class AlerceXmatch(Client):
 
         Parameters
         ----------
-        ra : :py:class:`float`
+        ra : float
             Right ascension in Degrees.
-        dec: :py:class:`float`
+        dec : float
             Declination in Degrees.
-        radius : :py:class:`float`
+        radius : float
             catsHTM conesearch radius in arcsec.
-        format : :py:class:`str`
-            Output format [votable|pandas]
+        format : str
+            Output format: "votable" or "pandas".
 
         Returns
         -------
-        :py:class:`float`
-            Check if redshift is in a catsHTM xmatch response.
+        float or None
+            Redshift value if found in crossmatch results; otherwise None.
         """
         params = {"ra": "%f" % ra, "dec": "%f" % dec, "radius": "%f" % radius}
 

@@ -1,9 +1,17 @@
+import json
+
+import copy
+
+from typing import Dict, Any
+
 from pandas import DataFrame, read_csv
 from io import StringIO
 from astropy.table import Table
+
 from .exceptions import handle_error, FormatValidationError
 import requests
 import abc
+import os
 
 
 class Result(abc.ABC):
@@ -134,9 +142,6 @@ class Client:
         self.config.update(kwargs)
         self.allowed_formats = ["pandas", "votable", "json", "csv"]
 
-    def load_config_from_file(self, path):
-        pass
-
     def load_config_from_object(self, object):
         self.config.update(object)
 
@@ -159,7 +164,6 @@ class Client:
         response_format="json",
     ):
         result_format = self._validate_format(result_format)
-
         resp = self.session.request(method, url, params=params, data=data)
         if resp.status_code >= 400:
             handle_error(resp, response_format)
@@ -169,3 +173,25 @@ class Client:
         if response_field and result_format != "json" and result_format != "csv":
             return ResultJson(resp.json()[response_field], format=result_format)
         return ResultJson(resp.json(), format=result_format)
+
+
+def load_config(service) -> Dict[str, Any]:
+    """ """
+    default_config_path = os.path.join(
+        os.path.dirname(os.path.abspath(__file__)), "default_config.json"
+    )
+
+    # Check if environment variable is set
+    config_path = os.getenv("ALERCE_CONFIG_PATH", default=default_config_path)
+
+    try:
+        with open(config_path, "r") as fh:
+            config = json.load(fh)
+    except FileNotFoundError:
+        raise
+
+    if service:
+        svc = service.lower()
+        return copy.deepcopy(config.get(svc, {}))
+
+    return config

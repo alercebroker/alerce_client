@@ -1,89 +1,83 @@
 ![image](https://github.com/alercebroker/alerce_client/workflows/Tests/badge.svg)[![codecov](https://codecov.io/gh/alercebroker/alerce_client/graph/badge.svg?token=Y2AQJ3SWFE)](https://codecov.io/gh/alercebroker/alerce_client)![image](https://readthedocs.org/projects/alerce/badge/?version=latest)
 
+# ALeRCE Python Client
 
-Welcome to ALeRCE Python Client.
-================================
+ALeRCE client is a Python library to interact with ALeRCE services and databases.
 
-[ALeRCE](http://alerce.science) client is a Python library to interact
-with ALeRCE services and databases.
+This README highlights installation, quickstart usage and migration notes for the
+multi-survey client (ZTF and LSST). For the full reference and tutorials, see the official documentation at
+https://alerce.readthedocs.io/en/latest/
 
-For full documentation please visit the official
-[Documentation](https://alerce.readthedocs.io/en/latest/):
+## Key features
 
-Installing ALeRCE Client
-========================
+- Multi-survey support: query ZTF and LSST data through a unified client.
+- Access to objects, lightcurves (detections / non-detections / forced photometry),
+  stamps, classifiers, crossmatches (catsHTM) and more.
+- Return formats: `json` (default), `pandas`, and `votable` where applicable.
 
-``` {.sourceCode .bash}
+## Installing
+
+Install from PyPI:
+
+```bash
 pip install alerce
 ```
 
-Or clone the repository and install from there
+Or install from source:
 
-``` {.sourceCode .bash}
+```bash
 git clone https://github.com/alercebroker/alerce_client.git
 cd alerce_client
 python setup.py install
 ```
 
-Usage
-=====
+## Quickstart
 
-``` {.sourceCode .python}
+Basic usage with the `Alerce` client:
+
+```python
 from alerce.core import Alerce
-alerce = Alerce()
+client = Alerce()
 
-dataframe = alerce.query_objects(
-    classifier="lc_classifier", 
-    class_name="LPV", 
-    format="pandas"
-)
+# Query objects (must specify survey for multi-survey API)
+ztf_objects = client.query_objects(survey="ztf", classifier="lc_classifier", class_name="SN", probability=0.8, format="pandas")
 
-detections = alerce.query_detections("ZTF20aaelulu", format="pandas", sort="mjd")
+# Query a lightcurve (detections/non-detections/forced photometry)
+lightcurve = client.query_lightcurve(oid="ZTF18abbuksn", survey="ztf", format="json")
 
-magstats = alerce.query_magstats("ZTF20aaelulu")
+# Query detections only
+detections = client.query_detections(oid="ZTF18abbuksn", survey="ztf", format="pandas")
 
-query='''
-SELECT
-    oid, sgmag1, srmag1, simag1, szmag1, sgscore1
-FROM
-    ps1_ztf
-WHERE
-    oid = 'ZTF20aaelulu'
-'''
-detections_direct = alerce.send_query(query, format="pandas")
+# Get stamps for an object (first detection by default or use measurement_id)
+stamps = client.get_stamps(oid="ZTF18abkifng", survey="ztf")
+
+# Crossmatch (catsHTM conesearch)
+ra, dec, radius = 10.0, 20.0, 1000  # radius in arcsec
+cone = client.catshtm_conesearch(ra, dec, radius, "GAIA/DR1", format="pandas")
 ```
 
-Configuration
-=============
+See the documentation for many more examples and parameters.
 
-By default the Alerce object should be ready to use without any external
-configuration, but in case you need to adjust any parameters then you
-can configure the Alerce object in different ways.
+## Multi-survey notes / Migration from ZTF-only API
 
-At the client object initialization
------------------------------------
+The client supports multiple surveys. Most query methods now require an explicit
+`survey` parameter. Supported surveys:
 
-You can pass parameters to the Alerce class constructor to set the
-parameters for API connection.
+- `ztf` — Zwicky Transient Facility
+- `lsst` — Legacy Survey of Space and Time (Rubin Observatory)
 
-For example using the ZTF API on localhost:5000 and the DB API on localhost:5050 
-``` {.sourceCode .python}
-alerce = Alerce(ZTF_API_URL="<http://localhost:5000>", ZTF_DB_API_URL="<http://localhost:5050>")
-```
+Backward compatibility: many methods default to `survey="ztf"` when omitted,
+but this behavior is deprecated and will be removed in a future release. Update
+your code to always pass `survey="ztf"` or `survey="lsst"` explicitly.
 
-From a dictionary object
-------------------------
+Object ID formats differ between surveys:
+- ZTF: string IDs like `"ZTF18abbuksn"`
+- LSST: numeric-like IDs such as `45121627560013211`
 
-You can pass parameters to the Alerce class from a dictionary object.
+## Contributing
 
-``` {.sourceCode .python}
-my_config = {
-    "ZTF_API_URL": "http://localhost:5000"
-    "ZTF_DB_API_URL": "http://localhost:5050"
-}
-alerce = Alerce()
-alerce.load_config_from_object(my_config)
-```
-Contribuiting
-=============
-Each pull request must have at least one commit following the [angular commit guidelines](https://github.com/angular/angular.js/blob/master/DEVELOPERS.md#commits) for the semantic versioning to work.
+Please read `CONTRIBUTING.rst` for the project's contribution guidelines.
+
+## License
+
+This project is licensed under the terms in `LICENSE.txt`.
