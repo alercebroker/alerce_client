@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 
 with open("requirements.txt") as f:
-    required_packages = f.readlines()
+    required_packages = [r.strip() for r in f.readlines() if r.strip()]
 
 # read the contents of your README file
 from os import path
@@ -22,4 +22,18 @@ setup(
     author_email="contact@alerce.online",
     packages=find_packages(),
     install_requires=required_packages,
+    python_requires=">=3.10",
+    classifiers=[
+        "Development Status :: 5 - Production/Stable",
+        "Intended Audience :: Developers",
+        "License :: OSI Approved :: MIT License",
+        "Programming Language :: Python :: 3",
+        "Programming Language :: Python :: 3 :: Only",
+        "Programming Language :: Python :: 3.10",
+        "Programming Language :: Python :: 3.11",
+        "Programming Language :: Python :: 3.12",
+        "Programming Language :: Python :: 3.13",
+        "Programming Language :: Python :: 3.14",
+        "Topic :: Software Development :: Libraries",
+    ],
 )
