@@ -1,14 +1,14 @@
 {
     "multisurvey": {
-        "URL_MS": "https://ms-api.alerce.online/",
+        "URL_MS": "https://api.alerce.online/multisurvey/",
         "ROUTES_MS": {
-            "objects": "/list_objects",
-            "single_object": "/object",
-            "detections": "/detections",
-            "forced_photometry": "/forced-photometry",
-            "non_detections": "/non_detections",
-            "lightcurve": "/lightcurve",
-            "probabilities": "/probability"
+            "objects": "object_api/list_objects",
+            "single_object": "object_api/object",
+            "detections": "lightcurve_api/detections",
+            "forced_photometry": "lightcurve_api/forced-photometry",
+            "non_detections": "lightcurve_api/non_detections",
+            "lightcurve": "lightcurve_api/lightcurve",
+            "probabilities": "probability_api/probability"
         }
     },
     "ztf": {
@@ -28,7 +28,7 @@
         }
     },
     "stamps": {
-        "STAMP_URL": "https://ms-stamps.alerce.online",
+        "STAMP_URL": "https://api.alerce.online/multisurvey/stamps_api/",
         "AVRO_ROUTES": {"get_stamp": "/stamp", "get_avro": "/get_avro"}
     },
     "stamps_ztf": {
