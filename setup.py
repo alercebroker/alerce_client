@@ -23,6 +23,10 @@ setup(
     packages=find_packages(),
     install_requires=required_packages,
     python_requires=">=3.10",
+    include_package_data=True,
+    package_data={
+        "alerce": ["default_config.json"],
+    },
     classifiers=[
         "Development Status :: 5 - Production/Stable",
         "Intended Audience :: Developers",
