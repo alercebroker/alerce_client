@@ -76,6 +76,7 @@ class AlerceCommonStamps:
         oid,
         candid=None,
         measurement_id=None,
+        include_variance_and_mask=False,  # NEW
         format="HDUList",
         survey=None,
     ):
@@ -90,13 +91,15 @@ class AlerceCommonStamps:
             Candid of the stamp to be downloaded. If None, uses the first detection.
         measurement_id : int, optional
             Alias for candid parameter (for multisurvey compatibility).
+
         format : str
             Output format. Options: 'HDUList' | 'numpy'
         survey : str, optional
             The survey to query. If None, defaults to 'ztf'. Note: relying on
             the default (omitting the `survey` parameter) is deprecated and will be removed in
             a future release; callers should explicitly pass the desired survey (e.g. `survey='ztf'`).
-
+        include_variance_and_mask : bool
+            If True, returns extra planes of the image cutouts.
         Returns
         -------
         HDUList or list
@@ -124,7 +127,10 @@ class AlerceCommonStamps:
             )
         elif survey in self.valid_surveys:
             return self.multisurvey_stamps_client.multisurvey_get_stamps(
-                oid=oid, candid=candid, survey=survey
+                oid=oid,
+                candid=candid,
+                include_variance_and_mask=include_variance_and_mask,
+                survey=survey,
             )
         else:
             raise ValueError(f"survey must be one of {self.valid_surveys}")
