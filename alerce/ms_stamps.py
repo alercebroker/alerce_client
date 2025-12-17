@@ -33,7 +33,7 @@ class AlerceStampsMultisurvey(Client):
             from IPython import get_ipython
             import os
 
-            if "IPKernelApp" not in get_ipynb().config:  # pragma: no cover
+            if "IPKernelApp" not in get_ipython().config:  # pragma: no cover
                 raise ImportError("console")
                 return False
             if "VSCODE_PID" in os.environ:  # pragma: no cover
