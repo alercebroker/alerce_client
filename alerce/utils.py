@@ -70,12 +70,27 @@ class ResultJson(Result):
     def to_pandas(self, index=None, sort=None):
         if isinstance(self.json_result, list):
             dataframe = DataFrame(self.json_result)
+        elif isinstance(self.json_result, dict) \
+            and "items" in self.json_result.keys():
+            dataframe = DataFrame(self.json_result["items"])
         else:
             dataframe = DataFrame([self.json_result])
         if sort:
             dataframe.sort_values(sort, inplace=True)
         if index:
             dataframe.set_index(index, inplace=True)
+        #print(dataframe["band"].dtype)
+        #display(dataframe)
+        if "band_map" in dataframe.columns \
+            and "band" in dataframe.columns \
+            and "band_name" not in dataframe.columns:
+            dataframe["band_name"] = dataframe[
+                ["band_map", "band"]
+                ].apply(lambda row: self.num_to_band(
+                    row["band_map"], row["band"]), axis=1)
+            dataframe.drop(columns=["band_map"], inplace=True)
+        #display(dataframe)
+            
         return dataframe
 
     def to_votable(self):
@@ -87,6 +102,9 @@ class ResultJson(Result):
     def to_csv(self):
         df = self.to_pandas()
         return df.to_csv(index=False)
+    
+    def num_to_band(self, band_map, band):
+        return band_map[str(band)]
 
 
 class ResultCsv(Result):
