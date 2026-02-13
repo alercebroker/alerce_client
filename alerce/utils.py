@@ -87,9 +87,6 @@ class ResultJson(Result):
     def to_csv(self):
         df = self.to_pandas()
         return df.to_csv(index=False)
-    
-    def num_to_band(self, band_map, band):
-        return band_map[str(band)]
 
 
 class ResultCsv(Result):
