@@ -33,6 +33,7 @@ class AlerceSearchMultiSurvey(Client):
         self, survey: str, format: str = "json", index=None, sort=None, **kwargs
     ):
         valid_params = [
+            "oid",
             "survey",
             "classifier",
             "class_name",
@@ -63,6 +64,8 @@ class AlerceSearchMultiSurvey(Client):
             result_format=format,
             response_field=None,
         )
+        q.json_result = q.json_result["items"]
+        
         return q.result(index, sort)
 
     def query_object(self, survey: str, oid, format: str = "json", **kwargs):
@@ -109,6 +112,7 @@ class AlerceSearchMultiSurvey(Client):
             result_format=format,
             response_field=None,
         )
+        self.add_band_name(q.json_result)
         return q.result(index, sort)
 
     def query_non_detections(
@@ -124,6 +128,7 @@ class AlerceSearchMultiSurvey(Client):
             result_format=format,
             response_field=None,
         )
+        self.add_band_name(q.json_result)
         return q.result(index, sort)
 
     def query_forced_photometry(
@@ -139,7 +144,7 @@ class AlerceSearchMultiSurvey(Client):
             result_format=format,
             response_field=None,
         )
-
+        self.add_band_name(q.json_result)
         return q.result(index, sort)
 
     def query_probabilities(
@@ -185,3 +190,12 @@ class AlerceSearchMultiSurvey(Client):
         **kwargs,
     ):
         raise NotImplementedError("Multisurvey query_classes not implemented.")
+    
+    def add_band_name(self, messages):
+        for message in messages:
+            message["band_name"] = self.num_to_band(message["band_map"],
+                                                    message["band"])
+            del message["band_map"]
+    
+    def num_to_band(self, band_map, band):
+        return band_map[str(band)]
