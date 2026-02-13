@@ -65,7 +65,6 @@ class AlerceSearchMultiSurvey(Client):
             response_field=None,
         )
         q.json_result = q.json_result["items"]
-        
         return q.result(index, sort)
 
     def query_object(self, survey: str, oid, format: str = "json", **kwargs):
@@ -91,6 +90,8 @@ class AlerceSearchMultiSurvey(Client):
             result_format=format,
             response_field=None,
         )
+        for key in q.json_result.keys():
+            self.add_band_name(q.json_result[key])
         return q.result()
 
     def query_detections(
