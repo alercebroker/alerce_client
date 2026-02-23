@@ -8,7 +8,7 @@ def create_stamp_parameters(oid, survey, measurement_id, stamp_type, avro_url, c
     elif call == "get":
         return (
             avro_url
-            + f"?oid={oid}&measurement_id={measurement_id}&stamp_type={stamp_type}&file_format=fits&survey_id={survey}"
+            + f"?oid={oid}&measurement_id={measurement_id}&stamp_type={stamp_type}&file_format=fits&survey_id={survey}&is_compressed=False"
         )
 
 
