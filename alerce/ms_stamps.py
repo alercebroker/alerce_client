@@ -136,10 +136,8 @@ class AlerceStampsMultisurvey(Client):
                 )
                 http_response = self.session.request("GET", url)
 
-                if survey == "ztf":
+                if survey == "ztf" or survey == "lsst":
                     fits_buffer = gzip.open(io.BytesIO(http_response.content))
-                elif survey == "lsst":
-                    fits_buffer = io.BytesIO(http_response.content)
                 else:
                     raise Exception(f"survey {survey} not valid")
 

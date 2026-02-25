@@ -9,7 +9,7 @@ def client():
 
 
 ZTF_OID = "ZTF18abeqwzl"
-LSST_OID = 169298433191444990
+LSST_OID = 313765480543813793
 
 
 def test_query_objects_ztf_legacy(client):
@@ -34,17 +34,16 @@ def test_query_objects_ztf_legacy_signature(client):
 def test_query_objects_lsst_multisurvey_1(client):
     params = {"classifier": "stamp_classifier_rubin", "class_name": "SN"}
     result = client.query_objects(survey="lsst", format="json", **params)
-    result_items = result["items"]
-    for item in result_items:
+    for item in result:
         assert item["class_name"] == "SN"
-    print("Multisurvey LSST objects:", result["items"])
+    print("Multisurvey LSST objects:", result)
     assert result is not None
 
 
 def test_query_objects_lsst_multisurvey_classifier_without_class_name(client):
     params = {"classifier": "stamp_classifier_rubin", "n_det": [5, 10]}
     result = client.query_objects(survey="lsst", format="json", **params)
-    result_items_df = pd.DataFrame(result["items"])
+    result_items_df = pd.DataFrame(result)
     print("Multisurvey LSST objects:")
     print(result_items_df)
     assert result is not None

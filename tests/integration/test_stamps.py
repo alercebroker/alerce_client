@@ -31,8 +31,8 @@ def test_get_stamp_lsst():
     alerce = Alerce()
     r = alerce.get_stamps(
         survey="lsst",
-        oid=169298436520149069,
-        measurement_id=169298436520149069,
+        oid=313765480543813793,
+        measurement_id=313985346497413306,
     )
     assert isinstance(r, dict)
     for hdu in r.values():
@@ -43,7 +43,7 @@ def test_get_stamp_lsst_without_measurement_id():
     alerce = Alerce()
     r = alerce.get_stamps(
         survey="lsst",
-        oid=169298436520149069,
+        oid=313765480543813793,
     )
     assert isinstance(r, dict)
     for hdu in r.values():

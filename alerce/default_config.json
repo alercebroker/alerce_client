@@ -1,6 +1,6 @@
 {
     "multisurvey": {
-        "URL_MS": "https://api.alerce.online/multisurvey/",
+        "URL_MS": "https://api-lsst.alerce.online/",
         "ROUTES_MS": {
             "objects": "object_api/list_objects",
             "single_object": "object_api/object",
@@ -28,7 +28,7 @@
         }
     },
     "stamps": {
-        "STAMP_URL": "https://api.alerce.online/multisurvey/stamps_api/",
+        "STAMP_URL": "https://api-lsst.alerce.online/stamps_api",
         "AVRO_ROUTES": {"get_stamp": "/stamp", "get_avro": "/get_avro"}
     },
     "stamps_ztf": {

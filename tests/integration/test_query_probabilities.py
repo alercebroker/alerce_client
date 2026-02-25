@@ -8,7 +8,7 @@ def client():
 
 
 ZTF_OID = "ZTF18abeqwzl"
-LSST_OID = 169298433191444990
+LSST_OID = 313765480543813793
 
 
 def test_query_probabilities_ztf_legacy(client):
