@@ -76,7 +76,7 @@ class AlerceCommonStamps:
         oid,
         candid=None,
         measurement_id=None,
-        include_variance_and_mask=False,  # NEW
+        include_variance_and_psf=False,
         format="HDUList",
         survey=None,
     ):
@@ -98,7 +98,7 @@ class AlerceCommonStamps:
             The survey to query. If None, defaults to 'ztf'. Note: relying on
             the default (omitting the `survey` parameter) is deprecated and will be removed in
             a future release; callers should explicitly pass the desired survey (e.g. `survey='ztf'`).
-        include_variance_and_mask : bool
+        include_variance_and_psf : bool
             If True, returns extra planes of the image cutouts.
         Returns
         -------
@@ -129,7 +129,7 @@ class AlerceCommonStamps:
             return self.multisurvey_stamps_client.multisurvey_get_stamps(
                 oid=oid,
                 candid=candid,
-                include_variance_and_mask=include_variance_and_mask,
+                include_variance_and_psf=include_variance_and_psf,
                 survey=survey,
             )
         else:
