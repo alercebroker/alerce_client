@@ -6,8 +6,9 @@ from astropy.io.fits import open as fits_open
 from urllib.error import HTTPError
 from alerce.ms_search import AlerceSearchMultiSurvey
 from alerce.exceptions import CandidError
-from .ms_stamp_utils import create_html_stamp_display, create_stamp_parameters
-from IPython.display import HTML, display
+from .ms_stamp_utils import create_stamp_parameters
+import matplotlib.pyplot as plt
+from PIL import Image
 
 VALID_SURVEYS = ["lsst", "ztf"]
 
@@ -84,31 +85,45 @@ class AlerceStampsMultisurvey(Client):
 
         avro_url = self.config["STAMP_URL"] + self.config["AVRO_ROUTES"]["get_stamp"]
 
-        science_url = create_stamp_parameters(
-            oid, survey, measurement_id, self.ztf_types["science"], avro_url, "plot"
-        )
-        template_url = create_stamp_parameters(
-            oid, survey, measurement_id, self.ztf_types["template"], avro_url, "plot"
-        )
-        difference_url = create_stamp_parameters(
-            oid, survey, measurement_id, self.ztf_types["difference"], avro_url, "plot"
-        )
-
         if not self._in_ipynb():
             warnings.warn("This method only works on Notebooks", RuntimeWarning)
             return
 
-        images = create_html_stamp_display(
-            oid, survey, measurement_id, science_url, template_url, difference_url
+        image_types = ["Science", "Template", "Difference"]
+        title = (
+            survey.upper()
+            + " oid:"
+            + str(oid)
+            + ", measurement_id:"
+            + str(measurement_id)
         )
-        display(HTML(images))
+        fig, ax = plt.subplots(figsize=[9, 5], ncols=3)
+        fig.suptitle(title, fontsize=10, y=0.82)
+
+        for i, image_type in enumerate(image_types):
+            url = create_stamp_parameters(
+                oid,
+                survey,
+                measurement_id,
+                self.ztf_types[image_type.lower()],
+                avro_url,
+                "plot",
+            )
+            http_response = self.session.request("GET", url)
+            data = http_response.content
+
+            ax[i].imshow(Image.open(io.BytesIO(data)))
+            ax[i].set_title(image_type, fontsize=10)
+            ax[i].axis("off")
+
+        plt.subplots_adjust(wspace=0.0)
 
     def multisurvey_get_stamps(
         self,
         survey,
         oid,
         candid=None,
-        include_variance_and_mask=False,
+        include_variance_and_psf=False,
         out_format="HDUList",
     ):
         """Download Stamps for an specific alert given oid and survey, measurement_id is optional."""
@@ -145,7 +160,7 @@ class AlerceStampsMultisurvey(Client):
                     io.BytesIO(fits_buffer.read()), ignore_missing_simple=True
                 )
 
-                if include_variance_and_mask:
+                if include_variance_and_psf:
                     stamp_list.append(tmp_hdulist)
                 else:
                     stamp_list.append(tmp_hdulist[0])
