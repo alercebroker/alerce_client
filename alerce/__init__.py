@@ -15,4 +15,5 @@ from .core import Alerce
 
 __all__ = ["Alerce"]
 
-__version__ = "2.0.0"
+# If you update this version, also update it in docs/source/conf.py
+__version__ = "2.3.0"

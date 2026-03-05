@@ -10,7 +10,14 @@ this_directory = path.abspath(path.dirname(__file__))
 with open(path.join(this_directory, "README.md"), encoding="utf-8") as f:
     long_description = f.read()
 
-__version__ = "2.2.1"
+# Get version from alerce/__init__.py
+version = {}
+with open(path.join(this_directory, "alerce", "__init__.py")) as f:
+    for line in f:
+        if line.startswith("__version__"):
+            exec(line, version)
+            break
+__version__ = version["__version__"]
 
 setup(
     name="alerce",

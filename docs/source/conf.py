@@ -23,7 +23,7 @@ copyright = "2025, ALeRCE"
 author = "ALeRCE"
 
 # The full version, including alpha/beta/rc tags
-release = "2.0.0"
+release = "2.3.0"
 
 
 # -- General configuration ---------------------------------------------------
