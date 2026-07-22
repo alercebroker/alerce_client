@@ -25,6 +25,30 @@
             "single_feature": "/objects/%s/features/%s",
             "classifiers": "/classifiers",
             "classifier_classes": "/classifiers/%s/%s/classes"
+        },
+        "VERSIONS": {
+          "V1": {
+            "ZTF_API_URL": "https://api.alerce.online/ztf/v1/",
+            "ZTF_ROUTES": {
+                "objects": "/objects",
+                "single_object": "/objects/%s",
+                "detections": "/objects/%s/detections",
+                "non_detections": "/objects/%s/non_detections",
+                "lightcurve": "/objects/%s/lightcurve",
+                "magstats": "/objects/%s/magstats",
+                "probabilities": "/objects/%s/probabilities",
+                "features": "/objects/%s/features",
+                "single_feature": "/objects/%s/features/%s",
+                "classifiers": "/classifiers",
+                "classifier_classes": "/classifiers/%s/%s/classes"
+            }
+          },
+          "V2": {
+            "ZTF_API_URL": "https://api.alerce.online/v2/",
+            "ZTF_ROUTES": {
+                "forced_photometry": "lightcurve/forced-photometry/%s"
+            }
+          }
         }
     },
     "stamps": {

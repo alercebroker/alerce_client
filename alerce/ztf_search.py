@@ -11,12 +11,24 @@ class ZTFSearch(Client):
         cfg = load_config(service="ztf")
         super().__init__(**cfg)
 
-    @property
-    def ztf_url(self):
-        return self.config["ZTF_API_URL"]
+    def __get_url(self, resource, *args, **kwargs):
+        """
+        Retrieves the base URL and endpoint for a given key.
+        Allows specifying a version via kwargs (see default_config.json).
+        """
 
-    def __get_url(self, resource, *args):
-        return self.ztf_url + self.config["ZTF_ROUTES"][resource] % args
+        config_for_version = self.config
+
+        if "version" in kwargs:
+            api_version = kwargs["version"]
+            config_for_version = self.config["VERSIONS"][api_version]
+
+        BASE_URL = config_for_version["ZTF_API_URL"]
+        ROUTES = config_for_version["ZTF_ROUTES"]
+        ROUTE = ROUTES[resource]
+        FULL_URL = BASE_URL + ROUTE % args
+
+        return FULL_URL
 
     def query_objects(self, format="pandas", index=None, sort=None, **kwargs):
         """
@@ -162,12 +174,9 @@ class ZTFSearch(Client):
         """
         q = self._request(
             "GET",
-            "https://api.alerce.online/v2/lightcurve/forced-photometry/%s" % oid,
-            result_format=format,
+            self.__get_url("forced_photometry", oid, version="V2"), 
+            result_format=format
         )
-
-        # NOTA: la api principal de ztf no tiene ruta de forced photometry, la v2 si tiene. Esto es lo mas facil
-        # pero no es correcto.
 
         # all this extra code is to expand the extra fields.
         complete_result = q.result(index, sort)
