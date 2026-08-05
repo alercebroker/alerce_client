@@ -12,19 +12,20 @@
         }
     },
     "ztf": {
-        "ZTF_API_URL": "https://api.alerce.online/ztf/v1/",
+        "ZTF_API_URL": "https://api.alerce.online",
         "ZTF_ROUTES": {
-            "objects": "/objects",
-            "single_object": "/objects/%s",
-            "detections": "/objects/%s/detections",
-            "non_detections": "/objects/%s/non_detections",
-            "lightcurve": "/objects/%s/lightcurve",
-            "magstats": "/objects/%s/magstats",
-            "probabilities": "/objects/%s/probabilities",
-            "features": "/objects/%s/features",
-            "single_feature": "/objects/%s/features/%s",
-            "classifiers": "/classifiers",
-            "classifier_classes": "/classifiers/%s/%s/classes"
+            "objects": "/ztf/v1/objects",
+            "single_object": "/ztf/v1/objects/%s",
+            "detections": "/ztf/v1/objects/%s/detections",
+            "non_detections": "/ztf/v1/objects/%s/non_detections",
+            "lightcurve": "/ztf/v1/objects/%s/lightcurve",
+            "magstats": "/ztf/v1/objects/%s/magstats",
+            "probabilities": "/ztf/v1/objects/%s/probabilities",
+            "features": "/ztf/v1/objects/%s/features",
+            "single_feature": "/ztf/v1/objects/%s/features/%s",
+            "classifiers": "/ztf/v1/classifiers",
+            "classifier_classes": "/ztf/v1/classifiers/%s/%s/classes",
+            "forced_photometry": "/v2/lightcurve/forced-photometry/%s"
         }
     },
     "stamps": {
