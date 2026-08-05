@@ -162,7 +162,7 @@ class ZTFSearch(Client):
         """
         q = self._request(
             "GET",
-            "https://api.alerce.online/v2/lightcurve/forced-photometry/%s" % oid,
+            self.__get_url("forced_photometry", oid),
             result_format=format,
         )
 
