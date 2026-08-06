@@ -32,7 +32,7 @@ def test_query_objects_ztf_legacy_signature(client):
 
 
 def test_query_objects_lsst_multisurvey_1(client):
-    params = {"classifier": "stamp_classifier_rubin", "class_name": "SN"}
+    params = {"classifier": "stamp_classifier_rubin_beta", "class_name": "SN"}
     result = client.query_objects(survey="lsst", format="json", **params)
     for item in result:
         assert item["class_name"] == "SN"
@@ -41,7 +41,7 @@ def test_query_objects_lsst_multisurvey_1(client):
 
 
 def test_query_objects_lsst_multisurvey_classifier_without_class_name(client):
-    params = {"classifier": "stamp_classifier_rubin", "n_det": [5, 10]}
+    params = {"classifier": "stamp_classifier_rubin_beta", "n_det": [5, 10]}
     result = client.query_objects(survey="lsst", format="json", **params)
     result_items_df = pd.DataFrame(result)
     print("Multisurvey LSST objects:")
