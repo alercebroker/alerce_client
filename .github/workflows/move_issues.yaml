@@ -4,6 +4,9 @@ on:
   issues:
     types: [opened]
 
+# The action authenticates with ADMIN_TOKEN; GITHUB_TOKEN needs no access.
+permissions: {}
+
 jobs:
   issue_opened_or_reopened:
     runs-on: ubuntu-latest
