@@ -145,7 +145,6 @@ class AlerceStampsMultisurvey(Client):
             stamp_list = []
 
             for stamp_type in stamp_types:
-
                 url = create_stamp_parameters(
                     oid, survey, measurement_id, stamp_type, avro_url, "get"
                 )
