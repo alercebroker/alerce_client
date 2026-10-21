@@ -37,10 +37,17 @@ Basic usage with the `Alerce` client:
 
 ```python
 from alerce.core import Alerce
+
 client = Alerce()
 
 # Query objects (must specify survey for multi-survey API)
-ztf_objects = client.query_objects(survey="ztf", classifier="lc_classifier", class_name="SN", probability=0.8, format="pandas")
+ztf_objects = client.query_objects(
+    survey="ztf",
+    classifier="lc_classifier",
+    class_name="SN",
+    probability=0.8,
+    format="pandas",
+)
 
 # Query a lightcurve (detections/non-detections/forced photometry)
 lightcurve = client.query_lightcurve(oid="ZTF18abbuksn", survey="ztf", format="json")
