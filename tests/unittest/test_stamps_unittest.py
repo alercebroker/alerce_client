@@ -1,13 +1,12 @@
-import pytest
-from unittest.mock import patch
-import numpy as np
-from astropy.io.fits import HDUList, PrimaryHDU
-from urllib.error import HTTPError
-import sys
 import os
+from unittest.mock import patch
+from urllib.error import HTTPError
+
+import numpy as np
+import pytest
+from astropy.io.fits import HDUList
 
 from alerce.core import Alerce
-
 
 FILE_PATH = os.path.dirname(__file__)
 EXAMPLE_PATH = os.path.join(FILE_PATH, "../examples/example.fits.gz")
@@ -86,25 +85,3 @@ def test_get_avro_invalid_oid(mock_fits):
     with pytest.warns(RuntimeWarning):
         result = alerce.get_avro(oid="INVALID_OID", candid="570448435315010000")
         assert result is None
-
-
-def test_multisurvey_not_implemented():
-    alerce = Alerce()
-    with pytest.raises(NotImplementedError):
-        alerce.multisurvey_stamps_client.multisurvey_get_stamps(
-            oid="ZTF18abjpdlh",
-            candid="570448435315010000",
-            survey="ztf",
-        )
-    with pytest.raises(NotImplementedError):
-        alerce.multisurvey_stamps_client.multisurvey_plot_stamps(
-            oid="ZTF18abjpdlh",
-            candid="570448435315010000",
-            survey="ztf",
-        )
-    with pytest.raises(NotImplementedError):
-        alerce.multisurvey_stamps_client.multisurvey_get_avro(
-            oid="ZTF18abjpdlh",
-            candid="570448435315010000",
-            survey="ztf",
-        )

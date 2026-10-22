@@ -1,6 +1,8 @@
+import warnings
+
 from .ms_stamps import AlerceStampsMultisurvey
 from .stamps import AlerceStamps
-import warnings
+from .utils import ZtfBackend
 
 
 class AlerceCommonStamps:
@@ -13,14 +15,12 @@ class AlerceCommonStamps:
     providing a single entry point for all stamp operations.
     """
 
-    def __init__(self, **kwargs):
+    def __init__(self, ztf_backend: ZtfBackend = "legacy", **kwargs):
         """
         Initializes the AlerceCommonStamps class with clients for legacy ZTF
         and multisurvey stamps.
-
-        Parameters
-        ----------
         """
+        self.ztf_backend = ztf_backend
         self.legacy_stamps_client = AlerceStamps()
         self.multisurvey_stamps_client = AlerceStampsMultisurvey()
         self.valid_surveys = ["ztf", "lsst"]
@@ -62,7 +62,7 @@ class AlerceCommonStamps:
                 DeprecationWarning,
             )
 
-        if survey == "ztf":
+        if survey == "ztf" and self.ztf_backend == "legacy":
             return self.legacy_stamps_client.plot_stamps(oid=oid, candid=candid)
         elif survey in self.valid_surveys:
             return self.multisurvey_stamps_client.multisurvey_plot_stamps(
@@ -121,7 +121,7 @@ class AlerceCommonStamps:
                 DeprecationWarning,
             )
 
-        if survey == "ztf":
+        if survey == "ztf" and self.ztf_backend == "legacy":
             return self.legacy_stamps_client.get_stamps(
                 oid=oid, candid=candid, format=format
             )

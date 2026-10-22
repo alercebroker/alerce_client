@@ -1,14 +1,17 @@
-import warnings
 import gzip
 import io
-from .utils import Client, load_config
-from astropy.io.fits import open as fits_open
+import warnings
 from urllib.error import HTTPError
-from alerce.ms_search import AlerceSearchMultiSurvey
-from alerce.exceptions import CandidError
-from .ms_stamp_utils import create_stamp_parameters
+
 import matplotlib.pyplot as plt
+from astropy.io.fits import open as fits_open
 from PIL import Image
+
+from alerce.exceptions import CandidError
+from alerce.ms_search import AlerceSearchMultiSurvey
+
+from .ms_stamp_utils import create_stamp_parameters
+from .utils import Client, load_config
 
 VALID_SURVEYS = ["lsst", "ztf"]
 
@@ -31,8 +34,9 @@ class AlerceStampsMultisurvey(Client):
 
     def _in_ipynb(self):
         try:
-            from IPython import get_ipython
             import os
+
+            from IPython import get_ipython
 
             if "IPKernelApp" not in get_ipython().config:  # pragma: no cover
                 raise ImportError("console")
@@ -62,13 +66,6 @@ class AlerceStampsMultisurvey(Client):
         return int(measurement_id)
 
     def _check_survey_validity(self, survey):
-        if survey == "ztf":
-            warnings.warn(
-                "ZTF is not yet supported in the stamp multisurvey API.", UserWarning
-            )
-            raise NotImplementedError(
-                "ZTF is not yet supported in the multisurvey API."
-            )
         if survey not in VALID_SURVEYS:
             raise ValueError(f"survey must be one of {VALID_SURVEYS}")
 

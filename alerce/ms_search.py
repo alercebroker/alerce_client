@@ -1,7 +1,5 @@
+
 from .utils import Client, load_config
-
-import warnings
-
 
 VALID_SURVEYS = ["lsst", "ztf"]
 
@@ -19,13 +17,6 @@ class AlerceSearchMultiSurvey(Client):
         return self.url_ms + self.routes_ms[resource]
 
     def _check_survey_validity(self, survey):
-        if survey == "ztf":
-            warnings.warn(
-                "ZTF is not yet supported in the multisurvey API.", UserWarning
-            )
-            raise NotImplementedError(
-                "ZTF is not yet supported in the multisurvey API."
-            )
         if survey not in VALID_SURVEYS:
             raise ValueError(f"survey must be one of {VALID_SURVEYS}")
 
@@ -54,7 +45,7 @@ class AlerceSearchMultiSurvey(Client):
         self._check_survey_validity(survey)
         params = {"survey": survey}
         params.update(kwargs)
-        for key in params.keys():
+        for key in params:
             if key not in valid_params:
                 raise ValueError(f"Invalid parameter: {key}")
         q = self._request(
