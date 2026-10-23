@@ -46,7 +46,9 @@ def test_default_object_has_legacy_fields(legacy_client: Alerce) -> None:
 
 
 def test_ms_query_objects(ms_client: Alerce) -> None:
-    result: list[dict] = ms_client.query_objects(survey="ztf", format="json", page_size=3)
+    result: list[dict] = ms_client.query_objects(
+        survey="ztf", format="json", page_size=3
+    )
     assert isinstance(result, list)
     assert len(result) > 0
     item: dict = result[0]
@@ -104,7 +106,13 @@ def test_ms_probabilities(ms_client: Alerce) -> None:
     probs: list[dict] = ms_client.query_probabilities(ZTF_OID, survey="ztf")
     assert len(probs) > 0
     prob: dict = probs[0]
-    for field in ("classifier_name", "classifier_version", "class_name", "probability", "ranking"):
+    for field in (
+        "classifier_name",
+        "classifier_version",
+        "class_name",
+        "probability",
+        "ranking",
+    ):
         assert field in prob, f"missing field: {field}"
 
 
@@ -123,7 +131,9 @@ def test_string_oid_detections(ms_client: Alerce) -> None:
 
 
 def test_string_oid_list_objects(ms_client: Alerce) -> None:
-    result: list[dict] = ms_client.query_objects(survey="ztf", format="json", oid=ZTF_OID)
+    result: list[dict] = ms_client.query_objects(
+        survey="ztf", format="json", oid=ZTF_OID
+    )
     assert len(result) > 0
     assert result[0]["oid"] == ZTF_OID
 
@@ -135,7 +145,15 @@ def test_ms_magstats(ms_client: Alerce) -> None:
     stats: list[dict] = ms_client.query_magstats(ZTF_OID, survey="ztf")
     assert len(stats) > 0
     row: dict = stats[0]
-    for field in ("magmean", "magmedian", "magsigma", "ndet", "firstmjd", "lastmjd", "band"):
+    for field in (
+        "magmean",
+        "magmedian",
+        "magsigma",
+        "ndet",
+        "firstmjd",
+        "lastmjd",
+        "band",
+    ):
         assert field in row, f"missing field: {field}"
 
 
@@ -204,7 +222,9 @@ def test_format_detections_json(ms_client: Alerce) -> None:
 
 
 def test_format_detections_pandas(ms_client: Alerce) -> None:
-    result: DataFrame = ms_client.query_detections(ZTF_OID, survey="ztf", format="pandas")
+    result: DataFrame = ms_client.query_detections(
+        ZTF_OID, survey="ztf", format="pandas"
+    )
     assert isinstance(result, DataFrame)
     assert len(result) > 0
     assert "band_name" in result.columns
@@ -217,6 +237,8 @@ def test_format_object_json(ms_client: Alerce) -> None:
 
 
 def test_format_probabilities_pandas(ms_client: Alerce) -> None:
-    result: DataFrame = ms_client.query_probabilities(ZTF_OID, survey="ztf", format="pandas")
+    result: DataFrame = ms_client.query_probabilities(
+        ZTF_OID, survey="ztf", format="pandas"
+    )
     assert isinstance(result, DataFrame)
     assert "classifier_name" in result.columns
