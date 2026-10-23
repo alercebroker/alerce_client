@@ -405,10 +405,6 @@ class AlerceCommonSearch:
                 oid, format=format, index=index, sort=sort
             )
         elif survey in self.valid_surveys:
-            if not hasattr(self.multisurvey_client, "query_probabilities"):
-                raise NotImplementedError(
-                    "Multisurvey query_probabilities not implemented."
-                )
             return self.multisurvey_client.query_probabilities(
                 survey, oid, format=format, index=index, sort=sort
             )
@@ -458,8 +454,6 @@ class AlerceCommonSearch:
                 oid, format=format, index=index, sort=sort
             )
         elif survey in self.valid_surveys:
-            if not hasattr(self.multisurvey_client, "query_features"):
-                raise NotImplementedError("Multisurvey query_features not implemented.")
             return self.multisurvey_client.query_features(
                 survey, oid, format=format, index=index, sort=sort
             )
@@ -503,8 +497,6 @@ class AlerceCommonSearch:
         if survey == "ztf" and self.ztf_backend == "legacy":
             return self.legacy_ztf_client.query_feature(oid, name, format=format)
         elif survey in self.valid_surveys:
-            if not hasattr(self.multisurvey_client, "query_feature"):
-                raise NotImplementedError("Multisurvey query_feature not implemented.")
             return self.multisurvey_client.query_feature(
                 survey, oid, name, format=format
             )
@@ -546,10 +538,6 @@ class AlerceCommonSearch:
             # legacy ZTFSearch.query_classifiers signature only expects format
             return self.legacy_ztf_client.query_classifiers(format=format)
         elif survey in self.valid_surveys:
-            if not hasattr(self.multisurvey_client, "query_classifiers"):
-                raise NotImplementedError(
-                    "Multisurvey query_classifiers not implemented."
-                )
             return self.multisurvey_client.query_classifiers(
                 survey, format=format, **kwargs
             )
@@ -599,8 +587,6 @@ class AlerceCommonSearch:
                 classifier_name, classifier_version, format=format
             )
         elif survey in self.valid_surveys:
-            if not hasattr(self.multisurvey_client, "query_classes"):
-                raise NotImplementedError("Multisurvey query_classes not implemented.")
             return self.multisurvey_client.query_classes(
                 survey, classifier_name, classifier_version, format=format, **kwargs
             )

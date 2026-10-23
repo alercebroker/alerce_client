@@ -6,11 +6,12 @@ with ``ztf_backend="legacy"``), all ZTF calls go through the legacy client
 as before.
 """
 
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, patch
 
 import pytest
 
 from alerce import Alerce
+from alerce.ms_search import AlerceSearchMultiSurvey
 
 ZTF_OID = "ZTF18abeqwzl"
 
@@ -23,6 +24,14 @@ SEARCH_METHODS = {
     "query_non_detections": {"oid": ZTF_OID},
     "query_forced_photometry": {"oid": ZTF_OID},
     "query_probabilities": {"oid": ZTF_OID},
+    "query_magstats": {"oid": ZTF_OID},
+    "query_features": {"oid": ZTF_OID},
+    "query_feature": {"oid": ZTF_OID, "name": "Amplitude"},
+    "query_classifiers": {},
+    "query_classes": {
+        "classifier_name": "lc_classifier",
+        "classifier_version": "1.0.0",
+    },
 }
 
 # (common_method, legacy_method, ms_method, kwargs)
@@ -169,3 +178,150 @@ class TestMultisurveyGuardRemoval:
     def test_stamps_accepts_ztf(self):
         client = Alerce()
         client.multisurvey_stamps_client._check_survey_validity("ztf")
+
+
+class TestMsSearchMagstats:
+    """Unit tests for AlerceSearchMultiSurvey.query_magstats."""
+
+    @pytest.fixture()
+    def ms(self):
+        return AlerceSearchMultiSurvey()
+
+    def test_calls_request_with_correct_params(self, ms):
+        mock_result = MagicMock()
+        mock_result.result.return_value = [{"magmean": 18.5, "band": "g"}]
+        with patch.object(ms, "_request", return_value=mock_result) as req:
+            ms.query_magstats("ztf", ZTF_OID)
+            req.assert_called_once_with(
+                "GET",
+                url=ms._get_survey_url("magstats"),
+                params={"survey_id": "ztf", "oid": ZTF_OID},
+                result_format="json",
+                response_field=None,
+            )
+
+    def test_passes_format_and_index_sort(self, ms):
+        mock_result = MagicMock()
+        with patch.object(ms, "_request", return_value=mock_result):
+            ms.query_magstats("ztf", ZTF_OID, format="pandas", index="band", sort="magmean")
+            mock_result.result.assert_called_once_with("band", "magmean")
+
+    def test_rejects_invalid_survey(self, ms):
+        with pytest.raises(ValueError, match="survey must be one of"):
+            ms.query_magstats("invalid", ZTF_OID)
+
+
+class TestMsSearchFeatures:
+    """Unit tests for AlerceSearchMultiSurvey.query_features."""
+
+    @pytest.fixture()
+    def ms(self):
+        return AlerceSearchMultiSurvey()
+
+    def test_calls_request_with_correct_params(self, ms):
+        mock_result = MagicMock()
+        mock_result.result.return_value = [{"name": "Amplitude", "value": 0.5}]
+        with patch.object(ms, "_request", return_value=mock_result) as req:
+            ms.query_features("ztf", ZTF_OID)
+            req.assert_called_once_with(
+                "GET",
+                url=ms._get_survey_url("features"),
+                params={"survey_id": "ztf", "oid": ZTF_OID},
+                result_format="json",
+                response_field=None,
+            )
+
+    def test_passes_format_and_index_sort(self, ms):
+        mock_result = MagicMock()
+        with patch.object(ms, "_request", return_value=mock_result):
+            ms.query_features("ztf", ZTF_OID, format="pandas", index="name", sort="value")
+            mock_result.result.assert_called_once_with("name", "value")
+
+    def test_rejects_invalid_survey(self, ms):
+        with pytest.raises(ValueError, match="survey must be one of"):
+            ms.query_features("invalid", ZTF_OID)
+
+
+class TestMsSearchFeature:
+    """Unit tests for AlerceSearchMultiSurvey.query_feature (single feature)."""
+
+    @pytest.fixture()
+    def ms(self):
+        return AlerceSearchMultiSurvey()
+
+    def test_calls_request_with_name_param(self, ms):
+        mock_result = MagicMock()
+        mock_result.result.return_value = [{"name": "Amplitude", "value": 0.5}]
+        with patch.object(ms, "_request", return_value=mock_result) as req:
+            ms.query_feature("ztf", ZTF_OID, "Amplitude")
+            req.assert_called_once_with(
+                "GET",
+                url=ms._get_survey_url("features"),
+                params={"survey_id": "ztf", "oid": ZTF_OID, "name": "Amplitude"},
+                result_format="json",
+                response_field=None,
+            )
+
+    def test_rejects_invalid_survey(self, ms):
+        with pytest.raises(ValueError, match="survey must be one of"):
+            ms.query_feature("invalid", ZTF_OID, "Amplitude")
+
+
+class TestMsSearchClassifiers:
+    """Unit tests for AlerceSearchMultiSurvey.query_classifiers."""
+
+    @pytest.fixture()
+    def ms(self):
+        return AlerceSearchMultiSurvey()
+
+    def test_calls_request_with_survey_id(self, ms):
+        mock_result = MagicMock()
+        mock_result.result.return_value = [{"classifier_name": "lc_classifier"}]
+        with patch.object(ms, "_request", return_value=mock_result) as req:
+            ms.query_classifiers("ztf")
+            req.assert_called_once_with(
+                "GET",
+                url=ms._get_survey_url("classifiers"),
+                params={"survey_id": "ztf"},
+                result_format="json",
+                response_field=None,
+            )
+
+    def test_forwards_classifier_name_kwarg(self, ms):
+        mock_result = MagicMock()
+        with patch.object(ms, "_request", return_value=mock_result) as req:
+            ms.query_classifiers("ztf", classifier_name="lc_classifier")
+            _, kwargs = req.call_args
+            assert kwargs["params"]["classifier_name"] == "lc_classifier"
+
+    def test_rejects_invalid_survey(self, ms):
+        with pytest.raises(ValueError, match="survey must be one of"):
+            ms.query_classifiers("invalid")
+
+
+class TestMsSearchClasses:
+    """Unit tests for AlerceSearchMultiSurvey.query_classes."""
+
+    @pytest.fixture()
+    def ms(self):
+        return AlerceSearchMultiSurvey()
+
+    def test_calls_request_with_classifier_params(self, ms):
+        mock_result = MagicMock()
+        mock_result.result.return_value = [{"name": "SNIa"}]
+        with patch.object(ms, "_request", return_value=mock_result) as req:
+            ms.query_classes("ztf", "lc_classifier", "2.2.0")
+            req.assert_called_once_with(
+                "GET",
+                url=ms._get_survey_url("classes"),
+                params={
+                    "classifier_name": "lc_classifier",
+                    "classifier_version": "2.2.0",
+                },
+                result_format="json",
+                response_field=None,
+            )
+
+    def test_rejects_invalid_survey(self, ms):
+        with pytest.raises(ValueError, match="survey must be one of"):
+            ms.query_classes("invalid", "lc_classifier", "2.2.0")
