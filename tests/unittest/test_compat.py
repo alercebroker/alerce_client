@@ -84,8 +84,12 @@ class TestToLegacyFieldRenames:
 
     def test_all_endpoints_covered(self):
         assert set(FIELD_MAP.keys()) == {
-            "object", "detections", "non_detections",
-            "forced_photometry", "magstats", "features",
+            "object",
+            "detections",
+            "non_detections",
+            "forced_photometry",
+            "magstats",
+            "features",
         }
 
 

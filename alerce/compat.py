@@ -56,7 +56,9 @@ def decode_ztf_oid(master_id: int) -> str:
     return f"ZTF{year:02d}{''.join(letters)}"
 
 
-def to_legacy(endpoint: str, data: dict[str, Any] | list[dict[str, Any]]) -> dict[str, Any] | list[dict[str, Any]]:
+def to_legacy(
+    endpoint: str, data: dict[str, Any] | list[dict[str, Any]]
+) -> dict[str, Any] | list[dict[str, Any]]:
     """Rename multisurvey fields to their legacy equivalents.
 
     Parameters
@@ -83,7 +85,9 @@ def to_legacy(endpoint: str, data: dict[str, Any] | list[dict[str, Any]]) -> dic
     return _convert(data, mapping, convert_oid)
 
 
-def _convert(record: dict[str, Any], mapping: dict[str, str], convert_oid: bool) -> dict[str, Any]:
+def _convert(
+    record: dict[str, Any], mapping: dict[str, str], convert_oid: bool
+) -> dict[str, Any]:
     out = {mapping.get(k, k): v for k, v in record.items()}
     if convert_oid and "oid" in out and isinstance(out["oid"], int):
         out["oid"] = decode_ztf_oid(out["oid"])

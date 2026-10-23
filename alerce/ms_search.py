@@ -1,4 +1,3 @@
-
 from .utils import Client, load_config
 
 VALID_SURVEYS = ["lsst", "ztf"]

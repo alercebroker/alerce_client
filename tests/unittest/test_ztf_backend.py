@@ -214,7 +214,9 @@ class TestMsSearchMagstats:
     def test_passes_format_and_index_sort(self, ms):
         mock_result = MagicMock()
         with patch.object(ms, "_request", return_value=mock_result):
-            ms.query_magstats("ztf", ZTF_OID, format="pandas", index="band", sort="magmean")
+            ms.query_magstats(
+                "ztf", ZTF_OID, format="pandas", index="band", sort="magmean"
+            )
             mock_result.result.assert_called_once_with("band", "magmean")
 
     def test_rejects_invalid_survey(self, ms):
@@ -245,7 +247,9 @@ class TestMsSearchFeatures:
     def test_passes_format_and_index_sort(self, ms):
         mock_result = MagicMock()
         with patch.object(ms, "_request", return_value=mock_result):
-            ms.query_features("ztf", ZTF_OID, format="pandas", index="name", sort="value")
+            ms.query_features(
+                "ztf", ZTF_OID, format="pandas", index="name", sort="value"
+            )
             mock_result.result.assert_called_once_with("name", "value")
 
     def test_rejects_invalid_survey(self, ms):
