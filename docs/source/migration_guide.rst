@@ -202,11 +202,94 @@ Use this checklist to update your code:
     ☐ Run your test suite to ensure everything works
     ☐ Remove any deprecation warning suppressions
 
+ZTF Backend Selection
+---------------------
+
+When querying ZTF data, you can choose which backend serves the request.
+The default is ``"legacy"`` (the original ZTF-only API). Setting
+``ztf_backend="multisurvey"`` routes ZTF queries through the new
+multi-survey API, which shares the same interface as LSST queries.
+
+.. code-block:: python
+
+    from alerce.core import Alerce
+
+    # Legacy backend (current default)
+    client = Alerce()
+
+    # Multi-survey backend (opt-in)
+    client = Alerce(ztf_backend="multisurvey")
+
+The legacy default will change to ``"multisurvey"`` in a future release.
+A ``FutureWarning`` is emitted once per session when the legacy backend
+handles a ZTF query.
+
+Field Differences
+^^^^^^^^^^^^^^^^^
+
+The multi-survey backend renames several fields relative to the legacy API:
+
+.. list-table::
+   :header-rows: 1
+
+   * - Endpoint
+     - Legacy field
+     - Multi-survey field
+   * - detections, non_detections, forced_photometry, magstats, features
+     - ``fid``
+     - ``band``
+   * - detections, forced_photometry
+     - ``candid``
+     - ``measurement_id``
+   * - detections, non_detections
+     - ``tid``
+     - ``survey_id``
+   * - object
+     - ``ndet``
+     - ``n_det``
+   * - object
+     - ``deltajd``
+     - ``deltamjd``
+
+The ``oid`` field also changes from a string (``"ZTF18abbrrty"``) to an
+integer encoding. See the ``alerce.compat`` module below for automatic
+conversion.
+
+Survey-specific fields (``g_r_max``, ``corrected``, ``stellar``, etc.)
+are included by default via the ``return_survey_extra`` parameter on
+``query_object``.
+
+Compatibility Utilities
+^^^^^^^^^^^^^^^^^^^^^^^
+
+The ``alerce.compat`` module converts multi-survey responses back to the
+legacy field names and OID format:
+
+.. code-block:: python
+
+    from alerce.compat import to_legacy, decode_ztf_oid
+
+    client = Alerce(ztf_backend="multisurvey")
+
+    # Get detections from the multi-survey backend
+    detections = client.query_detections("ZTF18abbrrty", survey="ztf")
+
+    # Convert to legacy field names + string OIDs
+    legacy_detections = to_legacy("detections", detections)
+    # "band" -> "fid", "measurement_id" -> "candid", int oid -> "ZTF..."
+
+    # Or decode a single OID
+    name = decode_ztf_oid(36028941604196290)  # "ZTF18abbrrty"
+
+``to_legacy`` accepts a single record (dict) or a list of records and
+returns a copy; the original data is not mutated.
+
 Timeline
 --------
 
 - **Version 1.x.x**: ALeRCE Python client only supports queries related to ZTF.
 - **Version 2.0.0**: Multiple surveys (ZTF, LSST). Survey parameter is optional with ZTF as default. In the future the survey parameter will be mandatory.
+- **Next**: The default ``ztf_backend`` will change from ``"legacy"`` to ``"multisurvey"``.
 
 Questions?
 ----------

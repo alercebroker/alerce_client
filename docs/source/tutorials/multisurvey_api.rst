@@ -242,7 +242,52 @@ To get the probabilities for an object using the different classifiers implement
 Query Features
 ================
 
-In development
+.. code-block:: python
+
+  # Getting all features for a ZTF object
+  ztf_features = alerce.query_features(
+    survey="ztf",
+    oid="ZTF18abbuksn",
+  )
+
+  # Getting a single feature
+  amplitude = alerce.query_feature(
+    oid="ZTF18abbuksn",
+    name="Amplitude",
+    survey="ztf",
+  )
+
+Converting to Legacy Field Names
+=================================
+
+The multi-survey API renames several fields compared to the legacy ZTF
+API (e.g. ``fid`` becomes ``band``, ``candid`` becomes
+``measurement_id``). If your code depends on the old field names, use the
+``alerce.compat`` module to convert responses:
+
+.. code-block:: python
+
+    from alerce.compat import to_legacy
+
+    detections = alerce.query_detections("ZTF18abbuksn", survey="ztf")
+
+    # Rename fields and decode integer OIDs back to ZTF names
+    legacy_detections = to_legacy("detections", detections)
+
+``to_legacy`` supports the following endpoint names: ``object``,
+``detections``, ``non_detections``, ``forced_photometry``, ``magstats``,
+``features``. It accepts a single record (dict) or a list and returns a
+copy without mutating the input.
+
+To decode a single integer OID:
+
+.. code-block:: python
+
+    from alerce.compat import decode_ztf_oid
+
+    decode_ztf_oid(36028941604196290)  # "ZTF18abbrrty"
+
+See the :doc:`../migration_guide` for the complete field mapping table.
 
 Migration from ZTF API
 ======================
