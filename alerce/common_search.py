@@ -16,6 +16,8 @@ class AlerceCommonSearch:
     providing a single entry point for all queries.
     """
 
+    _legacy_ztf_warned = False
+
     def __init__(self, ztf_backend: ZtfBackend = "legacy", **kwargs):
         """
         Initializes the AlerceCommonSearch class with clients for legacy ZTF
@@ -25,6 +27,17 @@ class AlerceCommonSearch:
         self.legacy_ztf_client = ZTFSearch()
         self.multisurvey_client = AlerceSearchMultiSurvey()
         self.valid_surveys = ["ztf", "lsst"]
+
+    def _warn_legacy_ztf(self):
+        if not AlerceCommonSearch._legacy_ztf_warned:
+            AlerceCommonSearch._legacy_ztf_warned = True
+            warnings.warn(
+                "The default ZTF backend will change from 'legacy' to "
+                "'multisurvey' in a future release. To adopt early, use "
+                "Alerce(ztf_backend='multisurvey').",
+                FutureWarning,
+                stacklevel=3,
+            )
 
     def query_objects(
         self,
@@ -71,6 +84,7 @@ class AlerceCommonSearch:
             )
 
         if survey == "ztf" and self.ztf_backend == "legacy":
+            self._warn_legacy_ztf()
             return self.legacy_ztf_client.query_objects(
                 format=format, index=index, sort=sort, **kwargs
             )
@@ -118,6 +132,7 @@ class AlerceCommonSearch:
             )
 
         if survey == "ztf" and self.ztf_backend == "legacy":
+            self._warn_legacy_ztf()
             # legacy ZTFSearch.query_object does not accept arbitrary kwargs; forward only supported args
             return self.legacy_ztf_client.query_object(oid, format=format)
         elif survey in self.valid_surveys:
@@ -160,6 +175,7 @@ class AlerceCommonSearch:
             )
 
         if survey == "ztf" and self.ztf_backend == "legacy":
+            self._warn_legacy_ztf()
             return self.legacy_ztf_client.query_lightcurve(oid, format=format)
         elif survey in self.valid_surveys:
             return self.multisurvey_client.query_lightcurve(survey, oid, format=format)
@@ -205,6 +221,7 @@ class AlerceCommonSearch:
             )
 
         if survey == "ztf" and self.ztf_backend == "legacy":
+            self._warn_legacy_ztf()
             return self.legacy_ztf_client.query_detections(
                 oid, format=format, index=index, sort=sort
             )
@@ -254,6 +271,7 @@ class AlerceCommonSearch:
             )
 
         if survey == "ztf" and self.ztf_backend == "legacy":
+            self._warn_legacy_ztf()
             return self.legacy_ztf_client.query_non_detections(
                 oid, format=format, index=index, sort=sort
             )
@@ -303,6 +321,7 @@ class AlerceCommonSearch:
             )
 
         if survey == "ztf" and self.ztf_backend == "legacy":
+            self._warn_legacy_ztf()
             return self.legacy_ztf_client.query_forced_photometry(
                 oid, format=format, index=index, sort=sort
             )
@@ -352,6 +371,7 @@ class AlerceCommonSearch:
             )
 
         if survey == "ztf" and self.ztf_backend == "legacy":
+            self._warn_legacy_ztf()
             return self.legacy_ztf_client.query_magstats(
                 oid, format=format, index=index, sort=sort
             )
@@ -401,6 +421,7 @@ class AlerceCommonSearch:
             )
 
         if survey == "ztf" and self.ztf_backend == "legacy":
+            self._warn_legacy_ztf()
             return self.legacy_ztf_client.query_probabilities(
                 oid, format=format, index=index, sort=sort
             )
@@ -450,6 +471,7 @@ class AlerceCommonSearch:
             )
 
         if survey == "ztf" and self.ztf_backend == "legacy":
+            self._warn_legacy_ztf()
             return self.legacy_ztf_client.query_features(
                 oid, format=format, index=index, sort=sort
             )
@@ -495,6 +517,7 @@ class AlerceCommonSearch:
             )
 
         if survey == "ztf" and self.ztf_backend == "legacy":
+            self._warn_legacy_ztf()
             return self.legacy_ztf_client.query_feature(oid, name, format=format)
         elif survey in self.valid_surveys:
             return self.multisurvey_client.query_feature(
@@ -535,6 +558,7 @@ class AlerceCommonSearch:
             )
 
         if survey == "ztf" and self.ztf_backend == "legacy":
+            self._warn_legacy_ztf()
             # legacy ZTFSearch.query_classifiers signature only expects format
             return self.legacy_ztf_client.query_classifiers(format=format)
         elif survey in self.valid_surveys:
@@ -582,6 +606,7 @@ class AlerceCommonSearch:
             )
 
         if survey == "ztf" and self.ztf_backend == "legacy":
+            self._warn_legacy_ztf()
             # legacy ZTFSearch.query_classes accepts only classifier_name, classifier_version and format
             return self.legacy_ztf_client.query_classes(
                 classifier_name, classifier_version, format=format

@@ -25,6 +25,19 @@ class AlerceCommonStamps:
         self.multisurvey_stamps_client = AlerceStampsMultisurvey()
         self.valid_surveys = ["ztf", "lsst"]
 
+    def _warn_legacy_ztf(self):
+        from .common_search import AlerceCommonSearch
+
+        if not AlerceCommonSearch._legacy_ztf_warned:
+            AlerceCommonSearch._legacy_ztf_warned = True
+            warnings.warn(
+                "The default ZTF backend will change from 'legacy' to "
+                "'multisurvey' in a future release. To adopt early, use "
+                "Alerce(ztf_backend='multisurvey').",
+                FutureWarning,
+                stacklevel=3,
+            )
+
     def plot_stamps(self, oid, candid=None, measurement_id=None, survey=None):
         """
         Plot stamp in a notebook given oid. It uses IPython HTML.
@@ -63,6 +76,7 @@ class AlerceCommonStamps:
             )
 
         if survey == "ztf" and self.ztf_backend == "legacy":
+            self._warn_legacy_ztf()
             return self.legacy_stamps_client.plot_stamps(oid=oid, candid=candid)
         elif survey in self.valid_surveys:
             return self.multisurvey_stamps_client.multisurvey_plot_stamps(
@@ -122,6 +136,7 @@ class AlerceCommonStamps:
             )
 
         if survey == "ztf" and self.ztf_backend == "legacy":
+            self._warn_legacy_ztf()
             return self.legacy_stamps_client.get_stamps(
                 oid=oid, candid=candid, format=format
             )

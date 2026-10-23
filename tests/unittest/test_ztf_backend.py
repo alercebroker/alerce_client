@@ -11,6 +11,7 @@ from unittest.mock import MagicMock, patch
 import pytest
 
 from alerce import Alerce
+from alerce.common_search import AlerceCommonSearch
 from alerce.ms_search import AlerceSearchMultiSurvey
 
 ZTF_OID = "ZTF18abeqwzl"
@@ -85,6 +86,10 @@ class TestSearchLegacy:
     def method(self, request):
         return request.param
 
+    @pytest.fixture(autouse=True)
+    def _reset_legacy_warned(self):
+        AlerceCommonSearch._legacy_ztf_warned = False
+
     @pytest.fixture()
     def client(self):
         c = Alerce()
@@ -92,12 +97,13 @@ class TestSearchLegacy:
         return c
 
     def test_ztf_routes_to_legacy(self, client, method):
-        getattr(client, method)(survey="ztf", **SEARCH_METHODS[method])
+        with pytest.warns(FutureWarning, match="default ZTF backend will change"):
+            getattr(client, method)(survey="ztf", **SEARCH_METHODS[method])
         getattr(client.legacy_ztf_client, method).assert_called_once()
         getattr(client.multisurvey_client, method).assert_not_called()
 
     def test_survey_none_routes_to_legacy(self, client, method):
-        with pytest.warns(DeprecationWarning):
+        with pytest.warns((DeprecationWarning, FutureWarning)):
             getattr(client, method)(survey=None, **SEARCH_METHODS[method])
         getattr(client.legacy_ztf_client, method).assert_called_once()
         getattr(client.multisurvey_client, method).assert_not_called()
@@ -135,6 +141,10 @@ class TestStampsLegacy:
     def spec(self, request):
         return request.param
 
+    @pytest.fixture(autouse=True)
+    def _reset_legacy_warned(self):
+        AlerceCommonSearch._legacy_ztf_warned = False
+
     @pytest.fixture()
     def client(self):
         c = Alerce()
@@ -143,7 +153,8 @@ class TestStampsLegacy:
 
     def test_ztf_routes_to_legacy(self, client, spec):
         common, leg, ms, kwargs = spec
-        getattr(client, common)(survey="ztf", **kwargs)
+        with pytest.warns(FutureWarning, match="default ZTF backend will change"):
+            getattr(client, common)(survey="ztf", **kwargs)
         getattr(client.legacy_stamps_client, leg).assert_called_once()
         getattr(client.multisurvey_stamps_client, ms).assert_not_called()
 
