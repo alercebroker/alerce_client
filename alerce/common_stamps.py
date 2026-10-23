@@ -58,7 +58,7 @@ class AlerceCommonStamps:
         if survey is None:
             survey = "ztf"
             warnings.warn(
-                "survey not provided, defaulting to 'ztf'. This will use the legacy ZTF client. This behavior will be deprecated in future versions.",
+                "survey not provided, defaulting to 'ztf'. Pass survey explicitly; this default will be removed in a future release.",
                 DeprecationWarning,
             )
 
@@ -117,7 +117,7 @@ class AlerceCommonStamps:
         if survey is None:
             survey = "ztf"
             warnings.warn(
-                "survey not provided, defaulting to 'ztf'. This will use the legacy ZTF client. This behavior will be deprecated in future versions.",
+                "survey not provided, defaulting to 'ztf'. Pass survey explicitly; this default will be removed in a future release.",
                 DeprecationWarning,
             )
 
