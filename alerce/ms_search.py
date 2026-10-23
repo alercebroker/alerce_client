@@ -58,9 +58,18 @@ class AlerceSearchMultiSurvey(Client):
         q.json_result = q.json_result["items"]
         return q.result(index, sort)
 
-    def query_object(self, survey: str, oid, format: str = "json", **kwargs):
+    def query_object(
+        self,
+        survey: str,
+        oid,
+        format: str = "json",
+        return_survey_extra: bool = True,
+        **kwargs,
+    ):
         self._check_survey_validity(survey)
         params = {"survey_id": survey, "oid": oid}
+        if return_survey_extra:
+            params["return_survey_extra"] = True
         params.update(kwargs)
         q = self._request(
             "GET",

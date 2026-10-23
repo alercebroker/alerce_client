@@ -100,6 +100,7 @@ class AlerceCommonSearch:
         oid,
         format="json",
         survey: str | None = None,
+        return_survey_extra: bool = True,
         **kwargs,
     ):
         """
@@ -116,6 +117,10 @@ class AlerceCommonSearch:
             The survey to query. If None, defaults to 'ztf'. Note: relying on the default
             (omitting the `survey` parameter) is deprecated and will be removed in a future
             release; callers should explicitly pass the desired survey (e.g. `survey='ztf'`).
+        return_survey_extra : bool
+            When True and using the multisurvey backend, include survey-specific
+            fields (e.g. g_r_max, corrected, stellar for ZTF). Ignored by the
+            legacy backend.
         kwargs: dict
             Additional parameters specific to the multisurvey API
 
@@ -133,11 +138,14 @@ class AlerceCommonSearch:
 
         if survey == "ztf" and self.ztf_backend == "legacy":
             self._warn_legacy_ztf()
-            # legacy ZTFSearch.query_object does not accept arbitrary kwargs; forward only supported args
             return self.legacy_ztf_client.query_object(oid, format=format)
         elif survey in self.valid_surveys:
             return self.multisurvey_client.query_object(
-                survey, oid, format=format, **kwargs
+                survey,
+                oid,
+                format=format,
+                return_survey_extra=return_survey_extra,
+                **kwargs,
             )
         else:
             raise ValueError(f"survey must be one of {self.valid_surveys}")

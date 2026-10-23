@@ -336,3 +336,43 @@ class TestMsSearchClasses:
     def test_rejects_invalid_survey(self, ms):
         with pytest.raises(ValueError, match="survey must be one of"):
             ms.query_classes("invalid", "lc_classifier", "2.2.0")
+
+
+class TestReturnSurveyExtra:
+    """return_survey_extra param on query_object."""
+
+    @pytest.fixture()
+    def ms(self):
+        return AlerceSearchMultiSurvey()
+
+    def test_true_by_default(self, ms):
+        mock_result = MagicMock()
+        with patch.object(ms, "_request", return_value=mock_result) as req:
+            ms.query_object("ztf", ZTF_OID)
+            _, call_kwargs = req.call_args
+            assert call_kwargs["params"]["return_survey_extra"] is True
+
+    def test_false_omits_param(self, ms):
+        mock_result = MagicMock()
+        with patch.object(ms, "_request", return_value=mock_result) as req:
+            ms.query_object("ztf", ZTF_OID, return_survey_extra=False)
+            _, call_kwargs = req.call_args
+            assert "return_survey_extra" not in call_kwargs["params"]
+
+    def test_routes_through_common_search(self):
+        client = Alerce(ztf_backend="multisurvey")
+        _mock_search(client)
+        client.query_object(ZTF_OID, survey="ztf", return_survey_extra=True)
+        client.multisurvey_client.query_object.assert_called_once()
+        _, call_kwargs = client.multisurvey_client.query_object.call_args
+        assert call_kwargs["return_survey_extra"] is True
+
+    def test_ignored_by_legacy(self):
+        client = Alerce(ztf_backend="legacy")
+        _mock_search(client)
+        AlerceCommonSearch._legacy_ztf_warned = False
+        with pytest.warns(FutureWarning):
+            client.query_object(ZTF_OID, survey="ztf", return_survey_extra=True)
+        client.legacy_ztf_client.query_object.assert_called_once()
+        _, call_kwargs = client.legacy_ztf_client.query_object.call_args
+        assert "return_survey_extra" not in call_kwargs
