@@ -151,6 +151,31 @@ them with :func:`~alerce.core.Alerce.query_magstats`
   # Getting magstats for an object
   magstats = alerce.query_magstats("ZTF18abbuksn")
 
+Switching to the Multi-Survey Backend
+======================================
+
+By default, ZTF queries use the legacy backend. You can opt in to the
+multi-survey backend, which shares the same codebase as LSST queries:
+
+.. code-block:: python
+
+    from alerce.core import Alerce
+    client = Alerce(ztf_backend="multisurvey")
+
+    detections = client.query_detections("ZTF18abbuksn", survey="ztf")
+
+The multi-survey backend renames some fields (``fid`` becomes ``band``,
+``candid`` becomes ``measurement_id``, etc.) and returns integer OIDs.
+Use ``alerce.compat.to_legacy`` to convert responses back to the legacy
+format:
+
+.. code-block:: python
+
+    from alerce.compat import to_legacy
+    legacy_detections = to_legacy("detections", detections)
+
+See the :doc:`../migration_guide` for the full list of field changes.
+
 Error Handling
 ===============
 

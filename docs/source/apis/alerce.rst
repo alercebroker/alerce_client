@@ -38,6 +38,14 @@ alerce.ztf\_search module
    :undoc-members:
    :show-inheritance:
 
+alerce.compat module
+--------------------
+
+.. automodule:: alerce.compat
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 Module contents
 ---------------
 

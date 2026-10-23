@@ -8,7 +8,11 @@
             "forced_photometry": "lightcurve_api/forced-photometry",
             "non_detections": "lightcurve_api/non_detections",
             "lightcurve": "lightcurve_api/lightcurve",
-            "probabilities": "probability_api/probability"
+            "probabilities": "probability_api/probability",
+            "magstats": "magstat_api/magstats",
+            "features": "features_api/features",
+            "classifiers": "classifier_api/classifiers",
+            "classes": "classifier_api/classes"
         }
     },
     "ztf": {
