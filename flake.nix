@@ -16,7 +16,7 @@
       system:
       let
         pkgs = nixpkgs.legacyPackages.${system};
-        python = pkgs.python3;
+        python = pkgs.python312;
 
         pythonEnv = python.withPackages (
           ps: with ps; [
@@ -50,6 +50,7 @@
         devShells.default = pkgs.mkShell {
           packages = with pkgs; [
             pythonEnv
+            uv
 
             # Formatting / linting
             ruff
@@ -57,6 +58,7 @@
 
             # Notebook diffs and cleanup (alerce_client.ipynb)
             nbstripout
+            quarto
 
             # General utilities
             gh
