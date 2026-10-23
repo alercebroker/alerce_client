@@ -2,7 +2,7 @@
 
 import pytest
 
-from alerce.compat import FIELD_MAP, _OID_ENDPOINTS, decode_ztf_oid, to_legacy
+from alerce.compat import _OID_ENDPOINTS, FIELD_MAP, decode_ztf_oid, to_legacy
 
 # Pre-computed (master_id, ztf_name) pairs.
 # Encoding: survey_prefix | (year * 26^7 + base26_seq)
