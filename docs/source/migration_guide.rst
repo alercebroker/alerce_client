@@ -30,8 +30,8 @@ When you omit the survey parameter, you'll see a deprecation warning:
     # This works but shows a deprecation warning
     objects = client.query_objects(ra=10.0, dec=-20.0, radius=30)
     # DeprecationWarning: survey not provided, defaulting to 'ztf'.
-    # This will use the legacy ZTF client. This behavior will be
-    # deprecated in future versions.
+    # Pass survey explicitly; this default will be removed in a future
+    # release.
 
 Migration Examples
 ------------------
