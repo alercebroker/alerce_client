@@ -428,6 +428,7 @@ class TestMsSearchQueryObjectsAliases:
         mock_result.result.return_value = []
         with patch.object(ms, "_request", return_value=mock_result):
             import warnings as w
+
             with w.catch_warnings():
                 w.simplefilter("error", DeprecationWarning)
                 ms.query_objects("ztf", n_det=[10, 50])

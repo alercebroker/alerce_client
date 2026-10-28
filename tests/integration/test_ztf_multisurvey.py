@@ -285,9 +285,7 @@ def test_ms_get_stamps_auto_candid(ms_client: Alerce) -> None:
 def test_ms_get_avro(ms_client: Alerce) -> None:
     import json
 
-    data: bytes = ms_client.get_avro(
-        ZTF_OID, candid=ZTF_CANDID, survey="ztf"
-    )
+    data: bytes = ms_client.get_avro(ZTF_OID, candid=ZTF_CANDID, survey="ztf")
     assert isinstance(data, bytes)
     assert len(data) > 100
     parsed = json.loads(data)
