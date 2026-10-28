@@ -176,19 +176,18 @@ class AlerceStampsMultisurvey(Client):
         """Download avro of some alert given oid and survey, measurement_id is optional."""
 
         self._check_survey_validity(survey)
-        params = {"survey_id": survey, "oid": oid}
-        if candid is not None:
-            params["candid"] = candid
-        params.update(kwargs)
 
-        measurement_id = kwargs.get("measurement_id")
-
+        measurement_id = candid or kwargs.get("measurement_id")
         if measurement_id is None:
             measurement_id = self._get_first_detection(survey, oid)
 
         try:
             url = self.config["STAMP_URL"] + self.config["AVRO_ROUTES"]["get_avro"]
-            params = {"oid": kwargs.get("oid"), "measurement_id": measurement_id}
+            params = {
+                "oid": oid,
+                "measurement_id": measurement_id,
+                "survey_id": survey,
+            }
             http_response = self.session.request("GET", url, params=params)
             return http_response.content
         except HTTPError:

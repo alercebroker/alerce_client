@@ -12,7 +12,6 @@ from pandas import DataFrame
 
 from alerce.core import Alerce
 
-
 ZTF_OID: str = "ZTF18abbrrty"
 ZTF_CANDID: int = 547355426215010007
 
@@ -281,3 +280,22 @@ def test_ms_get_stamps_auto_candid(ms_client: Alerce) -> None:
     stamps: list = ms_client.get_stamps(ZTF_OID, survey="ztf", format="numpy")
     assert len(stamps) == 3
     assert all(isinstance(s, np.ndarray) for s in stamps)
+
+
+def test_ms_get_avro(ms_client: Alerce) -> None:
+    import json
+
+    data: bytes = ms_client.get_avro(
+        ZTF_OID, candid=ZTF_CANDID, use_multisurvey_api=True, survey="ztf"
+    )
+    assert isinstance(data, bytes)
+    assert len(data) > 100
+    parsed = json.loads(data)
+    assert "candidate" in parsed
+    assert "objectId" in parsed
+
+
+def test_ms_get_avro_auto_candid(ms_client: Alerce) -> None:
+    data: bytes = ms_client.get_avro(ZTF_OID, use_multisurvey_api=True, survey="ztf")
+    assert isinstance(data, bytes)
+    assert len(data) > 100
