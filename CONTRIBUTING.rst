@@ -15,3 +15,16 @@ Steps to create a Pull Request
 5. `Create a PR <https://github.com/alercebroker/alerce_client/pulls>` to the *alercebroker* repository
 
 For a detailed guide check `this link <https://docs.github.com/en/github/collaborating-with-issues-and-pull-requests/creating-a-pull-request-from-a-fork>`_
+
+Pull Request titles
+-------------------
+
+PRs are squash-merged, so the PR title must follow `Conventional Commits <https://www.conventionalcommits.org/>`_
+(e.g. ``fix(stamps): handle double-gzipped FITS``). ``fix`` releases a patch version, ``feat`` a minor version and
+``feat!`` a major version; other types (``docs``, ``ci``, ``chore``, ...) do not trigger a release.
+
+Releases
+--------
+
+Versions are bumped and tagged automatically by python-semantic-release when changes are merged to ``main``.
+A maintainer publishes a GitHub release from the tag to upload the package to PyPI.
