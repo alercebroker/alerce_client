@@ -145,6 +145,7 @@ class AlerceCommonStamps:
                 oid=oid,
                 candid=candid,
                 include_variance_and_psf=include_variance_and_psf,
+                out_format=format,
                 survey=survey,
             )
         else:

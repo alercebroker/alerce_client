@@ -147,14 +147,13 @@ class AlerceStampsMultisurvey(Client):
                 )
                 http_response = self.session.request("GET", url)
 
-                if survey == "ztf" or survey == "lsst":
-                    fits_buffer = gzip.open(io.BytesIO(http_response.content))
-                else:
-                    raise Exception(f"survey {survey} not valid")
+                # The API returns double-gzipped FITS; decompress until
+                # we reach the inner FITS payload.
+                data = http_response.content
+                while data[:2] == b"\x1f\x8b":
+                    data = gzip.decompress(data)
 
-                tmp_hdulist = fits_open(
-                    io.BytesIO(fits_buffer.read()), ignore_missing_simple=True
-                )
+                tmp_hdulist = fits_open(io.BytesIO(data), ignore_missing_simple=True)
 
                 if include_variance_and_psf:
                     stamp_list.append(tmp_hdulist)

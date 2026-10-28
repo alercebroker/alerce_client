@@ -6,6 +6,7 @@ To run against staging during development:
     ALERCE_CONFIG_PATH=staging_config.json pytest tests/integration/test_ztf_multisurvey.py -v
 """
 
+import numpy as np
 import pytest
 from pandas import DataFrame
 
@@ -13,6 +14,7 @@ from alerce.core import Alerce
 
 
 ZTF_OID: str = "ZTF18abbrrty"
+ZTF_CANDID: int = 547355426215010007
 
 
 @pytest.fixture
@@ -242,3 +244,40 @@ def test_format_probabilities_pandas(ms_client: Alerce) -> None:
     )
     assert isinstance(result, DataFrame)
     assert "classifier_name" in result.columns
+
+
+# -- Stamps ------------------------------------------------------------------
+
+
+def test_ms_get_stamps_numpy(ms_client: Alerce) -> None:
+    stamps: list = ms_client.get_stamps(
+        ZTF_OID, candid=ZTF_CANDID, survey="ztf", format="numpy"
+    )
+    assert len(stamps) == 3
+    for arr in stamps:
+        assert isinstance(arr, np.ndarray)
+        assert arr.shape == (63, 63)
+
+
+def test_ms_get_stamps_hdulist(ms_client: Alerce) -> None:
+    stamps: dict = ms_client.get_stamps(
+        ZTF_OID, candid=ZTF_CANDID, survey="ztf", format="HDUList"
+    )
+    assert isinstance(stamps, dict)
+    expected_keys = {"cutoutScience", "cutoutTemplate", "cutoutDifference"}
+    assert set(stamps.keys()) == expected_keys
+    for hdu in stamps.values():
+        assert hdu.data.shape == (63, 63)
+
+
+def test_ms_get_stamps_measurement_id_kwarg(ms_client: Alerce) -> None:
+    stamps: list = ms_client.get_stamps(
+        ZTF_OID, measurement_id=ZTF_CANDID, survey="ztf", format="numpy"
+    )
+    assert len(stamps) == 3
+
+
+def test_ms_get_stamps_auto_candid(ms_client: Alerce) -> None:
+    stamps: list = ms_client.get_stamps(ZTF_OID, survey="ztf", format="numpy")
+    assert len(stamps) == 3
+    assert all(isinstance(s, np.ndarray) for s in stamps)
