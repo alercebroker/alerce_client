@@ -1,0 +1,5 @@
+target-version = "py310"
+line-length = 88
+
+[format]
+quote-style = "double"
