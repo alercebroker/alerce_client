@@ -151,7 +151,7 @@ class AlerceCommonStamps:
         else:
             raise ValueError(f"survey must be one of {self.valid_surveys}")
 
-    def get_avro(self, oid, candid=None, use_multisurvey_api=False, survey=None):
+    def get_avro(self, oid, candid=None, survey=None):
         """
         Download avro of some alert.
 
@@ -161,10 +161,11 @@ class AlerceCommonStamps:
             Object ID in ALeRCE DBs.
         candid : int, optional
             Candid of the avro to be downloaded. If None, uses the first detection.
-        use_multisurvey_api : bool
-            If True, uses the multisurvey API. Requires `survey` parameter.
         survey : str, optional
-            The survey to query. Required when use_multisurvey_api is True.
+            The survey to query. If None, defaults to 'ztf'. Note: relying on
+            the default (omitting the `survey` parameter) is deprecated and will
+            be removed in a future release; callers should explicitly pass the
+            desired survey (e.g. `survey='ztf'`).
 
         Returns
         -------
@@ -174,19 +175,22 @@ class AlerceCommonStamps:
         Raises
         ------
         ValueError
-            If use_multisurvey_api is True and survey is not provided.
-        NotImplementedError
-            If multisurvey get_avro is not implemented.
+            If the survey is not in the list of valid surveys.
         """
-        if use_multisurvey_api:
-            if survey is None:
-                raise ValueError(
-                    "survey must be provided when use_multisurvey_api is True"
-                )
-            if not hasattr(self.multisurvey_stamps_client, "multisurvey_get_avro"):
-                raise NotImplementedError("Multisurvey get_avro not implemented.")
+        if survey is None:
+            survey = "ztf"
+            warnings.warn(
+                "survey not provided, defaulting to 'ztf'. Pass survey explicitly; "
+                "this default will be removed in a future release.",
+                DeprecationWarning,
+            )
+
+        if survey == "ztf" and self.ztf_backend == "legacy":
+            self._warn_legacy_ztf()
+            return self.legacy_stamps_client.get_avro(oid, candid=candid)
+        elif survey in self.valid_surveys:
             return self.multisurvey_stamps_client.multisurvey_get_avro(
                 survey=survey, oid=oid, candid=candid
             )
         else:
-            return self.legacy_stamps_client.get_avro(oid, candid=candid)
+            raise ValueError(f"survey must be one of {self.valid_surveys}")

@@ -107,6 +107,15 @@ class TestToLegacyOidConversion:
         result = to_legacy(endpoint, record)
         assert result["oid"] == "ZTF18abbrrty"
 
+    def test_int_oid_decoded_for_non_detections(self):
+        master_id = 36028941604196290
+        record = {"oid": master_id, "band": 2, "survey_id": 1, "diffmaglim": 20.5}
+        result = to_legacy("non_detections", record)
+        assert isinstance(result["oid"], str), (
+            "non_detections integer OID should be decoded to a ZTF name"
+        )
+        assert result["oid"] == "ZTF18abbrrty"
+
     def test_no_oid_conversion_for_magstats(self):
         record = {"oid": 36028941604196290, "band": 1}
         result = to_legacy("magstats", record)

@@ -251,6 +251,7 @@ class AlerceSearchMultiSurvey(Client):
     ):
         self._check_survey_validity(survey)
         params = {
+            "survey_id": survey,
             "classifier_name": classifier_name,
             "classifier_version": classifier_version,
         }

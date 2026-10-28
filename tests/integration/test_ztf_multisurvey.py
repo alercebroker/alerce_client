@@ -286,7 +286,7 @@ def test_ms_get_avro(ms_client: Alerce) -> None:
     import json
 
     data: bytes = ms_client.get_avro(
-        ZTF_OID, candid=ZTF_CANDID, use_multisurvey_api=True, survey="ztf"
+        ZTF_OID, candid=ZTF_CANDID, survey="ztf"
     )
     assert isinstance(data, bytes)
     assert len(data) > 100
@@ -296,6 +296,6 @@ def test_ms_get_avro(ms_client: Alerce) -> None:
 
 
 def test_ms_get_avro_auto_candid(ms_client: Alerce) -> None:
-    data: bytes = ms_client.get_avro(ZTF_OID, use_multisurvey_api=True, survey="ztf")
+    data: bytes = ms_client.get_avro(ZTF_OID, survey="ztf")
     assert isinstance(data, bytes)
     assert len(data) > 100

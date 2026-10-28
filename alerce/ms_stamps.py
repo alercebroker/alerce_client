@@ -147,10 +147,11 @@ class AlerceStampsMultisurvey(Client):
                 )
                 http_response = self.session.request("GET", url)
 
-                # The API returns double-gzipped FITS; decompress until
-                # we reach the inner FITS payload.
-                data = http_response.content
-                while data[:2] == b"\x1f\x8b":
+                # ZTF stamps arrive double-gzipped (stored gzipped, server
+                # gzips again); LSST stamps are single-gzipped.
+                _GZIP_MAGIC = b"\x1f\x8b"
+                data = gzip.decompress(http_response.content)
+                if data[:2] == _GZIP_MAGIC:
                     data = gzip.decompress(data)
 
                 tmp_hdulist = fits_open(io.BytesIO(data), ignore_missing_simple=True)

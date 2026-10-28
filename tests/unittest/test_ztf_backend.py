@@ -179,6 +179,38 @@ class TestStampsMultisurvey:
         getattr(client.legacy_stamps_client, leg).assert_not_called()
 
 
+class TestGetAvroRouting:
+    """get_avro should honor ztf_backend, like get_stamps and plot_stamps."""
+
+    @pytest.fixture(autouse=True)
+    def _reset_legacy_warned(self):
+        AlerceCommonSearch._legacy_ztf_warned = False
+
+    @staticmethod
+    def _mock_avro(client):
+        client.legacy_stamps_client.get_avro = MagicMock(return_value=b"legacy")
+        client.multisurvey_stamps_client.multisurvey_get_avro = MagicMock(
+            return_value=b"multi"
+        )
+
+    def test_multisurvey_backend_routes_to_multisurvey(self):
+        client = Alerce(ztf_backend="multisurvey")
+        self._mock_avro(client)
+        result = client.get_avro(oid=ZTF_OID, candid=123, survey="ztf")
+        client.multisurvey_stamps_client.multisurvey_get_avro.assert_called_once()
+        client.legacy_stamps_client.get_avro.assert_not_called()
+        assert result == b"multi"
+
+    def test_legacy_backend_routes_to_legacy(self):
+        client = Alerce(ztf_backend="legacy")
+        self._mock_avro(client)
+        with pytest.warns(FutureWarning):
+            result = client.get_avro(oid=ZTF_OID, candid=123, survey="ztf")
+        client.legacy_stamps_client.get_avro.assert_called_once()
+        client.multisurvey_stamps_client.multisurvey_get_avro.assert_not_called()
+        assert result == b"legacy"
+
+
 class TestMultisurveyGuardRemoval:
     """The multisurvey clients should accept 'ztf' as a valid survey."""
 
@@ -330,12 +362,22 @@ class TestMsSearchClasses:
                 "GET",
                 url=ms._get_survey_url("classes"),
                 params={
+                    "survey_id": "ztf",
                     "classifier_name": "lc_classifier",
                     "classifier_version": "2.2.0",
                 },
                 result_format="json",
                 response_field=None,
             )
+
+    def test_params_include_survey_id(self, ms):
+        mock_result = MagicMock()
+        mock_result.result.return_value = []
+        with patch.object(ms, "_request", return_value=mock_result) as req:
+            ms.query_classes("ztf", "lc_classifier", "2.2.0")
+            _, kwargs = req.call_args
+            assert "survey_id" in kwargs["params"]
+            assert kwargs["params"]["survey_id"] == "ztf"
 
     def test_rejects_invalid_survey(self, ms):
         with pytest.raises(ValueError, match="survey must be one of"):

@@ -1,5 +1,6 @@
+import gzip
 import os
-from unittest.mock import patch
+from unittest.mock import MagicMock, patch
 from urllib.error import HTTPError
 
 import numpy as np
@@ -7,6 +8,7 @@ import pytest
 from astropy.io.fits import HDUList
 
 from alerce.core import Alerce
+from alerce.ms_stamps import AlerceStampsMultisurvey
 
 FILE_PATH = os.path.dirname(__file__)
 EXAMPLE_PATH = os.path.join(FILE_PATH, "../examples/example.fits.gz")
@@ -85,3 +87,34 @@ def test_get_avro_invalid_oid(mock_fits):
     with pytest.warns(RuntimeWarning):
         result = alerce.get_avro(oid="INVALID_OID", candid="570448435315010000")
         assert result is None
+
+
+class TestGzipDecompression:
+    """multisurvey_get_stamps handles single-gzipped (LSST) and
+    double-gzipped (ZTF) FITS responses."""
+
+    @pytest.mark.filterwarnings("ignore:Keyword name")
+    @patch("requests.Session.request")
+    def test_single_gzip(self, mock_request):
+        raw_fits = gzip.decompress(EXAMPLE_FITS.content)
+        mock_request.return_value = Dummy(gzip.compress(raw_fits))
+
+        client = AlerceStampsMultisurvey()
+        with patch.object(client, "_get_first_detection", return_value=999):
+            result = client.multisurvey_get_stamps(
+                survey="lsst", oid=123, candid=999, out_format="numpy"
+            )
+        assert len(result) == 3
+
+    @pytest.mark.filterwarnings("ignore:Keyword name")
+    @patch("requests.Session.request")
+    def test_double_gzip(self, mock_request):
+        raw_fits = gzip.decompress(EXAMPLE_FITS.content)
+        mock_request.return_value = Dummy(gzip.compress(gzip.compress(raw_fits)))
+
+        client = AlerceStampsMultisurvey()
+        with patch.object(client, "_get_first_detection", return_value=999):
+            result = client.multisurvey_get_stamps(
+                survey="ztf", oid="ZTF18abeqwzl", candid=999, out_format="numpy"
+            )
+        assert len(result) == 3

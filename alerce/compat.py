@@ -30,7 +30,7 @@ FIELD_MAP: dict[str, dict[str, str]] = {
     },
 }
 
-_OID_ENDPOINTS = {"object", "detections", "forced_photometry"}
+_OID_ENDPOINTS = {"object", "detections", "non_detections", "forced_photometry"}
 
 _SURVEY_PREFIX_BITS = 8
 _OID_MASK = (1 << (63 - _SURVEY_PREFIX_BITS)) - 1
