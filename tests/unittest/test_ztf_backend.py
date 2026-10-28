@@ -342,6 +342,55 @@ class TestMsSearchClasses:
             ms.query_classes("invalid", "lc_classifier", "2.2.0")
 
 
+class TestMsSearchQueryObjectsAliases:
+    """Legacy param aliases in AlerceSearchMultiSurvey.query_objects."""
+
+    @pytest.fixture()
+    def ms(self):
+        return AlerceSearchMultiSurvey()
+
+    def test_ndet_aliased_to_n_det(self, ms):
+        mock_result = MagicMock()
+        mock_result.json_result = {"items": []}
+        mock_result.result.return_value = []
+        with patch.object(ms, "_request", return_value=mock_result) as req:
+            with pytest.warns(DeprecationWarning, match="ndet.*n_det"):
+                ms.query_objects("ztf", ndet=[10, 50])
+            _, call_kwargs = req.call_args
+            assert call_kwargs["params"]["n_det"] == [10, 50]
+            assert "ndet" not in call_kwargs["params"]
+
+    def test_order_by_ndet_aliased(self, ms):
+        mock_result = MagicMock()
+        mock_result.json_result = {"items": []}
+        mock_result.result.return_value = []
+        with patch.object(ms, "_request", return_value=mock_result) as req:
+            with pytest.warns(DeprecationWarning, match="ndet.*n_det"):
+                ms.query_objects("ztf", order_by="ndet")
+            _, call_kwargs = req.call_args
+            assert call_kwargs["params"]["order_by"] == "n_det"
+
+    def test_order_by_deltajd_aliased(self, ms):
+        mock_result = MagicMock()
+        mock_result.json_result = {"items": []}
+        mock_result.result.return_value = []
+        with patch.object(ms, "_request", return_value=mock_result) as req:
+            with pytest.warns(DeprecationWarning, match="deltajd.*deltamjd"):
+                ms.query_objects("ztf", order_by="deltajd")
+            _, call_kwargs = req.call_args
+            assert call_kwargs["params"]["order_by"] == "deltamjd"
+
+    def test_n_det_passes_without_warning(self, ms):
+        mock_result = MagicMock()
+        mock_result.json_result = {"items": []}
+        mock_result.result.return_value = []
+        with patch.object(ms, "_request", return_value=mock_result):
+            import warnings as w
+            with w.catch_warnings():
+                w.simplefilter("error", DeprecationWarning)
+                ms.query_objects("ztf", n_det=[10, 50])
+
+
 class TestReturnSurveyExtra:
     """return_survey_extra param on query_object."""
 

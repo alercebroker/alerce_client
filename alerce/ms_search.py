@@ -1,6 +1,11 @@
+import warnings
+
 from .utils import Client, load_config
 
 VALID_SURVEYS = ["lsst", "ztf"]
+
+_PARAM_ALIASES = {"ndet": "n_det"}
+_ORDER_BY_ALIASES = {"ndet": "n_det", "deltajd": "deltamjd"}
 
 
 class AlerceSearchMultiSurvey(Client):
@@ -44,6 +49,23 @@ class AlerceSearchMultiSurvey(Client):
         self._check_survey_validity(survey)
         params = {"survey": survey}
         params.update(kwargs)
+        for old, new in _PARAM_ALIASES.items():
+            if old in params:
+                warnings.warn(
+                    f"Parameter '{old}' is deprecated, use '{new}' instead.",
+                    DeprecationWarning,
+                    stacklevel=3,
+                )
+                params[new] = params.pop(old)
+        if "order_by" in params and params["order_by"] in _ORDER_BY_ALIASES:
+            old_val = params["order_by"]
+            new_val = _ORDER_BY_ALIASES[old_val]
+            warnings.warn(
+                f"order_by='{old_val}' is deprecated, use '{new_val}' instead.",
+                DeprecationWarning,
+                stacklevel=3,
+            )
+            params["order_by"] = new_val
         for key in params:
             if key not in valid_params:
                 raise ValueError(f"Invalid parameter: {key}")
