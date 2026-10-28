@@ -30,6 +30,14 @@ jobs:
     - name: Build a binary wheel and a source tarball
       run: |
         python -m build --sdist --wheel --outdir dist/ .
+    # 2.1.0 shipped without default_config.json; install the wheel in a clean
+    # venv, outside the source tree, and load the config before uploading.
+    - name: Smoke-test the wheel
+      run: |
+        python -m venv "$RUNNER_TEMP/smoke"
+        "$RUNNER_TEMP/smoke/bin/pip" install dist/*.whl
+        cd "$RUNNER_TEMP"
+        "$RUNNER_TEMP/smoke/bin/python" -c "from alerce.utils import load_config; assert load_config(None); from alerce.core import Alerce; Alerce()"
     - name: Publish Python distribution to PyPI
       uses: pypa/gh-action-pypi-publish@7245906fb61fa33a13554f9d5fb856fe61758086 # v1.14.3
       with:
