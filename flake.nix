@@ -28,6 +28,10 @@
             ruff
             basedpyright
 
+            # GitHub Actions auditing
+            zizmor
+            actionlint
+
             # Notebook rendering
             quarto
 
@@ -51,12 +55,14 @@
 
             source .venv/bin/activate
 
-            if [ ! -f .venv/.installed ]; then
+            # Reinstall whenever the requirements change.
+            req_hash=$(cat requirements.txt requirements-dev.txt | sha256sum | cut -d' ' -f1)
+            if [ "$(cat .venv/.installed 2>/dev/null)" != "$req_hash" ]; then
               uv pip install -r requirements.txt -r requirements-dev.txt \
                 -e . \
-                pytest pytest-cov pytest-xdist coverage build \
+                pytest-cov pytest-xdist build \
                 ipykernel itables
-              touch .venv/.installed
+              echo "$req_hash" > .venv/.installed
             fi
           '';
         };
