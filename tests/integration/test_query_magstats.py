@@ -8,7 +8,7 @@ def client():
 
 
 ZTF_OID = "ZTF18abeqwzl"
-LSST_OID = 169298433191444990
+LSST_OID = 171141215992414254
 
 
 def test_query_magstats_ztf_legacy(client):
@@ -19,8 +19,9 @@ def test_query_magstats_ztf_legacy(client):
 
 
 def test_query_magstats_lsst(client):
-    with pytest.raises(NotImplementedError):
-        result = client.query_magstats(LSST_OID, survey="lsst")
+    result = client.query_magstats(LSST_OID, survey="lsst")
+    assert isinstance(result, list)
+    assert len(result) > 0
 
 
 def test_query_magstats_invalid_survey(client):

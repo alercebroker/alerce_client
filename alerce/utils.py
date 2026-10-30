@@ -1,17 +1,18 @@
-import json
-
 import copy
+import json
+from typing import Any, Literal
 
-from typing import Dict, Any
+ZtfBackend = Literal["legacy", "multisurvey"]
 
-from pandas import DataFrame, read_csv
-from io import StringIO
-from astropy.table import Table
-
-from .exceptions import handle_error, FormatValidationError
-import requests
 import abc
 import os
+from io import StringIO
+
+import requests
+from astropy.table import Table
+from pandas import DataFrame, read_csv
+
+from .exceptions import FormatValidationError, handle_error
 
 
 class Result(abc.ABC):
@@ -27,7 +28,6 @@ class Result(abc.ABC):
         :returns: the processed dataframe
 
         """
-        pass
 
     @abc.abstractmethod
     def to_votable(self):
@@ -175,7 +175,7 @@ class Client:
         return ResultJson(resp.json(), format=result_format)
 
 
-def load_config(service) -> Dict[str, Any]:
+def load_config(service) -> dict[str, Any]:
     """ """
     default_config_path = os.path.join(
         os.path.dirname(os.path.abspath(__file__)), "default_config.json"

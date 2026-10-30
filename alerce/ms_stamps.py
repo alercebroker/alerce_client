@@ -1,14 +1,17 @@
-import warnings
 import gzip
 import io
-from .utils import Client, load_config
-from astropy.io.fits import open as fits_open
+import warnings
 from urllib.error import HTTPError
-from alerce.ms_search import AlerceSearchMultiSurvey
-from alerce.exceptions import CandidError
-from .ms_stamp_utils import create_stamp_parameters
+
 import matplotlib.pyplot as plt
+from astropy.io.fits import open as fits_open
 from PIL import Image
+
+from alerce.exceptions import CandidError
+from alerce.ms_search import AlerceSearchMultiSurvey
+
+from .ms_stamp_utils import create_stamp_parameters
+from .utils import Client, load_config
 
 VALID_SURVEYS = ["lsst", "ztf"]
 
@@ -31,8 +34,9 @@ class AlerceStampsMultisurvey(Client):
 
     def _in_ipynb(self):
         try:
-            from IPython import get_ipython
             import os
+
+            from IPython import get_ipython
 
             if "IPKernelApp" not in get_ipython().config:  # pragma: no cover
                 raise ImportError("console")
@@ -62,13 +66,6 @@ class AlerceStampsMultisurvey(Client):
         return int(measurement_id)
 
     def _check_survey_validity(self, survey):
-        if survey == "ztf":
-            warnings.warn(
-                "ZTF is not yet supported in the stamp multisurvey API.", UserWarning
-            )
-            raise NotImplementedError(
-                "ZTF is not yet supported in the multisurvey API."
-            )
         if survey not in VALID_SURVEYS:
             raise ValueError(f"survey must be one of {VALID_SURVEYS}")
 
@@ -150,14 +147,14 @@ class AlerceStampsMultisurvey(Client):
                 )
                 http_response = self.session.request("GET", url)
 
-                if survey == "ztf" or survey == "lsst":
-                    fits_buffer = gzip.open(io.BytesIO(http_response.content))
-                else:
-                    raise Exception(f"survey {survey} not valid")
+                # ZTF stamps arrive double-gzipped (stored gzipped, server
+                # gzips again); LSST stamps are single-gzipped.
+                _GZIP_MAGIC = b"\x1f\x8b"
+                data = gzip.decompress(http_response.content)
+                if data[:2] == _GZIP_MAGIC:
+                    data = gzip.decompress(data)
 
-                tmp_hdulist = fits_open(
-                    io.BytesIO(fits_buffer.read()), ignore_missing_simple=True
-                )
+                tmp_hdulist = fits_open(io.BytesIO(data), ignore_missing_simple=True)
 
                 if include_variance_and_psf:
                     stamp_list.append(tmp_hdulist)
@@ -180,19 +177,18 @@ class AlerceStampsMultisurvey(Client):
         """Download avro of some alert given oid and survey, measurement_id is optional."""
 
         self._check_survey_validity(survey)
-        params = {"survey_id": survey, "oid": oid}
-        if candid is not None:
-            params["candid"] = candid
-        params.update(kwargs)
 
-        measurement_id = kwargs.get("measurement_id")
-
+        measurement_id = candid or kwargs.get("measurement_id")
         if measurement_id is None:
             measurement_id = self._get_first_detection(survey, oid)
 
         try:
             url = self.config["STAMP_URL"] + self.config["AVRO_ROUTES"]["get_avro"]
-            params = {"oid": kwargs.get("oid"), "measurement_id": measurement_id}
+            params = {
+                "oid": oid,
+                "measurement_id": measurement_id,
+                "survey_id": survey,
+            }
             http_response = self.session.request("GET", url, params=params)
             return http_response.content
         except HTTPError:

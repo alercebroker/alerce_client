@@ -1,6 +1,7 @@
 from .common_search import AlerceCommonSearch
-from .crossmatch import AlerceXmatch
 from .common_stamps import AlerceCommonStamps
+from .crossmatch import AlerceXmatch
+from .utils import ZtfBackend
 
 
 class Alerce(AlerceCommonSearch, AlerceXmatch, AlerceCommonStamps):
@@ -52,7 +53,11 @@ class Alerce(AlerceCommonSearch, AlerceXmatch, AlerceCommonStamps):
     migration_guide : Guide for migrating to the multi-survey API
     """
 
-    def __init__(self, **kwargs):
-        AlerceCommonSearch.__init__(self, **kwargs)
+    def __init__(self, ztf_backend: ZtfBackend = "legacy", **kwargs):
+        _valid = ("legacy", "multisurvey")
+        if ztf_backend not in _valid:
+            raise ValueError(f"ztf_backend must be one of {_valid}")
+        self.ztf_backend = ztf_backend
+        AlerceCommonSearch.__init__(self, ztf_backend=ztf_backend, **kwargs)
         AlerceXmatch.__init__(self, **kwargs)
-        AlerceCommonStamps.__init__(self, **kwargs)
+        AlerceCommonStamps.__init__(self, ztf_backend=ztf_backend, **kwargs)

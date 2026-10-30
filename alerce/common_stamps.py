@@ -1,6 +1,8 @@
+import warnings
+
 from .ms_stamps import AlerceStampsMultisurvey
 from .stamps import AlerceStamps
-import warnings
+from .utils import ZtfBackend
 
 
 class AlerceCommonStamps:
@@ -13,17 +15,28 @@ class AlerceCommonStamps:
     providing a single entry point for all stamp operations.
     """
 
-    def __init__(self, **kwargs):
+    def __init__(self, ztf_backend: ZtfBackend = "legacy", **kwargs):
         """
         Initializes the AlerceCommonStamps class with clients for legacy ZTF
         and multisurvey stamps.
-
-        Parameters
-        ----------
         """
+        self.ztf_backend = ztf_backend
         self.legacy_stamps_client = AlerceStamps()
         self.multisurvey_stamps_client = AlerceStampsMultisurvey()
         self.valid_surveys = ["ztf", "lsst"]
+
+    def _warn_legacy_ztf(self):
+        from .common_search import AlerceCommonSearch
+
+        if not AlerceCommonSearch._legacy_ztf_warned:
+            AlerceCommonSearch._legacy_ztf_warned = True
+            warnings.warn(
+                "The default ZTF backend will change from 'legacy' to "
+                "'multisurvey' in a future release. To adopt early, use "
+                "Alerce(ztf_backend='multisurvey').",
+                FutureWarning,
+                stacklevel=3,
+            )
 
     def plot_stamps(self, oid, candid=None, measurement_id=None, survey=None):
         """
@@ -58,11 +71,12 @@ class AlerceCommonStamps:
         if survey is None:
             survey = "ztf"
             warnings.warn(
-                "survey not provided, defaulting to 'ztf'. This will use the legacy ZTF client. This behavior will be deprecated in future versions.",
+                "survey not provided, defaulting to 'ztf'. Pass survey explicitly; this default will be removed in a future release.",
                 DeprecationWarning,
             )
 
-        if survey == "ztf":
+        if survey == "ztf" and self.ztf_backend == "legacy":
+            self._warn_legacy_ztf()
             return self.legacy_stamps_client.plot_stamps(oid=oid, candid=candid)
         elif survey in self.valid_surveys:
             return self.multisurvey_stamps_client.multisurvey_plot_stamps(
@@ -117,11 +131,12 @@ class AlerceCommonStamps:
         if survey is None:
             survey = "ztf"
             warnings.warn(
-                "survey not provided, defaulting to 'ztf'. This will use the legacy ZTF client. This behavior will be deprecated in future versions.",
+                "survey not provided, defaulting to 'ztf'. Pass survey explicitly; this default will be removed in a future release.",
                 DeprecationWarning,
             )
 
-        if survey == "ztf":
+        if survey == "ztf" and self.ztf_backend == "legacy":
+            self._warn_legacy_ztf()
             return self.legacy_stamps_client.get_stamps(
                 oid=oid, candid=candid, format=format
             )
@@ -130,12 +145,13 @@ class AlerceCommonStamps:
                 oid=oid,
                 candid=candid,
                 include_variance_and_psf=include_variance_and_psf,
+                out_format=format,
                 survey=survey,
             )
         else:
             raise ValueError(f"survey must be one of {self.valid_surveys}")
 
-    def get_avro(self, oid, candid=None, use_multisurvey_api=False, survey=None):
+    def get_avro(self, oid, candid=None, survey=None):
         """
         Download avro of some alert.
 
@@ -145,10 +161,11 @@ class AlerceCommonStamps:
             Object ID in ALeRCE DBs.
         candid : int, optional
             Candid of the avro to be downloaded. If None, uses the first detection.
-        use_multisurvey_api : bool
-            If True, uses the multisurvey API. Requires `survey` parameter.
         survey : str, optional
-            The survey to query. Required when use_multisurvey_api is True.
+            The survey to query. If None, defaults to 'ztf'. Note: relying on
+            the default (omitting the `survey` parameter) is deprecated and will
+            be removed in a future release; callers should explicitly pass the
+            desired survey (e.g. `survey='ztf'`).
 
         Returns
         -------
@@ -158,19 +175,22 @@ class AlerceCommonStamps:
         Raises
         ------
         ValueError
-            If use_multisurvey_api is True and survey is not provided.
-        NotImplementedError
-            If multisurvey get_avro is not implemented.
+            If the survey is not in the list of valid surveys.
         """
-        if use_multisurvey_api:
-            if survey is None:
-                raise ValueError(
-                    "survey must be provided when use_multisurvey_api is True"
-                )
-            if not hasattr(self.multisurvey_stamps_client, "multisurvey_get_avro"):
-                raise NotImplementedError("Multisurvey get_avro not implemented.")
+        if survey is None:
+            survey = "ztf"
+            warnings.warn(
+                "survey not provided, defaulting to 'ztf'. Pass survey explicitly; "
+                "this default will be removed in a future release.",
+                DeprecationWarning,
+            )
+
+        if survey == "ztf" and self.ztf_backend == "legacy":
+            self._warn_legacy_ztf()
+            return self.legacy_stamps_client.get_avro(oid, candid=candid)
+        elif survey in self.valid_surveys:
             return self.multisurvey_stamps_client.multisurvey_get_avro(
                 survey=survey, oid=oid, candid=candid
             )
         else:
-            return self.legacy_stamps_client.get_avro(oid, candid=candid)
+            raise ValueError(f"survey must be one of {self.valid_surveys}")

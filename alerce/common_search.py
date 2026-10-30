@@ -1,6 +1,8 @@
-from .ztf_search import ZTFSearch
-from .ms_search import AlerceSearchMultiSurvey
 import warnings
+
+from .ms_search import AlerceSearchMultiSurvey
+from .utils import ZtfBackend
+from .ztf_search import ZTFSearch
 
 
 class AlerceCommonSearch:
@@ -14,14 +16,28 @@ class AlerceCommonSearch:
     providing a single entry point for all queries.
     """
 
-    def __init__(self, **kwargs):
+    _legacy_ztf_warned = False
+
+    def __init__(self, ztf_backend: ZtfBackend = "legacy", **kwargs):
         """
         Initializes the AlerceCommonSearch class with clients for legacy ZTF
         and multisurvey data.
         """
+        self.ztf_backend = ztf_backend
         self.legacy_ztf_client = ZTFSearch()
         self.multisurvey_client = AlerceSearchMultiSurvey()
         self.valid_surveys = ["ztf", "lsst"]
+
+    def _warn_legacy_ztf(self):
+        if not AlerceCommonSearch._legacy_ztf_warned:
+            AlerceCommonSearch._legacy_ztf_warned = True
+            warnings.warn(
+                "The default ZTF backend will change from 'legacy' to "
+                "'multisurvey' in a future release. To adopt early, use "
+                "Alerce(ztf_backend='multisurvey').",
+                FutureWarning,
+                stacklevel=3,
+            )
 
     def query_objects(
         self,
@@ -63,11 +79,12 @@ class AlerceCommonSearch:
         if survey is None:
             survey = "ztf"
             warnings.warn(
-                "survey not provided, defaulting to 'ztf'. This will use the legacy ZTF client. This behavior will be deprecated in future versions.",
+                "survey not provided, defaulting to 'ztf'. Pass survey explicitly; this default will be removed in a future release.",
                 DeprecationWarning,
             )
 
-        if survey == "ztf":
+        if survey == "ztf" and self.ztf_backend == "legacy":
+            self._warn_legacy_ztf()
             return self.legacy_ztf_client.query_objects(
                 format=format, index=index, sort=sort, **kwargs
             )
@@ -83,6 +100,7 @@ class AlerceCommonSearch:
         oid,
         format="json",
         survey: str | None = None,
+        return_survey_extra: bool = True,
         **kwargs,
     ):
         """
@@ -99,6 +117,10 @@ class AlerceCommonSearch:
             The survey to query. If None, defaults to 'ztf'. Note: relying on the default
             (omitting the `survey` parameter) is deprecated and will be removed in a future
             release; callers should explicitly pass the desired survey (e.g. `survey='ztf'`).
+        return_survey_extra : bool
+            When True and using the multisurvey backend, include survey-specific
+            fields (e.g. g_r_max, corrected, stellar for ZTF). Ignored by the
+            legacy backend.
         kwargs: dict
             Additional parameters specific to the multisurvey API
 
@@ -110,16 +132,20 @@ class AlerceCommonSearch:
         if survey is None:
             survey = "ztf"
             warnings.warn(
-                "survey not provided, defaulting to 'ztf'. This will use the legacy ZTF client. This behavior will be deprecated in future versions.",
+                "survey not provided, defaulting to 'ztf'. Pass survey explicitly; this default will be removed in a future release.",
                 DeprecationWarning,
             )
 
-        if survey == "ztf":
-            # legacy ZTFSearch.query_object does not accept arbitrary kwargs; forward only supported args
+        if survey == "ztf" and self.ztf_backend == "legacy":
+            self._warn_legacy_ztf()
             return self.legacy_ztf_client.query_object(oid, format=format)
         elif survey in self.valid_surveys:
             return self.multisurvey_client.query_object(
-                survey, oid, format=format, **kwargs
+                survey,
+                oid,
+                format=format,
+                return_survey_extra=return_survey_extra,
+                **kwargs,
             )
         else:
             raise ValueError(f"survey must be one of {self.valid_surveys}")
@@ -152,11 +178,12 @@ class AlerceCommonSearch:
         if survey is None:
             survey = "ztf"
             warnings.warn(
-                "survey not provided, defaulting to 'ztf'. This will use the legacy ZTF client. This behavior will be deprecated in future versions.",
+                "survey not provided, defaulting to 'ztf'. Pass survey explicitly; this default will be removed in a future release.",
                 DeprecationWarning,
             )
 
-        if survey == "ztf":
+        if survey == "ztf" and self.ztf_backend == "legacy":
+            self._warn_legacy_ztf()
             return self.legacy_ztf_client.query_lightcurve(oid, format=format)
         elif survey in self.valid_surveys:
             return self.multisurvey_client.query_lightcurve(survey, oid, format=format)
@@ -197,11 +224,12 @@ class AlerceCommonSearch:
         if survey is None:
             survey = "ztf"
             warnings.warn(
-                "survey not provided, defaulting to 'ztf'. This will use the legacy ZTF client. This behavior will be deprecated in future versions.",
+                "survey not provided, defaulting to 'ztf'. Pass survey explicitly; this default will be removed in a future release.",
                 DeprecationWarning,
             )
 
-        if survey == "ztf":
+        if survey == "ztf" and self.ztf_backend == "legacy":
+            self._warn_legacy_ztf()
             return self.legacy_ztf_client.query_detections(
                 oid, format=format, index=index, sort=sort
             )
@@ -246,11 +274,12 @@ class AlerceCommonSearch:
         if survey is None:
             survey = "ztf"
             warnings.warn(
-                "survey not provided, defaulting to 'ztf'. This will use the legacy ZTF client. This behavior will be deprecated in future versions.",
+                "survey not provided, defaulting to 'ztf'. Pass survey explicitly; this default will be removed in a future release.",
                 DeprecationWarning,
             )
 
-        if survey == "ztf":
+        if survey == "ztf" and self.ztf_backend == "legacy":
+            self._warn_legacy_ztf()
             return self.legacy_ztf_client.query_non_detections(
                 oid, format=format, index=index, sort=sort
             )
@@ -295,11 +324,12 @@ class AlerceCommonSearch:
         if survey is None:
             survey = "ztf"
             warnings.warn(
-                "survey not provided, defaulting to 'ztf'. This will use the legacy ZTF client. This behavior will be deprecated in future versions.",
+                "survey not provided, defaulting to 'ztf'. Pass survey explicitly; this default will be removed in a future release.",
                 DeprecationWarning,
             )
 
-        if survey == "ztf":
+        if survey == "ztf" and self.ztf_backend == "legacy":
+            self._warn_legacy_ztf()
             return self.legacy_ztf_client.query_forced_photometry(
                 oid, format=format, index=index, sort=sort
             )
@@ -344,11 +374,12 @@ class AlerceCommonSearch:
         if survey is None:
             survey = "ztf"
             warnings.warn(
-                "survey not provided, defaulting to 'ztf'. This will use the legacy ZTF client. This behavior will be deprecated in future versions.",
+                "survey not provided, defaulting to 'ztf'. Pass survey explicitly; this default will be removed in a future release.",
                 DeprecationWarning,
             )
 
-        if survey == "ztf":
+        if survey == "ztf" and self.ztf_backend == "legacy":
+            self._warn_legacy_ztf()
             return self.legacy_ztf_client.query_magstats(
                 oid, format=format, index=index, sort=sort
             )
@@ -393,19 +424,16 @@ class AlerceCommonSearch:
         if survey is None:
             survey = "ztf"
             warnings.warn(
-                "survey not provided, defaulting to 'ztf'. This will use the legacy ZTF client. This behavior will be deprecated in future versions.",
+                "survey not provided, defaulting to 'ztf'. Pass survey explicitly; this default will be removed in a future release.",
                 DeprecationWarning,
             )
 
-        if survey == "ztf":
+        if survey == "ztf" and self.ztf_backend == "legacy":
+            self._warn_legacy_ztf()
             return self.legacy_ztf_client.query_probabilities(
                 oid, format=format, index=index, sort=sort
             )
         elif survey in self.valid_surveys:
-            if not hasattr(self.multisurvey_client, "query_probabilities"):
-                raise NotImplementedError(
-                    "Multisurvey query_probabilities not implemented."
-                )
             return self.multisurvey_client.query_probabilities(
                 survey, oid, format=format, index=index, sort=sort
             )
@@ -446,17 +474,16 @@ class AlerceCommonSearch:
         if survey is None:
             survey = "ztf"
             warnings.warn(
-                "survey not provided, defaulting to 'ztf'. This will use the legacy ZTF client. This behavior will be deprecated in future versions.",
+                "survey not provided, defaulting to 'ztf'. Pass survey explicitly; this default will be removed in a future release.",
                 DeprecationWarning,
             )
 
-        if survey == "ztf":
+        if survey == "ztf" and self.ztf_backend == "legacy":
+            self._warn_legacy_ztf()
             return self.legacy_ztf_client.query_features(
                 oid, format=format, index=index, sort=sort
             )
         elif survey in self.valid_surveys:
-            if not hasattr(self.multisurvey_client, "query_features"):
-                raise NotImplementedError("Multisurvey query_features not implemented.")
             return self.multisurvey_client.query_features(
                 survey, oid, format=format, index=index, sort=sort
             )
@@ -493,15 +520,14 @@ class AlerceCommonSearch:
         if survey is None:
             survey = "ztf"
             warnings.warn(
-                "survey not provided, defaulting to 'ztf'. This will use the legacy ZTF client. This behavior will be deprecated in future versions.",
+                "survey not provided, defaulting to 'ztf'. Pass survey explicitly; this default will be removed in a future release.",
                 DeprecationWarning,
             )
 
-        if survey == "ztf":
+        if survey == "ztf" and self.ztf_backend == "legacy":
+            self._warn_legacy_ztf()
             return self.legacy_ztf_client.query_feature(oid, name, format=format)
         elif survey in self.valid_surveys:
-            if not hasattr(self.multisurvey_client, "query_feature"):
-                raise NotImplementedError("Multisurvey query_feature not implemented.")
             return self.multisurvey_client.query_feature(
                 survey, oid, name, format=format
             )
@@ -535,18 +561,15 @@ class AlerceCommonSearch:
         if survey is None:
             survey = "ztf"
             warnings.warn(
-                "survey not provided, defaulting to 'ztf'. This will use the legacy ZTF client. This behavior will be deprecated in future versions.",
+                "survey not provided, defaulting to 'ztf'. Pass survey explicitly; this default will be removed in a future release.",
                 DeprecationWarning,
             )
 
-        if survey == "ztf":
+        if survey == "ztf" and self.ztf_backend == "legacy":
+            self._warn_legacy_ztf()
             # legacy ZTFSearch.query_classifiers signature only expects format
             return self.legacy_ztf_client.query_classifiers(format=format)
         elif survey in self.valid_surveys:
-            if not hasattr(self.multisurvey_client, "query_classifiers"):
-                raise NotImplementedError(
-                    "Multisurvey query_classifiers not implemented."
-                )
             return self.multisurvey_client.query_classifiers(
                 survey, format=format, **kwargs
             )
@@ -586,18 +609,17 @@ class AlerceCommonSearch:
         if survey is None:
             survey = "ztf"
             warnings.warn(
-                "survey not provided, defaulting to 'ztf'. This will use the legacy ZTF client. This behavior will be deprecated in future versions.",
+                "survey not provided, defaulting to 'ztf'. Pass survey explicitly; this default will be removed in a future release.",
                 DeprecationWarning,
             )
 
-        if survey == "ztf":
+        if survey == "ztf" and self.ztf_backend == "legacy":
+            self._warn_legacy_ztf()
             # legacy ZTFSearch.query_classes accepts only classifier_name, classifier_version and format
             return self.legacy_ztf_client.query_classes(
                 classifier_name, classifier_version, format=format
             )
         elif survey in self.valid_surveys:
-            if not hasattr(self.multisurvey_client, "query_classes"):
-                raise NotImplementedError("Multisurvey query_classes not implemented.")
             return self.multisurvey_client.query_classes(
                 survey, classifier_name, classifier_version, format=format, **kwargs
             )

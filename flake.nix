@@ -16,47 +16,20 @@
       system:
       let
         pkgs = nixpkgs.legacyPackages.${system};
-        python = pkgs.python3;
-
-        pythonEnv = python.withPackages (
-          ps: with ps; [
-            # requirements.txt
-            pandas
-            astropy
-            requests
-            ipython
-            matplotlib
-
-            # requirements-dev.txt
-            requests-mock
-            numpydoc
-            sphinx
-            sphinx-autodoc-typehints
-            sphinx-rtd-theme
-
-            # CI tooling (.github/workflows)
-            pytest
-            coverage
-            build
-
-            # Extra development helpers
-            pytest-cov
-            pytest-xdist
-            ipykernel
-          ]
-        );
+        python = pkgs.python312;
       in
       {
         devShells.default = pkgs.mkShell {
           packages = with pkgs; [
-            pythonEnv
+            python
+            uv
 
             # Formatting / linting
             ruff
             basedpyright
 
-            # Notebook diffs and cleanup (alerce_client.ipynb)
-            nbstripout
+            # Notebook rendering
+            quarto
 
             # General utilities
             gh
@@ -66,9 +39,25 @@
             nixfmt
           ];
 
+          env.LD_LIBRARY_PATH = pkgs.lib.makeLibraryPath [
+            pkgs.stdenv.cc.cc.lib
+            pkgs.zlib
+          ];
+
           shellHook = ''
-            # Use the working tree copy of the package without installing it
-            export PYTHONPATH="$PWD''${PYTHONPATH:+:$PYTHONPATH}"
+            if [ ! -d .venv ]; then
+              uv venv --python "${python}/bin/python" .venv
+            fi
+
+            source .venv/bin/activate
+
+            if [ ! -f .venv/.installed ]; then
+              uv pip install -r requirements.txt -r requirements-dev.txt \
+                -e . \
+                pytest pytest-cov pytest-xdist coverage build \
+                ipykernel itables
+              touch .venv/.installed
+            fi
           '';
         };
 

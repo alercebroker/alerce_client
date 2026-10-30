@@ -8,7 +8,8 @@ def client():
 
 
 ZTF_OID = "ZTF18abeqwzl"
-LSST_OID = 169298433191444990
+LSST_OID = 171141215992414254
+LSST_FEATURE_NAME = "Coordinate_x"
 NAME = "feature_name"
 
 
@@ -20,8 +21,10 @@ def test_query_feature_ztf_legacy(client):
 
 
 def test_query_feature_lsst(client):
-    with pytest.raises(NotImplementedError):
-        client.query_feature(LSST_OID, NAME, survey="lsst")
+    result = client.query_feature(LSST_OID, LSST_FEATURE_NAME, survey="lsst")
+    assert isinstance(result, list)
+    assert len(result) > 0
+    assert result[0]["name"] == LSST_FEATURE_NAME
 
 
 def test_query_feature_invalid_survey(client):

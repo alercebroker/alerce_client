@@ -1,9 +1,11 @@
-from .utils import Client, load_config
-
 import warnings
 
+from .utils import Client, load_config
 
 VALID_SURVEYS = ["lsst", "ztf"]
+
+_PARAM_ALIASES = {"ndet": "n_det"}
+_ORDER_BY_ALIASES = {"ndet": "n_det", "deltajd": "deltamjd"}
 
 
 class AlerceSearchMultiSurvey(Client):
@@ -19,13 +21,6 @@ class AlerceSearchMultiSurvey(Client):
         return self.url_ms + self.routes_ms[resource]
 
     def _check_survey_validity(self, survey):
-        if survey == "ztf":
-            warnings.warn(
-                "ZTF is not yet supported in the multisurvey API.", UserWarning
-            )
-            raise NotImplementedError(
-                "ZTF is not yet supported in the multisurvey API."
-            )
         if survey not in VALID_SURVEYS:
             raise ValueError(f"survey must be one of {VALID_SURVEYS}")
 
@@ -54,7 +49,24 @@ class AlerceSearchMultiSurvey(Client):
         self._check_survey_validity(survey)
         params = {"survey": survey}
         params.update(kwargs)
-        for key in params.keys():
+        for old, new in _PARAM_ALIASES.items():
+            if old in params:
+                warnings.warn(
+                    f"Parameter '{old}' is deprecated, use '{new}' instead.",
+                    DeprecationWarning,
+                    stacklevel=3,
+                )
+                params[new] = params.pop(old)
+        if "order_by" in params and params["order_by"] in _ORDER_BY_ALIASES:
+            old_val = params["order_by"]
+            new_val = _ORDER_BY_ALIASES[old_val]
+            warnings.warn(
+                f"order_by='{old_val}' is deprecated, use '{new_val}' instead.",
+                DeprecationWarning,
+                stacklevel=3,
+            )
+            params["order_by"] = new_val
+        for key in params:
             if key not in valid_params:
                 raise ValueError(f"Invalid parameter: {key}")
         q = self._request(
@@ -67,9 +79,18 @@ class AlerceSearchMultiSurvey(Client):
         q.json_result = q.json_result["items"]
         return q.result(index, sort)
 
-    def query_object(self, survey: str, oid, format: str = "json", **kwargs):
+    def query_object(
+        self,
+        survey: str,
+        oid,
+        format: str = "json",
+        return_survey_extra: bool = True,
+        **kwargs,
+    ):
         self._check_survey_validity(survey)
         params = {"survey_id": survey, "oid": oid}
+        if return_survey_extra:
+            params["return_survey_extra"] = True
         params.update(kwargs)
         q = self._request(
             "GET",
@@ -169,18 +190,56 @@ class AlerceSearchMultiSurvey(Client):
     def query_magstats(
         self, survey: str, oid, format: str = "json", index=None, sort=None
     ):
-        raise NotImplementedError("Multisurvey query_magstats not implemented.")
+        self._check_survey_validity(survey)
+        params = {"survey_id": survey, "oid": oid}
+        q = self._request(
+            "GET",
+            url=self._get_survey_url("magstats"),
+            params=params,
+            result_format=format,
+            response_field=None,
+        )
+        return q.result(index, sort)
 
     def query_features(
         self, survey: str, oid, format: str = "json", index=None, sort=None
     ):
-        raise NotImplementedError("Multisurvey query_features not implemented.")
+        self._check_survey_validity(survey)
+        params = {"survey_id": survey, "oid": oid}
+        q = self._request(
+            "GET",
+            url=self._get_survey_url("features"),
+            params=params,
+            result_format=format,
+            response_field=None,
+        )
+        return q.result(index, sort)
 
     def query_feature(self, survey: str, oid, name, format: str = "json", **kwargs):
-        raise NotImplementedError("Multisurvey query_feature not implemented.")
+        self._check_survey_validity(survey)
+        params = {"survey_id": survey, "oid": oid, "name": name}
+        params.update(kwargs)
+        q = self._request(
+            "GET",
+            url=self._get_survey_url("features"),
+            params=params,
+            result_format=format,
+            response_field=None,
+        )
+        return q.result()
 
     def query_classifiers(self, survey: str, format: str = "json", **kwargs):
-        raise NotImplementedError("Multisurvey query_classifiers not implemented.")
+        self._check_survey_validity(survey)
+        params = {"survey_id": survey}
+        params.update(kwargs)
+        q = self._request(
+            "GET",
+            url=self._get_survey_url("classifiers"),
+            params=params,
+            result_format=format,
+            response_field=None,
+        )
+        return q.result()
 
     def query_classes(
         self,
@@ -190,7 +249,21 @@ class AlerceSearchMultiSurvey(Client):
         format: str = "json",
         **kwargs,
     ):
-        raise NotImplementedError("Multisurvey query_classes not implemented.")
+        self._check_survey_validity(survey)
+        params = {
+            "survey_id": survey,
+            "classifier_name": classifier_name,
+            "classifier_version": classifier_version,
+        }
+        params.update(kwargs)
+        q = self._request(
+            "GET",
+            url=self._get_survey_url("classes"),
+            params=params,
+            result_format=format,
+            response_field=None,
+        )
+        return q.result()
 
     def add_band_name(self, messages):
         for message in messages:
