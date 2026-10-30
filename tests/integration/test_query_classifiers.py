@@ -18,8 +18,10 @@ def test_query_classifiers_ztf_legacy(client):
 
 
 def test_query_classifiers_lsst(client):
-    with pytest.raises(NotImplementedError):
-        client.query_classifiers(survey="lsst")
+    result = client.query_classifiers(survey="lsst")
+    assert isinstance(result, list)
+    assert len(result) > 0
+    assert "classifier_name" in result[0]
 
 
 def test_query_classifiers_invalid_survey(client):
