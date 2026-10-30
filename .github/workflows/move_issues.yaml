@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Move issue to New
-        uses: leonsteinhaeuser/project-beta-automations@7f947733020ee03daa363d16ea1223717b132f11 # v2.0.1
+        uses: leonsteinhaeuser/project-beta-automations@939000fb1900c9fc4f7b5058a09d9f833ebc6859 # v2.2.1
         with:
           gh_token: ${{ secrets.ADMIN_TOKEN }}
           organization: alercebroker
