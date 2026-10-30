@@ -1,0 +1,48 @@
+# Checks the GitHub Actions setup: actionlint for correctness (syntax,
+# expressions, shellcheck on run scripts), zizmor for security
+# (https://docs.zizmor.sh/).
+name: Workflow Lint
+
+on:
+  pull_request:
+    paths:
+      - ".github/**"
+  push:
+    branches: [main]
+    paths:
+      - ".github/**"
+
+permissions:
+  contents: read
+
+jobs:
+  actionlint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      # No official action; the maintainer recommends the Docker image.
+      # Dependabot does not track it, so bump the digest by hand.
+      - name: Run actionlint
+        uses: docker://rhysd/actionlint@sha256:b1934ee5f1c509618f2508e6eb47ee0d3520686341fec936f3b79331f9315667 # 1.7.12
+        with:
+          args: -color
+
+  zizmor:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      # Findings are reported as annotations and fail the job; no SARIF upload,
+      # so the workflow needs no security-events permission.
+      - name: Run zizmor
+        uses: zizmorcore/zizmor-action@53290badfa369cb0bf7ad16342cb62c2fa47ac7b # v0.8.0
+        with:
+          version: "1.31.1"
+          advanced-security: false
+          annotations: true
+          # Informational findings (currently: Trusted Publishing, which needs
+          # PyPI admin access) would fail every run.
+          min-severity: low
