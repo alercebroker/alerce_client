@@ -1,34 +1,46 @@
-name: CI
+name: Version
 on:
-  pull_request:
-    types:
-      - closed
+  push:
     branches:
       - main
     paths:
       - 'alerce/**'
+      - 'requirements.txt'
+      - 'setup.py'
 
 # All writes go through ADMIN_TOKEN; GITHUB_TOKEN needs no access.
 permissions: {}
 
+# Never run two releases at once; a queued run picks up the newer commits.
+concurrency:
+  group: version
+  cancel-in-progress: false
+
 jobs:
   versioning:
-    if: github.event.pull_request.merged == true
+    # The release commit pushed by this job touches alerce/ and would retrigger it.
+    if: "!startsWith(github.event.head_commit.message, 'chore(release):')"
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
-        with:
-          python-version: "3.10"
       - name: Checkout code  # zizmor: ignore[artipacked]
-        # Credentials must persist for the final `git push`.
+        # Credentials must persist for the release commit and tag push.
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
+          ref: ${{ github.ref_name }}
           fetch-depth: 0
           token: ${{ secrets.ADMIN_TOKEN }}
+      - name: Pin branch to the triggering commit
+        # Checking out by branch name may pick up commits pushed after this run started.
+        run: git reset --hard "$GITHUB_SHA"
+      # Bumps alerce/__init__.py and docs/source/conf.py, commits and tags.
+      # No GitHub release: publishing one from the tag is the manual gate
+      # that triggers build.yml.
       - name: Semantic Release
-        run: |
-          git config --global user.name "@alerceadmin"
-          git config --global user.email "alerceadmin@users.noreply.github.com"
-          pip install python-semantic-release==7.28.1
-          semantic-release version
-          git push
+        uses: python-semantic-release/python-semantic-release@b700dbeb1f431a0fcc30a79f3f0869407fe07278 # v10.7.0
+        with:
+          github_token: ${{ secrets.ADMIN_TOKEN }}
+          git_committer_name: alerceadmin
+          git_committer_email: alerceadmin@users.noreply.github.com
+          changelog: "false"
+          vcs_release: "false"
+          build: "false"

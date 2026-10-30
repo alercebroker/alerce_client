@@ -10,3 +10,7 @@ updates:
           - "*"
     cooldown:
       default-days: 7
+    # PR titles must be conventional commits; ci does not trigger a release.
+    commit-message:
+      prefix: "ci"
+      include: "scope"
