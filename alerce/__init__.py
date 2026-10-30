@@ -15,5 +15,5 @@ from .core import Alerce
 
 __all__ = ["Alerce"]
 
-# If you update this version, also update it in docs/source/conf.py
-__version__ = "2.4.0"
+# Managed by python-semantic-release (see pyproject.toml); do not edit by hand.
+__version__ = "2.3.1"
