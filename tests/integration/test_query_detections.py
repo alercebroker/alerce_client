@@ -1,9 +1,12 @@
 import pytest
 from alerce.core import Alerce
+from alerce.exceptions import ObjectNotFoundError
 
-# Dummy OIDs for testing
 ZTF_OID = "ZTF18abeqwzl"
-LSST_OID = 169298433191444990
+# Verified on api-lsst.alerce.online and Fink/LSST (2026-11-05).
+LSST_OID = 313721466436714578
+# Not in the database: a single missing OID returns 404, a list returns empty.
+LSST_MISSING_OID = 169298433191444990
 
 
 @pytest.fixture
@@ -28,8 +31,20 @@ def test_query_detections_ztf(client):
 
 def test_query_detections_lsst(client):
     result = client.query_detections(LSST_OID, survey="lsst")
-    print("Multisurvey LSST detections:", result)
-    assert result is not None
+    assert len(result) > 0
+    assert {d["oid"] for d in result} == {LSST_OID}
+
+
+def test_query_detections_lsst_missing_oid(client):
+    with pytest.raises(ObjectNotFoundError):
+        client.query_detections(LSST_MISSING_OID, survey="lsst")
+
+
+def test_query_detections_lsst_missing_oid_list(client):
+    result = client.query_detections(
+        [LSST_MISSING_OID, LSST_MISSING_OID + 1], survey="lsst"
+    )
+    assert result == []
 
 
 def test_query_detections_invalid_survey(client):
